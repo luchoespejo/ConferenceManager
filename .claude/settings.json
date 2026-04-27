@@ -1,0 +1,18 @@
+{
+  "git": {
+    "baseBranch": "main",
+    "integrationBranch": "develop",
+    "pushPolicy": "manual",
+    "commitFormat": "conventional",
+    "branchPatterns": {
+      "feature": "feature/US-{N}-{short-title}",
+      "fix": "fix/US-{N}-{short-title}",
+      "release": "release/{version}"
+    }
+  },
+  "pipeline": {
+    "mode": "with-checkpoints",
+    "devPlanReview": true
+  },
+  "language": "es"
+}

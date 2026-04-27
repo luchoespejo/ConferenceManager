@@ -1,0 +1,29 @@
+# .NET
+backend/bin/
+backend/obj/
+backend/*.user
+backend/appsettings.Development.json
+
+# Angular
+admin/node_modules/
+admin/dist/
+admin/.angular/
+
+# Next.js
+site/node_modules/
+site/.next/
+site/out/
+
+# Env files
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vs/
+*.suo
+.vscode/settings.json
