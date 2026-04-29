@@ -143,7 +143,7 @@ Then the system returns HTTP 401
 - **ID:** US-1
 - **Epic:** E1 — Autenticación y gestión de organizadores
 - **Estimate:** M
-- **Status:** Ready
+- **Status:** Done
 - **Author:** Functional Analyst
 - **Date:** 2026-04-26
-- **Reviewed by PO:** 2026-04-26
+- **Reviewed by PO:** Approved 2026-04-28
