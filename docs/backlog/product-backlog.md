@@ -1,6 +1,6 @@
 # Product Backlog — ConferenceManager
 
-_Última actualización: 2026-04-26 — Product Owner_
+_Última actualización: 2026-04-28 — Product Owner_
 
 ---
 
@@ -22,7 +22,7 @@ _Última actualización: 2026-04-26 — Product Owner_
 
 | ID | Historia | Épica | Prioridad | Tamaño | Estado | Dependencias |
 |----|----------|-------|-----------|--------|--------|--------------|
-| US-1 | Registro y login de organizadores | E1 | 🔴 Alta | M | Pendiente | — |
+| US-1 | Registro y login de organizadores | E1 | 🔴 Alta | M | Done | — |
 | US-2 | Crear y configurar un congreso | E2 | 🔴 Alta | L | Pendiente | US-1 |
 | US-3 | Gestionar salas de un congreso | E2 | 🔴 Alta | S | Pendiente | US-2 |
 | US-4 | Gestionar expositores de un congreso | E2 | 🔴 Alta | M | Pendiente | US-2 |
