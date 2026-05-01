@@ -106,6 +106,37 @@ namespace ConferenceManager.Data.Migrations
                     b.ToTable("conferencias", (string)null);
                 });
 
+            modelBuilder.Entity("ConferenceManager.Models.Sala", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<Guid>("ConferenciaId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int?>("Capacidad")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamptz")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ConferenciaId", "Nombre")
+                        .IsUnique();
+
+                    b.ToTable("salas", (string)null);
+                });
+
             modelBuilder.Entity("ConferenceManager.Models.RefreshToken", b =>
                 {
                     b.Property<Guid>("Id")
@@ -216,6 +247,17 @@ namespace ConferenceManager.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("ConferenceManager.Models.Sala", b =>
+                {
+                    b.HasOne("ConferenceManager.Models.Conferencia", "Conferencia")
+                        .WithMany()
+                        .HasForeignKey("ConferenciaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Conferencia");
                 });
 
             modelBuilder.Entity("ConferenceManager.Models.Usuario", b =>
