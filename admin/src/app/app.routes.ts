@@ -16,5 +16,15 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent)
   },
+  {
+    path: 'congreso/nuevo',
+    canActivate: [authGuard],
+    loadComponent: () => import('./congresos/congreso-form/congreso-form.component').then(m => m.CongresoFormComponent)
+  },
+  {
+    path: 'congreso/:id/configuracion',
+    canActivate: [authGuard],
+    loadComponent: () => import('./congresos/congreso-form/congreso-form.component').then(m => m.CongresoFormComponent)
+  },
   { path: '**', redirectTo: 'dashboard' }
 ];

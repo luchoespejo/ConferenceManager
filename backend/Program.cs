@@ -67,6 +67,7 @@ else
     builder.Services.AddScoped<IEmailService, ResendEmailService>();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IConferenciaService, ConferenciaService>();
 
 // ── Controllers + Swagger ─────────────────────────────────────────────────────
 builder.Services.AddControllers();
