@@ -8,6 +8,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Usuario> Usuarios => Set<Usuario>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
     public DbSet<Conferencia> Conferencias => Set<Conferencia>();
+    public DbSet<Sala> Salas => Set<Sala>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -32,6 +33,13 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         }
 
         foreach (var entry in ChangeTracker.Entries<Conferencia>()
+            .Where(e => e.State == EntityState.Added))
+        {
+            if (entry.Entity.CreatedAt == default)
+                entry.Entity.CreatedAt = DateTime.UtcNow;
+        }
+
+        foreach (var entry in ChangeTracker.Entries<Sala>()
             .Where(e => e.State == EntityState.Added))
         {
             if (entry.Entity.CreatedAt == default)
