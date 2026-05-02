@@ -9,7 +9,7 @@ export class ParticipanteService {
   private http = inject(HttpClient);
 
   private baseUrl(conferenciaId: string) {
-    return `${environment.apiUrl}/dashboard/conferencias/${conferenciaId}/participantes`;
+    return `${environment.apiUrl}/api/dashboard/conferencias/${conferenciaId}/participantes`;
   }
 
   getAll(conferenciaId: string): Observable<Participante[]> {

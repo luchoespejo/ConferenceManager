@@ -9,7 +9,7 @@ export class AvisoUrgenteService {
   private http = inject(HttpClient);
 
   private baseUrl(conferenciaId: string) {
-    return `${environment.apiUrl}/dashboard/conferencias/${conferenciaId}/avisos-urgentes`;
+    return `${environment.apiUrl}/api/dashboard/conferencias/${conferenciaId}/avisos-urgentes`;
   }
 
   getAll(conferenciaId: string): Observable<AvisoUrgente[]> {

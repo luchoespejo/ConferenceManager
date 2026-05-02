@@ -9,7 +9,7 @@ export class ExpositorService {
   private http = inject(HttpClient);
 
   private baseUrl(conferenciaId: string) {
-    return `${environment.apiUrl}/dashboard/conferencias/${conferenciaId}/expositores`;
+    return `${environment.apiUrl}/api/dashboard/conferencias/${conferenciaId}/expositores`;
   }
 
   getAll(conferenciaId: string): Observable<ExpositorListItem[]> {
