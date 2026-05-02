@@ -1,0 +1,2 @@
+- [US-1 Approval Decision](po_approval_us1.md) — US-1 approved 2026-04-28; all acceptance criteria pass, Phase 2 debt documented
+- [US-2 Review & Scope](po_review_us2.md) — US-2 approved 2026-04-28; slug immutable post-pub, cascade delete, monopoly risk accepted

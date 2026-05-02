@@ -69,6 +69,7 @@ else
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IConferenciaService, ConferenciaService>();
 builder.Services.AddScoped<ISalaService, SalaService>();
+builder.Services.AddScoped<IExpositorService, ExpositorService>();
 
 // ── Controllers + Swagger ─────────────────────────────────────────────────────
 builder.Services.AddControllers();
