@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: conference_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: conference_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: conference_backend
+    ports:
+      - "5000:5000"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:5000
+      ConnectionStrings__DefaultConnection: "Host=postgres;Database=conference_db;Username=postgres;Password=postgres"
+      Jwt__SecretKey: "this-is-a-very-long-secret-key-for-jwt-testing-32-chars-min"
+      Jwt__Issuer: "ConferenceManager"
+      Jwt__Audience: "ConferenceManager"
+      App__BaseUrl: "http://localhost:5000"
+      App__SiteUrl: "http://localhost:3000"
+      Email__UseFake: "true"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+    command: dotnet watch run
+
+  site:
+    build:
+      context: ./site
+      dockerfile: Dockerfile
+    container_name: conference_site
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: "http://localhost:5000"
+    depends_on:
+      - backend
+    volumes:
+      - ./site:/app
+      - /app/node_modules
+    command: npm run dev
+
+  admin:
+    build:
+      context: ./admin
+      dockerfile: Dockerfile
+    container_name: conference_admin
+    ports:
+      - "4200:4200"
+    depends_on:
+      - backend
+    volumes:
+      - ./admin:/app
+      - /app/node_modules
+    command: ng serve --host 0.0.0.0
+
+volumes:
+  postgres_data:
+
+networks:
+  default:
+    name: conference_network
