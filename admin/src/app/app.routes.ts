@@ -31,5 +31,10 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () => import('./salas/salas.component').then(m => m.SalasComponent)
   },
+  {
+    path: 'congreso/:id/expositores',
+    canActivate: [authGuard],
+    loadComponent: () => import('./expositores/expositores.component').then(m => m.ExpositoresComponent)
+  },
   { path: '**', redirectTo: 'dashboard' }
 ];

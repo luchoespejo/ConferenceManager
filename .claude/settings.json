@@ -11,8 +11,8 @@
     }
   },
   "pipeline": {
-    "mode": "with-checkpoints",
-    "devPlanReview": true
+    "mode": "lean",
+    "devPlanReview": false
   },
   "language": "es"
 }

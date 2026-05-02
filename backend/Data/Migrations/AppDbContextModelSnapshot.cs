@@ -227,6 +227,54 @@ namespace ConferenceManager.Data.Migrations
                     b.ToTable("usuarios", (string)null);
                 });
 
+            modelBuilder.Entity("ConferenceManager.Models.Expositor", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<Guid>("ConferenciaId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamptz")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<string>("Bio")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("FotoUrl")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("RedesSociales")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("TokenAcceso")
+                        .IsRequired()
+                        .HasMaxLength(36)
+                        .HasColumnType("character varying(36)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ConferenciaId");
+
+                    b.HasIndex("TokenAcceso")
+                        .IsUnique();
+
+                    b.ToTable("expositores", (string)null);
+                });
+
             modelBuilder.Entity("ConferenceManager.Models.Conferencia", b =>
                 {
                     b.HasOne("ConferenceManager.Models.Usuario", "Usuario")
@@ -250,6 +298,17 @@ namespace ConferenceManager.Data.Migrations
                 });
 
             modelBuilder.Entity("ConferenceManager.Models.Sala", b =>
+                {
+                    b.HasOne("ConferenceManager.Models.Conferencia", "Conferencia")
+                        .WithMany()
+                        .HasForeignKey("ConferenciaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Conferencia");
+                });
+
+            modelBuilder.Entity("ConferenceManager.Models.Expositor", b =>
                 {
                     b.HasOne("ConferenceManager.Models.Conferencia", "Conferencia")
                         .WithMany()
