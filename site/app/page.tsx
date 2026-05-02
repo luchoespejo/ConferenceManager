@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { headers } from 'next/headers';
 import Link from 'next/link';
 
 interface Conferencia {

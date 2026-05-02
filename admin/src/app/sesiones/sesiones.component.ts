@@ -20,7 +20,7 @@ import { SalaService } from '../salas/sala.service';
 import { ExpositorService } from '../expositores/expositor.service';
 import { SesionListItem, CreateSesionDto } from './sesion.model';
 import { SalaDto } from '../salas/sala.model';
-import { ExpositorListItemDto } from '../expositores/expositor.model';
+import { ExpositorListItem } from '../expositores/expositor.model';
 
 @Component({
   selector: 'app-sesiones',
