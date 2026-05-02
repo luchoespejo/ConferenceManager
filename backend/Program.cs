@@ -54,9 +54,19 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAdminClient", policy =>
     {
         if (builder.Environment.IsDevelopment())
-            policy.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod();
+        {
+            policy
+                .WithOrigins("http://localhost:3000", "http://localhost:4200", "http://localhost:3001")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        }
         else
-            policy.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod();
+        {
+            policy
+                .WithOrigins(allowedOrigins)
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        }
     });
 });
 

@@ -81,4 +81,28 @@ public class PublicService(AppDbContext context) : IPublicService
 
         return expositores;
     }
+
+    public async Task<SesionPublicaDto?> GetSesionByIdAsync(string slug, Guid id)
+    {
+        var sesion = await context.Sesiones
+            .AsNoTracking()
+            .Where(s => s.Id == id && s.Conferencia.Slug == slug && s.Conferencia.Estado == ConferenciaEstado.Publicado)
+            .Select(s => new SesionPublicaDto
+            {
+                Id = s.Id,
+                Titulo = s.Titulo,
+                Descripcion = s.Descripcion,
+                Fecha = s.Fecha,
+                HoraInicio = s.HoraInicio,
+                HoraFin = s.HoraFin,
+                Track = s.Track,
+                SalaNombre = s.Sala.Nombre,
+                ExpositorNombre = s.Expositor.Nombre,
+                EncuestaUrl = s.EncuestaUrl,
+                QrCodeUrl = s.QrCodeUrl
+            })
+            .FirstOrDefaultAsync();
+
+        return sesion;
+    }
 }

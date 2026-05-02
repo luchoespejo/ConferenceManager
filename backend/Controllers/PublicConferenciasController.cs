@@ -32,4 +32,15 @@ public class PublicConferenciasController(IPublicService publicService) : Contro
         var expositores = await publicService.GetExpositorsBySlugAsync(slug);
         return Ok(expositores);
     }
+
+    [HttpGet("sesiones/{id}")]
+    public async Task<ActionResult<SesionPublicaDto>> GetSesion(string slug, Guid id)
+    {
+        var sesion = await publicService.GetSesionByIdAsync(slug, id);
+
+        if (sesion is null)
+            return NotFound();
+
+        return Ok(sesion);
+    }
 }
