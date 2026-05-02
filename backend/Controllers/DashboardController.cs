@@ -13,9 +13,7 @@ public class DashboardController : ControllerBase
     [HttpGet("test")]
     public IActionResult Test()
     {
-        var email = User.FindFirstValue(JwtRegisteredClaimNames.Email)
-                    ?? User.FindFirstValue(ClaimTypes.Email);
-
-        return Ok(new { email });
+        var claims = User.Claims.Select(c => new { c.Type, c.Value }).ToList();
+        return Ok(new { claims });
     }
 }

@@ -13,7 +13,7 @@ namespace ConferenceManager.Controllers;
 public class ConferenciasController(IConferenciaService conferenciaService) : ControllerBase
 {
     private Guid UsuarioId =>
-        Guid.Parse(User.FindFirstValue(JwtRegisteredClaimNames.Sub)!);
+        Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
     [HttpGet]
     public async Task<IActionResult> GetMisConferencias()
