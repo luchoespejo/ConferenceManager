@@ -37,7 +37,7 @@ services:
         condition: service_healthy
     volumes:
       - ./backend:/app
-    command: sh -c "dotnet restore && dotnet run -c Debug"
+    command: sh -c "dotnet clean && dotnet restore && dotnet run -c Debug"
 
   site:
     image: node:20-alpine
