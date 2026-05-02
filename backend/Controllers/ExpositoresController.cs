@@ -2,6 +2,7 @@ using ConferenceManager.DTOs.Expositores;
 using ConferenceManager.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.JsonWebTokens;
 using System.Security.Claims;
 
 namespace ConferenceManager.Controllers;
@@ -14,7 +15,7 @@ public class ExpositoresController(IExpositorService expositorService) : Control
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ExpositorListItemDto>>> GetAll(Guid conferenciaId)
     {
-        var usuarioId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var usuarioId = Guid.Parse(User.FindFirstValue(JwtRegisteredClaimNames.Sub)!);
         var result = await expositorService.GetAllAsync(conferenciaId, usuarioId);
 
         if (!result.Success)
@@ -26,7 +27,7 @@ public class ExpositoresController(IExpositorService expositorService) : Control
     [HttpGet("{id}")]
     public async Task<ActionResult<ExpositorDetalleDto>> GetById(Guid conferenciaId, Guid id)
     {
-        var usuarioId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var usuarioId = Guid.Parse(User.FindFirstValue(JwtRegisteredClaimNames.Sub)!);
         var result = await expositorService.GetByIdAsync(id, conferenciaId, usuarioId);
 
         if (!result.Success)
@@ -38,7 +39,7 @@ public class ExpositoresController(IExpositorService expositorService) : Control
     [HttpPost]
     public async Task<ActionResult<ExpositorDetalleDto>> Create(Guid conferenciaId, CreateExpositorDto dto)
     {
-        var usuarioId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var usuarioId = Guid.Parse(User.FindFirstValue(JwtRegisteredClaimNames.Sub)!);
         var result = await expositorService.CreateAsync(conferenciaId, usuarioId, dto);
 
         if (!result.Success)
@@ -50,7 +51,7 @@ public class ExpositoresController(IExpositorService expositorService) : Control
     [HttpPut("{id}")]
     public async Task<ActionResult<ExpositorDetalleDto>> Update(Guid conferenciaId, Guid id, UpdateExpositorDto dto)
     {
-        var usuarioId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var usuarioId = Guid.Parse(User.FindFirstValue(JwtRegisteredClaimNames.Sub)!);
         var result = await expositorService.UpdateAsync(id, conferenciaId, usuarioId, dto);
 
         if (!result.Success)
@@ -62,7 +63,7 @@ public class ExpositoresController(IExpositorService expositorService) : Control
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(Guid conferenciaId, Guid id)
     {
-        var usuarioId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var usuarioId = Guid.Parse(User.FindFirstValue(JwtRegisteredClaimNames.Sub)!);
         var result = await expositorService.DeleteAsync(id, conferenciaId, usuarioId);
 
         if (!result.Success)

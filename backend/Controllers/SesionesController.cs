@@ -2,6 +2,7 @@ using ConferenceManager.DTOs.Sesiones;
 using ConferenceManager.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.JsonWebTokens;
 using System.Security.Claims;
 
 namespace ConferenceManager.Controllers;
@@ -11,11 +12,13 @@ namespace ConferenceManager.Controllers;
 [Authorize]
 public class SesionesController(ISesionService sesionService) : ControllerBase
 {
+    private Guid UsuarioId =>
+        Guid.Parse(User.FindFirstValue(JwtRegisteredClaimNames.Sub)!);
+
     [HttpGet]
     public async Task<ActionResult<IEnumerable<SesionListItemDto>>> GetAll(Guid conferenciaId)
     {
-        var usuarioId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "");
-        var result = await sesionService.GetAllAsync(conferenciaId, usuarioId);
+        var result = await sesionService.GetAllAsync(conferenciaId, UsuarioId);
 
         if (!result.Success)
             return NotFound(new { error = result.ErrorCode });
@@ -26,8 +29,7 @@ public class SesionesController(ISesionService sesionService) : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<SesionDto>> GetById(Guid conferenciaId, Guid id)
     {
-        var usuarioId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "");
-        var result = await sesionService.GetByIdAsync(id, conferenciaId, usuarioId);
+        var result = await sesionService.GetByIdAsync(id, conferenciaId, UsuarioId);
 
         if (!result.Success)
             return NotFound(new { error = result.ErrorCode });
@@ -38,20 +40,18 @@ public class SesionesController(ISesionService sesionService) : ControllerBase
     [HttpPost]
     public async Task<ActionResult<SesionDto>> Create(Guid conferenciaId, [FromBody] CreateSesionDto dto)
     {
-        var usuarioId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "");
-        var result = await sesionService.CreateAsync(conferenciaId, usuarioId, dto);
+        var result = await sesionService.CreateAsync(conferenciaId, UsuarioId, dto);
 
         if (!result.Success)
             return BadRequest(new { error = result.ErrorCode });
 
-        return CreatedAtAction(nameof(GetById), new { conferenciaId, id = result.Data.Id }, result.Data);
+        return CreatedAtAction(nameof(GetById), new { conferenciaId, id = result.Data!.Id }, result.Data);
     }
 
     [HttpPut("{id}")]
     public async Task<ActionResult<SesionDto>> Update(Guid conferenciaId, Guid id, [FromBody] UpdateSesionDto dto)
     {
-        var usuarioId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "");
-        var result = await sesionService.UpdateAsync(id, conferenciaId, usuarioId, dto);
+        var result = await sesionService.UpdateAsync(id, conferenciaId, UsuarioId, dto);
 
         if (!result.Success)
             return BadRequest(new { error = result.ErrorCode });
@@ -62,8 +62,7 @@ public class SesionesController(ISesionService sesionService) : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(Guid conferenciaId, Guid id)
     {
-        var usuarioId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "");
-        var result = await sesionService.DeleteAsync(id, conferenciaId, usuarioId);
+        var result = await sesionService.DeleteAsync(id, conferenciaId, UsuarioId);
 
         if (!result.Success)
             return NotFound(new { error = result.ErrorCode });

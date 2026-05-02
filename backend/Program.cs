@@ -2,14 +2,13 @@ using ConferenceManager.Data;
 using ConferenceManager.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 
-// Prevent ASP.NET Core from remapping JWT claim names (e.g. "sub" → NameIdentifier)
-JsonWebTokenHandler.DefaultInboundClaimTypeMap.Clear();
+// Prevent ASP.NET Core from remapping "sub" → NameIdentifier claim
+JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
 var builder = WebApplication.CreateBuilder(args);
 
