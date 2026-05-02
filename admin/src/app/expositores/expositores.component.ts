@@ -13,10 +13,10 @@ import {
   FormGroup,
   Validators
 } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ExpositorService } from './expositor.service';
-import { ExpositorListItem, CreateExpositorDto } from './expositor.model';
+import { ExpositorListItem, UpdateExpositorDto } from './expositor.model';
 
 @Component({
   selector: 'app-expositores',
@@ -31,7 +31,7 @@ import { ExpositorListItem, CreateExpositorDto } from './expositor.model';
           <span class="brand-name">ConferenceManager</span>
         </a>
         <div class="topbar-right">
-          <a routerLink="/dashboard" class="btn btn-secondary btn-sm">← Volver</a>
+          <a [routerLink]="['/congreso', conferenciaId]" class="btn btn-secondary btn-sm">← Volver</a>
         </div>
       </nav>
       <div class="page-body">
@@ -40,12 +40,12 @@ import { ExpositorListItem, CreateExpositorDto } from './expositor.model';
             <h2>Expositores</h2>
             <p>Gestioná los expositores del congreso</p>
           </div>
-          <button class="btn btn-primary" (click)="mostrarForm.set(true)">+ Nuevo expositor</button>
+          <button class="btn btn-primary" (click)="abrirCrear()">+ Nuevo expositor</button>
         </div>
 
         @if (mostrarForm()) {
           <div class="form-panel">
-            <h3>Nuevo expositor</h3>
+            <h3>{{ editandoId() ? 'Editar expositor' : 'Nuevo expositor' }}</h3>
             <form [formGroup]="form" (ngSubmit)="submit()">
               <div class="form-row" style="margin-bottom:1rem">
                 <div class="form-group">
@@ -66,8 +66,8 @@ import { ExpositorListItem, CreateExpositorDto } from './expositor.model';
                 <input class="form-control" type="text" formControlName="fotoUrl" placeholder="https://..." />
               </div>
               <div class="form-actions">
-                <button type="button" class="btn btn-secondary" (click)="mostrarForm.set(false)">Cancelar</button>
-                <button type="submit" class="btn btn-primary">Guardar expositor</button>
+                <button type="button" class="btn btn-secondary" (click)="cancelar()">Cancelar</button>
+                <button type="submit" class="btn btn-primary">{{ editandoId() ? 'Actualizar' : 'Guardar' }}</button>
               </div>
             </form>
           </div>
@@ -95,6 +95,7 @@ import { ExpositorListItem, CreateExpositorDto } from './expositor.model';
                   <div class="item-sub">{{ expositor.email || 'Sin email' }}</div>
                 </div>
                 <div class="item-actions">
+                  <button class="btn btn-secondary btn-sm" (click)="abrirEditar(expositor)">Editar</button>
                   <button class="btn btn-danger btn-sm" (click)="eliminar(expositor.id)">Eliminar</button>
                 </div>
               </div>
@@ -112,6 +113,7 @@ export class ExpositoresComponent implements OnInit, OnDestroy {
 
   expositores = signal<ExpositorListItem[]>([]);
   mostrarForm = signal(false);
+  editandoId = signal<string | null>(null);
   conferenciaId!: string;
   form!: FormGroup;
   private subs = new Subscription();
@@ -136,19 +138,61 @@ export class ExpositoresComponent implements OnInit, OnDestroy {
     );
   }
 
+  abrirCrear(): void {
+    this.editandoId.set(null);
+    this.form.reset();
+    this.mostrarForm.set(true);
+  }
+
+  abrirEditar(expositor: ExpositorListItem): void {
+    this.editandoId.set(expositor.id);
+    this.form.patchValue({
+      nombre: expositor.nombre,
+      email: expositor.email ?? '',
+      fotoUrl: expositor.fotoUrl ?? '',
+      bio: ''
+    });
+    this.mostrarForm.set(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  cancelar(): void {
+    this.mostrarForm.set(false);
+    this.editandoId.set(null);
+    this.form.reset();
+  }
+
   submit(): void {
     if (!this.form.valid) return;
-    const dto: CreateExpositorDto = this.form.value;
-    this.subs.add(
-      this.expositorService.create(this.conferenciaId, dto).subscribe({
-        next: () => {
-          this.form.reset();
-          this.mostrarForm.set(false);
-          this.cargar();
-        },
-        error: (err) => console.error('Error creando expositor:', err)
-      })
-    );
+    const v = this.form.value;
+    const id = this.editandoId();
+
+    if (id) {
+      const dto: UpdateExpositorDto = {
+        nombre: v.nombre,
+        email: v.email || undefined,
+        bio: v.bio || undefined,
+        fotoUrl: v.fotoUrl || undefined
+      };
+      this.subs.add(
+        this.expositorService.update(this.conferenciaId, id, dto).subscribe({
+          next: () => { this.cancelar(); this.cargar(); },
+          error: (err) => console.error('Error actualizando expositor:', err)
+        })
+      );
+    } else {
+      this.subs.add(
+        this.expositorService.create(this.conferenciaId, {
+          nombre: v.nombre,
+          email: v.email || undefined,
+          bio: v.bio || undefined,
+          fotoUrl: v.fotoUrl || undefined
+        }).subscribe({
+          next: () => { this.cancelar(); this.cargar(); },
+          error: (err) => console.error('Error creando expositor:', err)
+        })
+      );
+    }
   }
 
   eliminar(id: string): void {
