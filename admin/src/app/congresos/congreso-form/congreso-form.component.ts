@@ -47,149 +47,160 @@ function slugFromNombre(nombre: string): string {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
   template: `
-    <div class="form-container">
-      <h1>{{ id ? 'Configurar congreso' : 'Nuevo congreso' }}</h1>
-
-      @if (loadError()) {
-        <p class="error">No se pudo cargar el congreso. <a routerLink="/dashboard">Volver</a></p>
-      } @else {
-        <form [formGroup]="form" (ngSubmit)="onSubmit()">
-
-          <!-- Nombre -->
-          <div class="field">
-            <label for="nombre">Nombre *</label>
-            <input id="nombre" type="text" formControlName="nombre" />
-            @if (f['nombre'].touched && f['nombre'].errors?.['required']) {
-              <span class="field-error">El nombre es requerido.</span>
-            }
-          </div>
-
-          <!-- Slug -->
-          <div class="field">
-            <label for="slug">Slug (subdominio) *</label>
-            <input
-              id="slug"
-              type="text"
-              formControlName="slug"
-              (input)="onSlugInput()"
-            />
-            @if (f['slug'].touched && f['slug'].errors?.['required']) {
-              <span class="field-error">El slug es requerido.</span>
-            }
-            @if (f['slug'].touched && f['slug'].errors?.['pattern']) {
-              <span class="field-error">Solo letras minúsculas, números y guiones (3-50 caracteres).</span>
-            }
-            @if (slugConflict()) {
-              <span class="field-error">Este slug ya está en uso. Elegí otro.</span>
-            }
-            @if (form.get('slug')?.disabled) {
-              <span class="field-hint">El slug no se puede cambiar en congresos publicados o finalizados.</span>
-            }
-          </div>
-
-          <!-- Fechas -->
-          <div class="field-row">
-            <div class="field">
-              <label for="fechaInicio">Fecha inicio *</label>
-              <input id="fechaInicio" type="date" formControlName="fechaInicio" />
-              @if (f['fechaInicio'].touched && f['fechaInicio'].errors?.['required']) {
-                <span class="field-error">La fecha de inicio es requerida.</span>
-              }
-            </div>
-            <div class="field">
-              <label for="fechaFin">Fecha fin *</label>
-              <input id="fechaFin" type="date" formControlName="fechaFin" />
-              @if (f['fechaFin'].touched && f['fechaFin'].errors?.['required']) {
-                <span class="field-error">La fecha de fin es requerida.</span>
-              }
-            </div>
-          </div>
-          @if (form.errors?.['fechaFinAnterior'] && (f['fechaFin'].touched || f['fechaInicio'].touched)) {
-            <span class="field-error">La fecha de fin debe ser igual o posterior a la fecha de inicio.</span>
+    <div class="page-shell">
+      <nav class="topbar">
+        <a routerLink="/dashboard" class="topbar-brand">
+          <div class="brand-icon">🎪</div>
+          <span class="brand-name">ConferenceManager</span>
+        </a>
+        <div class="topbar-right">
+          @if (id) {
+            <span class="badge badge-{{ congresoEstado().toLowerCase() }}">{{ congresoEstado() }}</span>
           }
-          @if (fechasError()) {
-            <span class="field-error">{{ fechasError() }}</span>
-          }
+          <a routerLink="/dashboard" class="btn btn-secondary btn-sm">← Dashboard</a>
+        </div>
+      </nav>
 
-          <!-- Descripción -->
-          <div class="field">
-            <label for="descripcion">Descripción</label>
-            <textarea id="descripcion" formControlName="descripcion" rows="3"></textarea>
+      <div class="page-body">
+        <div class="page-header">
+          <div class="page-title">
+            <h2>{{ id ? 'Configurar congreso' : 'Nuevo congreso' }}</h2>
+            <p>{{ id ? 'Editá los datos de tu evento' : 'Completá la información para crear tu congreso' }}</p>
           </div>
+        </div>
 
-          <!-- Branding -->
-          <fieldset>
-            <legend>Branding</legend>
+        @if (loadError()) {
+          <div class="error-banner">
+            No se pudo cargar el congreso. <a routerLink="/dashboard">Volver al dashboard</a>
+          </div>
+        } @else {
+          <form [formGroup]="form" (ngSubmit)="onSubmit()">
 
-            <div class="field">
-              <label for="logoUrl">URL del logo</label>
-              <input id="logoUrl" type="url" formControlName="logoUrl" />
-            </div>
-
-            <div class="field-row">
-              <div class="field">
-                <label for="colorPrimario">Color primario</label>
-                <input id="colorPrimario" type="text" formControlName="colorPrimario" placeholder="#rrggbb" maxlength="7" />
-                @if (f['colorPrimario'].errors?.['maxlength']) {
-                  <span class="field-error">Máximo 7 caracteres.</span>
+            <!-- Información general -->
+            <div class="card" style="margin-bottom:1.25rem">
+              <h3 style="margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:1px solid var(--border)">Información general</h3>
+              <div class="form-group" style="margin-bottom:1rem">
+                <label for="nombre">Nombre <span class="required">*</span></label>
+                <input id="nombre" type="text" formControlName="nombre" class="form-control" placeholder="Nombre del congreso" />
+                @if (f['nombre'].touched && f['nombre'].errors?.['required']) {
+                  <div class="error-msg">El nombre es requerido.</div>
                 }
               </div>
-              <div class="field">
-                <label for="colorSecundario">Color secundario</label>
-                <input id="colorSecundario" type="text" formControlName="colorSecundario" placeholder="#rrggbb" maxlength="7" />
-                @if (f['colorSecundario'].errors?.['maxlength']) {
-                  <span class="field-error">Máximo 7 caracteres.</span>
+              <div class="form-group" style="margin-bottom:1rem">
+                <label for="slug">Slug (subdominio) <span class="required">*</span></label>
+                <input id="slug" type="text" formControlName="slug" class="form-control" placeholder="mi-congreso" (input)="onSlugInput()" />
+                @if (f['slug'].touched && f['slug'].errors?.['required']) {
+                  <div class="error-msg">El slug es requerido.</div>
                 }
+                @if (f['slug'].touched && f['slug'].errors?.['pattern']) {
+                  <div class="error-msg">Solo letras minúsculas, números y guiones (3-50 caracteres).</div>
+                }
+                @if (slugConflict()) {
+                  <div class="error-msg">Este slug ya está en uso. Elegí otro.</div>
+                }
+                @if (form.get('slug')?.disabled) {
+                  <div class="hint" style="font-size:.8rem;color:var(--muted)">El slug no se puede cambiar en congresos publicados o finalizados.</div>
+                }
+              </div>
+              <div class="form-row" style="margin-bottom:1rem">
+                <div class="form-group">
+                  <label for="fechaInicio">Fecha inicio <span class="required">*</span></label>
+                  <input id="fechaInicio" type="date" formControlName="fechaInicio" class="form-control" />
+                  @if (f['fechaInicio'].touched && f['fechaInicio'].errors?.['required']) {
+                    <div class="error-msg">La fecha de inicio es requerida.</div>
+                  }
+                </div>
+                <div class="form-group">
+                  <label for="fechaFin">Fecha fin <span class="required">*</span></label>
+                  <input id="fechaFin" type="date" formControlName="fechaFin" class="form-control" />
+                  @if (f['fechaFin'].touched && f['fechaFin'].errors?.['required']) {
+                    <div class="error-msg">La fecha de fin es requerida.</div>
+                  }
+                </div>
+              </div>
+              @if (form.errors?.['fechaFinAnterior'] && (f['fechaFin'].touched || f['fechaInicio'].touched)) {
+                <div class="error-msg" style="margin-bottom:.75rem">La fecha de fin debe ser igual o posterior a la fecha de inicio.</div>
+              }
+              @if (fechasError()) {
+                <div class="error-msg" style="margin-bottom:.75rem">{{ fechasError() }}</div>
+              }
+              <div class="form-group">
+                <label for="descripcion">Descripción</label>
+                <textarea id="descripcion" formControlName="descripcion" class="form-control" rows="3" placeholder="Descripción del congreso (opcional)"></textarea>
               </div>
             </div>
 
-            <div class="field">
-              <label for="tipografia">Tipografía</label>
-              <input id="tipografia" type="text" formControlName="tipografia" maxlength="100" />
-              @if (f['tipografia'].errors?.['maxlength']) {
-                <span class="field-error">Máximo 100 caracteres.</span>
+            <!-- Branding -->
+            <div class="card" style="margin-bottom:1.25rem">
+              <h3 style="margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:1px solid var(--border)">Branding</h3>
+              <div class="form-group" style="margin-bottom:1rem">
+                <label for="logoUrl">URL del logo</label>
+                <input id="logoUrl" type="url" formControlName="logoUrl" class="form-control" placeholder="https://..." />
+              </div>
+              <div class="form-row" style="margin-bottom:1rem">
+                <div class="form-group">
+                  <label for="colorPrimario">Color primario</label>
+                  <input id="colorPrimario" type="text" formControlName="colorPrimario" class="form-control" placeholder="#rrggbb" maxlength="7" />
+                  @if (f['colorPrimario'].errors?.['maxlength']) {
+                    <div class="error-msg">Máximo 7 caracteres.</div>
+                  }
+                </div>
+                <div class="form-group">
+                  <label for="colorSecundario">Color secundario</label>
+                  <input id="colorSecundario" type="text" formControlName="colorSecundario" class="form-control" placeholder="#rrggbb" maxlength="7" />
+                  @if (f['colorSecundario'].errors?.['maxlength']) {
+                    <div class="error-msg">Máximo 7 caracteres.</div>
+                  }
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="tipografia">Tipografía</label>
+                <input id="tipografia" type="text" formControlName="tipografia" class="form-control" placeholder="Inter, Roboto..." maxlength="100" />
+                @if (f['tipografia'].errors?.['maxlength']) {
+                  <div class="error-msg">Máximo 100 caracteres.</div>
+                }
+              </div>
+            </div>
+
+            <!-- Sede -->
+            <div class="card" style="margin-bottom:1.25rem">
+              <h3 style="margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:1px solid var(--border)">Sede del evento</h3>
+              <div class="form-group" style="margin-bottom:1rem">
+                <label for="venueNombre">Nombre del lugar</label>
+                <input id="venueNombre" type="text" formControlName="venueNombre" class="form-control" placeholder="Ej. Centro de Convenciones" />
+              </div>
+              <div class="form-group" style="margin-bottom:1rem">
+                <label for="venueDireccion">Dirección</label>
+                <input id="venueDireccion" type="text" formControlName="venueDireccion" class="form-control" placeholder="Calle y número, ciudad" />
+              </div>
+              <div class="form-group">
+                <label for="venueLinkMaps">Link de Google Maps</label>
+                <input id="venueLinkMaps" type="url" formControlName="venueLinkMaps" class="form-control" placeholder="https://maps.google.com/..." />
+              </div>
+            </div>
+
+            @if (apiError()) {
+              <div class="error-banner" style="margin-bottom:1.25rem">{{ apiError() }}</div>
+            }
+
+            <!-- Sticky footer actions -->
+            <div style="position:sticky;bottom:0;background:var(--bg);border-top:1px solid var(--border);padding:1rem 0;display:flex;gap:.75rem;justify-content:flex-end;margin-top:1.5rem">
+              <a routerLink="/dashboard" class="btn btn-secondary">Cancelar</a>
+              @if (id && congresoEstado() === 'Borrador') {
+                <button type="button" class="btn btn-secondary" style="border-color:var(--success);color:var(--success)" (click)="publicar()" [disabled]="publicando()">
+                  @if (publicando()) { <span class="spinner"></span> }
+                  Publicar
+                </button>
               }
-            </div>
-          </fieldset>
-
-          <!-- Venue -->
-          <fieldset>
-            <legend>Sede del evento</legend>
-
-            <div class="field">
-              <label for="venueNombre">Nombre del lugar</label>
-              <input id="venueNombre" type="text" formControlName="venueNombre" />
-            </div>
-            <div class="field">
-              <label for="venueDireccion">Dirección</label>
-              <input id="venueDireccion" type="text" formControlName="venueDireccion" />
-            </div>
-            <div class="field">
-              <label for="venueLinkMaps">Link de Google Maps</label>
-              <input id="venueLinkMaps" type="url" formControlName="venueLinkMaps" />
-            </div>
-          </fieldset>
-
-          <!-- General API error -->
-          @if (apiError()) {
-            <p class="error">{{ apiError() }}</p>
-          }
-
-          <!-- Actions -->
-          <div class="form-actions">
-            <a routerLink="/dashboard" class="btn btn-secondary">Cancelar</a>
-            <button type="submit" class="btn btn-primary" [disabled]="submitting()">
-              {{ submitting() ? 'Guardando...' : (id ? 'Guardar cambios' : 'Crear congreso') }}
-            </button>
-            @if (id && congresoEstado() === 'Borrador') {
-              <button type="button" class="btn btn-success" (click)="publicar()" [disabled]="publicando()">
-                {{ publicando() ? 'Publicando...' : 'Publicar' }}
+              <button type="submit" class="btn btn-primary" [disabled]="submitting()">
+                @if (submitting()) { <span class="spinner"></span> }
+                {{ id ? 'Guardar cambios' : 'Crear congreso' }}
               </button>
-            }
-          </div>
+            </div>
 
-        </form>
-      }
+          </form>
+        }
+      </div>
     </div>
   `
 })

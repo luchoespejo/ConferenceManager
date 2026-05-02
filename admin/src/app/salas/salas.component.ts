@@ -19,106 +19,111 @@ import { HttpErrorResponse } from '@angular/common/http';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
   template: `
-    <div class="salas-page">
-      <header class="salas-header">
-        <h1>Salas del congreso</h1>
-        <a routerLink="/dashboard" class="btn btn-secondary">Volver al dashboard</a>
-      </header>
+    <div class="page-shell">
+      <nav class="topbar">
+        <a routerLink="/dashboard" class="topbar-brand">
+          <div class="brand-icon">🎪</div>
+          <span class="brand-name">ConferenceManager</span>
+        </a>
+        <div class="topbar-right">
+          <a routerLink="/dashboard" class="btn btn-secondary btn-sm">← Volver</a>
+        </div>
+      </nav>
+      <div class="page-body">
+        <div class="page-header">
+          <div class="page-title">
+            <h2>Salas</h2>
+            <p>Gestioná las salas del congreso</p>
+          </div>
+        </div>
 
-      @if (loading()) {
-        <p class="loading-msg">Cargando salas...</p>
-      } @else {
-        <section class="sala-form-section">
-          <h2>{{ editingId() ? 'Editar sala' : 'Nueva sala' }}</h2>
-          <form [formGroup]="salaForm" (ngSubmit)="onSubmit()" class="sala-form">
-            <div class="form-group">
-              <label for="nombre">Nombre <span class="required">*</span></label>
-              <input
-                id="nombre"
-                type="text"
-                formControlName="nombre"
-                class="form-control"
-                [class.is-invalid]="salaForm.get('nombre')?.invalid && salaForm.get('nombre')?.touched"
-                placeholder="Ej. Sala Principal"
-              />
-              @if (salaForm.get('nombre')?.hasError('required') && salaForm.get('nombre')?.touched) {
-                <div class="error-msg">El nombre es obligatorio.</div>
-              }
-              @if (salaForm.get('nombre')?.hasError('maxlength') && salaForm.get('nombre')?.touched) {
-                <div class="error-msg">El nombre no puede superar los 100 caracteres.</div>
-              }
-              @if (nombreDuplicadoError()) {
-                <div class="error-msg">Ya existe una sala con ese nombre en este congreso.</div>
-              }
-            </div>
-
-            <div class="form-group">
-              <label for="capacidad">Capacidad (opcional)</label>
-              <input
-                id="capacidad"
-                type="number"
-                formControlName="capacidad"
-                class="form-control"
-                [class.is-invalid]="salaForm.get('capacidad')?.invalid && salaForm.get('capacidad')?.touched"
-                placeholder="Ej. 300"
-                min="1"
-              />
-              @if (salaForm.get('capacidad')?.hasError('min') && salaForm.get('capacidad')?.touched) {
-                <div class="error-msg">La capacidad debe ser un entero positivo.</div>
-              }
-            </div>
-
-            <div class="form-actions">
-              <button type="submit" class="btn btn-primary" [disabled]="submitting()">
-                {{ submitting() ? 'Guardando...' : (editingId() ? 'Actualizar' : 'Crear sala') }}
-              </button>
-              @if (editingId()) {
-                <button type="button" class="btn btn-secondary" (click)="cancelEdit()">
-                  Cancelar
-                </button>
-              }
-            </div>
-          </form>
-        </section>
-
-        <section class="salas-list-section">
-          <h2>Salas registradas</h2>
-          @if (salas().length === 0) {
-            <p class="empty-msg">No hay salas registradas para este congreso.</p>
-          } @else {
-            <table class="salas-table">
-              <thead>
-                <tr>
-                  <th>Nombre</th>
-                  <th>Capacidad</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (sala of salas(); track sala.id) {
-                  <tr>
-                    <td>{{ sala.nombre }}</td>
-                    <td>{{ sala.capacidad ?? '—' }}</td>
-                    <td class="actions-cell">
-                      <button class="btn btn-sm" (click)="startEdit(sala)">Editar</button>
-                      <button class="btn btn-sm btn-danger" (click)="deleteSala(sala.id)" [disabled]="submitting()">
-                        Eliminar
-                      </button>
-                    </td>
-                  </tr>
-                  @if (deleteErrorId() === sala.id) {
-                    <tr class="error-row">
-                      <td colspan="3">
-                        <span class="error-msg">No se puede eliminar una sala con sesiones asignadas.</span>
-                      </td>
-                    </tr>
+        @if (loading()) {
+          <div style="display:flex;align-items:center;gap:12px;padding:3rem;color:var(--muted)">
+            <div class="spinner"></div> Cargando salas...
+          </div>
+        } @else {
+          <div class="form-panel">
+            <h3>{{ editingId() ? 'Editar sala' : 'Nueva sala' }}</h3>
+            <form [formGroup]="salaForm" (ngSubmit)="onSubmit()">
+              <div class="form-row" style="margin-bottom:1rem">
+                <div class="form-group">
+                  <label for="nombre">Nombre <span class="required">*</span></label>
+                  <input
+                    id="nombre"
+                    type="text"
+                    formControlName="nombre"
+                    class="form-control"
+                    placeholder="Ej. Sala Principal"
+                  />
+                  @if (salaForm.get('nombre')?.hasError('required') && salaForm.get('nombre')?.touched) {
+                    <div class="error-msg">El nombre es obligatorio.</div>
                   }
+                  @if (salaForm.get('nombre')?.hasError('maxlength') && salaForm.get('nombre')?.touched) {
+                    <div class="error-msg">El nombre no puede superar los 100 caracteres.</div>
+                  }
+                  @if (nombreDuplicadoError()) {
+                    <div class="error-msg">Ya existe una sala con ese nombre en este congreso.</div>
+                  }
+                </div>
+                <div class="form-group">
+                  <label for="capacidad">Capacidad (opcional)</label>
+                  <input
+                    id="capacidad"
+                    type="number"
+                    formControlName="capacidad"
+                    class="form-control"
+                    placeholder="Ej. 300"
+                    min="1"
+                  />
+                  @if (salaForm.get('capacidad')?.hasError('min') && salaForm.get('capacidad')?.touched) {
+                    <div class="error-msg">La capacidad debe ser un entero positivo.</div>
+                  }
+                </div>
+              </div>
+              <div class="form-actions">
+                @if (editingId()) {
+                  <button type="button" class="btn btn-secondary" (click)="cancelEdit()">Cancelar</button>
                 }
-              </tbody>
-            </table>
+                <button type="submit" class="btn btn-primary" [disabled]="submitting()">
+                  @if (submitting()) { <span class="spinner"></span> }
+                  {{ editingId() ? 'Actualizar sala' : 'Crear sala' }}
+                </button>
+              </div>
+            </form>
+          </div>
+
+          @if (salas().length === 0) {
+            <div class="empty-wrap" style="min-height:200px">
+              <div class="empty-icon">🚪</div>
+              <h3>No hay salas registradas</h3>
+              <p>Agregá la primera sala usando el formulario de arriba.</p>
+            </div>
+          } @else {
+            <div class="item-list" style="margin-top:1.5rem">
+              @for (sala of salas(); track sala.id) {
+                <div class="item-row">
+                  <div class="item-avatar">🚪</div>
+                  <div class="item-info">
+                    <div class="item-name">{{ sala.nombre }}</div>
+                    <div class="item-sub">
+                      {{ sala.capacidad ? 'Capacidad: ' + sala.capacidad + ' personas' : 'Sin capacidad definida' }}
+                    </div>
+                  </div>
+                  <div class="item-actions">
+                    <button class="btn btn-secondary btn-sm" (click)="startEdit(sala)">Editar</button>
+                    <button class="btn btn-danger btn-sm" (click)="deleteSala(sala.id)" [disabled]="submitting()">Eliminar</button>
+                  </div>
+                </div>
+                @if (deleteErrorId() === sala.id) {
+                  <div class="error-msg" style="padding:.5rem 1rem">
+                    No se puede eliminar una sala con sesiones asignadas.
+                  </div>
+                }
+              }
+            </div>
           }
-        </section>
-      }
+        }
+      </div>
     </div>
   `
 })

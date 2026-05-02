@@ -13,7 +13,7 @@ import {
   FormGroup,
   Validators
 } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { SesionService } from './sesion.service';
 import { SalaService } from '../salas/sala.service';
@@ -26,78 +26,144 @@ import { ExpositorListItem } from '../expositores/expositor.model';
   selector: 'app-sesiones',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   template: `
-    <div class="container">
-      <h2>Sesiones</h2>
-      <button (click)="mostrarForm.set(true)">Nueva Sesión</button>
+    <div class="page-shell">
+      <nav class="topbar">
+        <a routerLink="/dashboard" class="topbar-brand">
+          <div class="brand-icon">🎪</div>
+          <span class="brand-name">ConferenceManager</span>
+        </a>
+        <div class="topbar-right">
+          <a routerLink="/dashboard" class="btn btn-secondary btn-sm">← Volver</a>
+        </div>
+      </nav>
+      <div class="page-body">
+        <div class="page-header">
+          <div class="page-title">
+            <h2>Sesiones</h2>
+            <p>Gestioná el programa del congreso</p>
+          </div>
+          <button class="btn btn-primary" (click)="mostrarForm.set(true)">+ Nueva sesión</button>
+        </div>
 
-      <div class="sesiones-list">
-        @for (sesion of sesiones(); track sesion.id) {
-          <div class="sesion-item">
-            <div class="sesion-header">
-              <h4>{{ sesion.titulo }}</h4>
-              <span class="track" *ngIf="sesion.track">{{ sesion.track }}</span>
-            </div>
-            <div class="sesion-meta">
-              <p><strong>Fecha:</strong> {{ sesion.fecha }}</p>
-              <p><strong>Hora:</strong> {{ sesion.horaInicio }} - {{ sesion.horaFin }}</p>
-              <p><strong>Sala:</strong> {{ sesion.salaNombre }}</p>
-              <p><strong>Expositor:</strong> {{ sesion.expositorNombre }}</p>
-            </div>
-            <button (click)="eliminar(sesion.id)">Eliminar</button>
+        @if (mostrarForm()) {
+          <div class="form-panel">
+            <h3>Nueva sesión</h3>
+            <form [formGroup]="form" (ngSubmit)="submit()">
+              <div class="form-group" style="margin-bottom:1rem">
+                <label>Título <span class="required">*</span></label>
+                <input class="form-control" type="text" formControlName="titulo" placeholder="Título de la sesión" />
+              </div>
+              <div class="form-group" style="margin-bottom:1rem">
+                <label>Descripción</label>
+                <textarea class="form-control" formControlName="descripcion" placeholder="Descripción de la sesión"></textarea>
+              </div>
+              <div class="form-row" style="margin-bottom:1rem">
+                <div class="form-group">
+                  <label>Sala <span class="required">*</span></label>
+                  <select class="form-control" formControlName="salaId">
+                    <option value="">Seleccionar sala</option>
+                    @for (sala of salas(); track sala.id) {
+                      <option [value]="sala.id">{{ sala.nombre }}</option>
+                    }
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Expositor <span class="required">*</span></label>
+                  <select class="form-control" formControlName="expositorId">
+                    <option value="">Seleccionar expositor</option>
+                    @for (expositor of expositores(); track expositor.id) {
+                      <option [value]="expositor.id">{{ expositor.nombre }}</option>
+                    }
+                  </select>
+                </div>
+              </div>
+              <div class="form-row" style="margin-bottom:1rem">
+                <div class="form-group">
+                  <label>Fecha <span class="required">*</span></label>
+                  <input class="form-control" type="date" formControlName="fecha" />
+                </div>
+                <div class="form-group">
+                  <label>Track</label>
+                  <input class="form-control" type="text" formControlName="track" placeholder="Ej. Keynote" />
+                </div>
+              </div>
+              <div class="form-row" style="margin-bottom:1rem">
+                <div class="form-group">
+                  <label>Hora inicio <span class="required">*</span></label>
+                  <input class="form-control" type="time" formControlName="horaInicio" />
+                </div>
+                <div class="form-group">
+                  <label>Hora fin <span class="required">*</span></label>
+                  <input class="form-control" type="time" formControlName="horaFin" />
+                </div>
+              </div>
+              <div class="form-row" style="margin-bottom:1rem">
+                <div class="form-group">
+                  <label>URL Encuesta</label>
+                  <input class="form-control" type="url" formControlName="encuestaUrl" placeholder="https://..." />
+                </div>
+                <div class="form-group">
+                  <label>URL QR</label>
+                  <input class="form-control" type="url" formControlName="qrCodeUrl" placeholder="https://..." />
+                </div>
+              </div>
+              <div class="form-actions">
+                <button type="button" class="btn btn-secondary" (click)="mostrarForm.set(false)">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Guardar sesión</button>
+              </div>
+            </form>
+          </div>
+        }
+
+        @if (sesiones().length === 0) {
+          <div class="empty-wrap" style="min-height:200px">
+            <div class="empty-icon">📅</div>
+            <h3>No hay sesiones registradas</h3>
+            <p>Agregá la primera sesión usando el botón de arriba.</p>
+          </div>
+        } @else {
+          <div class="table-wrap" style="margin-top:1.5rem">
+            <table>
+              <thead>
+                <tr>
+                  <th>Título</th>
+                  <th>Fecha</th>
+                  <th>Horario</th>
+                  <th>Sala</th>
+                  <th>Expositor</th>
+                  <th>Track</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (sesion of sesiones(); track sesion.id) {
+                  <tr>
+                    <td style="font-weight:600">{{ sesion.titulo }}</td>
+                    <td>{{ sesion.fecha }}</td>
+                    <td style="white-space:nowrap">{{ sesion.horaInicio }} – {{ sesion.horaFin }}</td>
+                    <td>{{ sesion.salaNombre }}</td>
+                    <td>{{ sesion.expositorNombre }}</td>
+                    <td>
+                      @if (sesion.track) {
+                        <span class="badge badge-finalizado">{{ sesion.track }}</span>
+                      } @else {
+                        <span style="color:var(--muted)">—</span>
+                      }
+                    </td>
+                    <td>
+                      <button class="btn btn-danger btn-sm" (click)="eliminar(sesion.id)">Eliminar</button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
           </div>
         }
       </div>
-
-      @if (mostrarForm()) {
-        <div class="form-panel">
-          <h3>Nueva Sesión</h3>
-          <form [formGroup]="form" (ngSubmit)="submit()">
-            <input type="text" formControlName="titulo" placeholder="Título" required>
-            <textarea formControlName="descripcion" placeholder="Descripción"></textarea>
-
-            <select formControlName="salaId" required>
-              <option value="">Seleccionar sala</option>
-              @for (sala of salas(); track sala.id) {
-                <option [value]="sala.id">{{ sala.nombre }}</option>
-              }
-            </select>
-
-            <select formControlName="expositorId" required>
-              <option value="">Seleccionar expositor</option>
-              @for (expositor of expositores(); track expositor.id) {
-                <option [value]="expositor.id">{{ expositor.nombre }}</option>
-              }
-            </select>
-
-            <input type="date" formControlName="fecha" required>
-            <input type="time" formControlName="horaInicio" required>
-            <input type="time" formControlName="horaFin" required>
-            <input type="text" formControlName="track" placeholder="Track (ej. Keynote)">
-            <input type="url" formControlName="encuestaUrl" placeholder="URL Encuesta">
-            <input type="url" formControlName="qrCodeUrl" placeholder="URL QR">
-
-            <button type="submit">Guardar</button>
-            <button type="button" (click)="mostrarForm.set(false)">Cancelar</button>
-          </form>
-        </div>
-      }
     </div>
-  `,
-  styles: [`
-    .container { padding: 20px; }
-    .sesiones-list { display: flex; flex-direction: column; gap: 10px; margin: 20px 0; }
-    .sesion-item { padding: 15px; border: 1px solid #ccc; border-radius: 4px; }
-    .sesion-header { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
-    .sesion-header h4 { margin: 0; flex: 1; }
-    .track { background: #f0f0f0; padding: 4px 8px; border-radius: 3px; font-size: 0.85em; }
-    .sesion-meta { margin: 10px 0; }
-    .sesion-meta p { margin: 5px 0; font-size: 0.9em; color: #666; }
-    .form-panel { padding: 20px; border: 1px solid #ccc; border-radius: 4px; margin: 20px 0; }
-    input, textarea, select { width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px; }
-    button { padding: 8px 16px; margin-right: 8px; border: 1px solid #ddd; border-radius: 4px; background: #f5f5f5; cursor: pointer; }
-  `]
+  `
 })
 export class SesionesComponent implements OnInit, OnDestroy {
   private sesionService = inject(SesionService);

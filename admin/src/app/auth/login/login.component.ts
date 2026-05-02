@@ -10,23 +10,33 @@ import { AuthService } from '../auth.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
   template: `
-    <div class="auth-container">
-      <h1>Iniciar sesión</h1>
-      <form [formGroup]="form" (ngSubmit)="onSubmit()">
-        <div>
-          <label>Email</label>
-          <input type="email" formControlName="email" />
+    <div class="auth-shell">
+      <div class="auth-card">
+        <div class="auth-header">
+          <div class="auth-logo">🎪</div>
+          <div>
+            <p class="auth-title">ConferenceManager</p>
+            <p class="auth-subtitle">Panel de organizadores</p>
+          </div>
         </div>
-        <div>
-          <label>Contraseña</label>
-          <input type="password" formControlName="password" />
-        </div>
-        <button type="submit" [disabled]="loading()">
-          {{ loading() ? 'Ingresando...' : 'Ingresar' }}
-        </button>
-        @if (error()) { <p class="error">{{ error() }}</p> }
-      </form>
-      <a routerLink="/registro">¿No tenés cuenta? Registrate</a>
+        @if (error()) {
+          <div class="error-banner">{{ error() }}</div>
+        }
+        <form class="auth-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+          <div class="form-group">
+            <label>Email</label>
+            <input class="form-control" type="email" formControlName="email" placeholder="tu@email.com" />
+          </div>
+          <div class="form-group">
+            <label>Contraseña</label>
+            <input class="form-control" type="password" formControlName="password" placeholder="••••••••" />
+          </div>
+          <button class="btn btn-primary" type="submit" [disabled]="loading()" style="width:100%;justify-content:center;padding:.75rem">
+            @if (loading()) { <span class="spinner"></span> } Ingresar
+          </button>
+        </form>
+        <p class="auth-footer">¿No tenés cuenta? <a routerLink="/registro">Registrate</a></p>
+      </div>
     </div>
   `
 })

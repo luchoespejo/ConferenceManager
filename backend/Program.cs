@@ -143,6 +143,14 @@ app.UseAuthorization();
 app.UseHttpsRedirection();
 
 app.MapGet("/api/health", () => Results.Ok(new { status = "ok" }));
+
+app.MapPost("/api/seed", async (AppDbContext db) =>
+{
+    if (!app.Environment.IsDevelopment()) return Results.Forbid();
+    await SeedData.SeedAsync(db);
+    return Results.Ok(new { message = "Seeded OK" });
+});
+
 app.MapControllers();
 
 app.Run();
