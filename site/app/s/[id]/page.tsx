@@ -17,18 +17,10 @@ interface Sesion {
   qrCodeUrl?: string;
 }
 
-interface Expositor {
-  id: string;
-  nombre: string;
-  bio?: string;
-  fotoUrl?: string;
-}
-
 export default function SesionDetail() {
   const params = useParams();
   const id = params.id as string;
   const [sesion, setSesion] = useState<Sesion | null>(null);
-  const [expositor, setExpositor] = useState<Expositor | null>(null);
   const [loading, setLoading] = useState(true);
   const [slug, setSlug] = useState<string>('');
 
@@ -43,23 +35,10 @@ export default function SesionDetail() {
 
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
-    // Fetch programa to find the sesion
-    fetch(`${apiUrl}/api/public/${extractedSlug || 'demo'}/programa`)
+    fetch(`${apiUrl}/api/public/${extractedSlug || 'demo'}/sesiones/${id}`)
       .then((res) => res.json())
       .then((data) => {
-        const foundSesion = data.find((s: Sesion) => s.id === id);
-        setSesion(foundSesion);
-      })
-      .then(() => {
-        // Fetch expositores
-        return fetch(`${apiUrl}/api/public/${extractedSlug || 'demo'}/expositores`);
-      })
-      .then((res) => res.json())
-      .then((data) => {
-        if (sesion) {
-          const foundExpositor = data.find((e: Expositor) => e.nombre === sesion.expositorNombre);
-          setExpositor(foundExpositor);
-        }
+        setSesion(data);
         setLoading(false);
       })
       .catch(() => {
@@ -100,24 +79,10 @@ export default function SesionDetail() {
         </div>
 
         {/* Expositor */}
-        {expositor && (
-          <div className="bg-gray-50 p-6 rounded-lg mb-8 border-l-4 border-blue-500">
-            <h2 className="text-2xl font-bold mb-4">Expositor</h2>
-            <div className="flex gap-6">
-              {expositor.fotoUrl && (
-                <img
-                  src={expositor.fotoUrl}
-                  alt={expositor.nombre}
-                  className="w-24 h-24 rounded-full object-cover"
-                />
-              )}
-              <div>
-                <h3 className="text-xl font-bold mb-2">{expositor.nombre}</h3>
-                {expositor.bio && <p className="text-gray-700">{expositor.bio}</p>}
-              </div>
-            </div>
-          </div>
-        )}
+        <div className="bg-gray-50 p-6 rounded-lg mb-8 border-l-4 border-blue-500">
+          <h2 className="text-2xl font-bold mb-4">Expositor</h2>
+          <p className="text-xl font-bold">{sesion.expositorNombre}</p>
+        </div>
 
         {/* Actions */}
         <div className="flex gap-4">
