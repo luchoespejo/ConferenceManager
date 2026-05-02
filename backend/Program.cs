@@ -14,6 +14,11 @@ var jwtSecretKey = builder.Configuration["Jwt:SecretKey"]
 if (jwtSecretKey.Length < 32)
     throw new InvalidOperationException("Jwt:SecretKey must be at least 32 characters.");
 
+var appBaseUrl = builder.Configuration["App:BaseUrl"]
+    ?? throw new InvalidOperationException("App:BaseUrl is not configured.");
+if (string.IsNullOrWhiteSpace(appBaseUrl))
+    throw new InvalidOperationException("App:BaseUrl cannot be empty.");
+
 // ── Database ─────────────────────────────────────────────────────────────────
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("ConnectionStrings:DefaultConnection is not configured.");
@@ -70,6 +75,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IConferenciaService, ConferenciaService>();
 builder.Services.AddScoped<ISalaService, SalaService>();
 builder.Services.AddScoped<IExpositorService, ExpositorService>();
+builder.Services.AddScoped<ISesionService, SesionService>();
 
 // ── Controllers + Swagger ─────────────────────────────────────────────────────
 builder.Services.AddControllers();

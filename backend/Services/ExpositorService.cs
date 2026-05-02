@@ -107,7 +107,7 @@ public class ExpositorService(AppDbContext context) : IExpositorService
         if (expositor == null)
             return ServiceResult.Fail(ExpositorErrorCodes.NotFound);
 
-        var tieneSesiones = false; // TODO US-5: verificar sesiones asignadas
+        var tieneSesiones = await context.Sesiones.AnyAsync(s => s.ExpositorId == id);
         if (tieneSesiones)
             return ServiceResult.Fail(ExpositorErrorCodes.CannotDeleteWithSessions);
 

@@ -24,7 +24,7 @@ public class ConferenciaService(AppDbContext context) : IConferenciaService
                 Estado = c.Estado.ToString(),
                 FechaInicio = c.FechaInicio,
                 FechaFin = c.FechaFin,
-                CantidadSesiones = 0, // hardcoded until US-5 creates sesiones table
+                CantidadSesiones = context.Sesiones.Where(s => s.ConferenciaId == c.Id).Count(),
                 CreadoEn = c.CreatedAt
             })
             .ToListAsync();

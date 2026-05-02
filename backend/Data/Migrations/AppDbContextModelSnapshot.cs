@@ -17,7 +17,7 @@ namespace ConferenceManager.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.7")
+                .HasAnnotation("ProductVersion", "8.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "pgcrypto");
@@ -135,6 +135,69 @@ namespace ConferenceManager.Data.Migrations
                         .IsUnique();
 
                     b.ToTable("salas", (string)null);
+                });
+
+            modelBuilder.Entity("ConferenceManager.Models.Sesion", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<Guid>("ConferenciaId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamptz")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<string>("Descripcion")
+                        .HasColumnType("text");
+
+                    b.Property<DateOnly>("Fecha")
+                        .HasColumnType("date");
+
+                    b.Property<string>("EncuestaUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<Guid>("ExpositorId")
+                        .HasColumnType("uuid");
+
+                    b.Property<TimeOnly>("HoraFin")
+                        .HasColumnType("time");
+
+                    b.Property<TimeOnly>("HoraInicio")
+                        .HasColumnType("time");
+
+                    b.Property<string>("QrCodeUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<Guid>("SalaId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Titulo")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("Track")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ConferenciaId");
+
+                    b.HasIndex("ExpositorId");
+
+                    b.HasIndex("Fecha");
+
+                    b.HasIndex("SalaId");
+
+                    b.ToTable("sesiones", (string)null);
                 });
 
             modelBuilder.Entity("ConferenceManager.Models.RefreshToken", b =>
@@ -317,6 +380,31 @@ namespace ConferenceManager.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Conferencia");
+                });
+
+            modelBuilder.Entity("ConferenceManager.Models.Sesion", b =>
+                {
+                    b.HasOne("ConferenceManager.Models.Conferencia", "Conferencia")
+                        .WithMany()
+                        .HasForeignKey("ConferenciaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ConferenceManager.Models.Expositor", "Expositor")
+                        .WithMany()
+                        .HasForeignKey("ExpositorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ConferenceManager.Models.Sala", "Sala")
+                        .WithMany()
+                        .HasForeignKey("SalaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Conferencia");
+                    b.Navigation("Expositor");
+                    b.Navigation("Sala");
                 });
 
             modelBuilder.Entity("ConferenceManager.Models.Usuario", b =>

@@ -148,8 +148,7 @@ public class SalaService(AppDbContext context) : ISalaService
                 SalaErrorCodes.SalaNotFound,
                 "La sala no existe o no pertenece al congreso especificado.");
 
-        // TODO US-5: reemplazar 0 por await context.Sesiones.AnyAsync(ses => ses.SalaId == id)
-        var tieneSesiones = false;
+        var tieneSesiones = await context.Sesiones.AnyAsync(s => s.SalaId == id);
 
         if (tieneSesiones)
             return ServiceResult.Fail(
