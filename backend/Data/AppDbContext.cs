@@ -11,6 +11,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Sala> Salas => Set<Sala>();
     public DbSet<Expositor> Expositores => Set<Expositor>();
     public DbSet<Sesion> Sesiones => Set<Sesion>();
+    public DbSet<Participante> Participantes => Set<Participante>();
+    public DbSet<AvisoUrgente> AvisosUrgentes => Set<AvisoUrgente>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -56,6 +58,20 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         }
 
         foreach (var entry in ChangeTracker.Entries<Sesion>()
+            .Where(e => e.State == EntityState.Added))
+        {
+            if (entry.Entity.CreatedAt == default)
+                entry.Entity.CreatedAt = DateTime.UtcNow;
+        }
+
+        foreach (var entry in ChangeTracker.Entries<Participante>()
+            .Where(e => e.State == EntityState.Added))
+        {
+            if (entry.Entity.CreatedAt == default)
+                entry.Entity.CreatedAt = DateTime.UtcNow;
+        }
+
+        foreach (var entry in ChangeTracker.Entries<AvisoUrgente>()
             .Where(e => e.State == EntityState.Added))
         {
             if (entry.Entity.CreatedAt == default)

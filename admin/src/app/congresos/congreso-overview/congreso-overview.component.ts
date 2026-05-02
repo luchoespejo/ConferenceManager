@@ -125,6 +125,14 @@ import { CongresoOverviewDto } from '../congreso.model';
               </div>
               <span class="action-arrow">→</span>
             </a>
+            <a [routerLink]="['/congreso', id, 'avisos']" class="action-card">
+              <div class="action-icon">📢</div>
+              <div class="action-content">
+                <div class="action-title">Avisos Urgentes</div>
+                <div class="action-desc">Publicá comunicados en tiempo real durante el evento</div>
+              </div>
+              <span class="action-arrow">→</span>
+            </a>
           </div>
 
           <!-- Proximas sesiones -->
