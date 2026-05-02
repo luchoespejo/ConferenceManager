@@ -30,12 +30,12 @@ export default function SesionDetail() {
     setSlug(extractedSlug);
 
     if (['localhost', 'www', 'tuplataforma'].includes(extractedSlug)) {
-      setSlug('demo');
+      setSlug('reactconf');
     }
 
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
-    fetch(`${apiUrl}/api/public/${extractedSlug || 'demo'}/sesiones/${id}`)
+    fetch(`${apiUrl}/api/public/${extractedSlug || 'reactconf'}/sesiones/${id}`)
       .then((res) => res.json())
       .then((data) => {
         setSesion(data);

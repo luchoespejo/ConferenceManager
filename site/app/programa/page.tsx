@@ -29,11 +29,11 @@ export default function Programa() {
     setSlug(extractedSlug);
 
     if (['localhost', 'www', 'tuplataforma'].includes(extractedSlug)) {
-      setSlug('demo');
+      setSlug('reactconf');
     }
 
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-    fetch(`${apiUrl}/api/public/${extractedSlug || 'demo'}/programa`)
+    fetch(`${apiUrl}/api/public/${extractedSlug || 'reactconf'}/programa`)
       .then((res) => res.json())
       .then((data) => {
         setSesiones(data);

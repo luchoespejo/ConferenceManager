@@ -6,7 +6,7 @@ function getSlug(): string {
   if (typeof window === 'undefined') return '';
   const host = window.location.hostname;
   const slug = host.split('.')[0];
-  return ['localhost', 'www', 'tuplataforma'].includes(slug) ? 'demo' : slug;
+  return ['localhost', 'www', 'tuplataforma'].includes(slug) ? 'reactconf' : slug;
 }
 
 export default function Certificado() {
