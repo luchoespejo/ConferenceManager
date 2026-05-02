@@ -56,5 +56,10 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () => import('./avisos-urgentes/avisos-urgentes.component').then(m => m.AvisosUrgentesComponent)
   },
+  {
+    path: 'congreso/:id/programa',
+    canActivate: [authGuard],
+    loadComponent: () => import('./programa/programa.component').then(m => m.ProgramaComponent)
+  },
   { path: '**', redirectTo: 'dashboard' }
 ];

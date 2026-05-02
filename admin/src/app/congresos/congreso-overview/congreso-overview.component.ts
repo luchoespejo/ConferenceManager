@@ -133,6 +133,14 @@ import { CongresoOverviewDto } from '../congreso.model';
               </div>
               <span class="action-arrow">→</span>
             </a>
+            <a [routerLink]="['/congreso', id, 'programa']" class="action-card">
+              <div class="action-icon">🗓️</div>
+              <div class="action-content">
+                <div class="action-title">Programa</div>
+                <div class="action-desc">Vista de grilla del evento por día y sala</div>
+              </div>
+              <span class="action-arrow">→</span>
+            </a>
           </div>
 
           <!-- Proximas sesiones -->
