@@ -1,65 +1,95 @@
-import Image from "next/image";
+'use client';
+
+import { useEffect, useState } from 'react';
+import { headers } from 'next/headers';
+import Link from 'next/link';
+
+interface Conferencia {
+  id: string;
+  slug: string;
+  nombre: string;
+  descripcion?: string;
+  fechaInicio: string;
+  fechaFin: string;
+  logoUrl?: string;
+  colorPrimario?: string;
+  colorSecundario?: string;
+  venueNombre?: string;
+  venueDireccion?: string;
+}
 
 export default function Home() {
+  const [conferencia, setConferencia] = useState<Conferencia | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [slug, setSlug] = useState<string>('');
+
+  useEffect(() => {
+    const host = typeof window !== 'undefined' ? window.location.hostname : '';
+    const extractedSlug = host.split('.')[0];
+    setSlug(extractedSlug);
+
+    if (['localhost', 'www', 'tuplataforma'].includes(extractedSlug)) {
+      setSlug('demo');
+    }
+
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+    fetch(`${apiUrl}/api/public/${extractedSlug || 'demo'}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setConferencia(data);
+        setLoading(false);
+      })
+      .catch(() => {
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return <div className="flex items-center justify-center h-screen">Cargando...</div>;
+  }
+
+  if (!conferencia) {
+    return <div className="flex items-center justify-center h-screen">Congreso no encontrado.</div>;
+  }
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div
+      className="min-h-screen"
+      style={{
+        '--color-primary': conferencia.colorPrimario || '#000',
+        '--color-secondary': conferencia.colorSecundario || '#666',
+      } as React.CSSProperties & { [key: string]: string }}
+    >
+      {/* Hero */}
+      <div className="bg-[var(--color-primary)] text-white py-20 px-6 text-center">
+        {conferencia.logoUrl && (
+          <img src={conferencia.logoUrl} alt="Logo" className="h-16 mx-auto mb-6" />
+        )}
+        <h1 className="text-4xl font-bold mb-4">{conferencia.nombre}</h1>
+        {conferencia.descripcion && (
+          <p className="text-lg text-gray-100 max-w-2xl mx-auto mb-6">{conferencia.descripcion}</p>
+        )}
+        <p className="text-sm text-gray-200 mb-8">
+          {new Date(conferencia.fechaInicio).toLocaleDateString()} -{' '}
+          {new Date(conferencia.fechaFin).toLocaleDateString()}
+        </p>
+        <Link href="/programa" className="inline-block bg-white text-[var(--color-primary)] font-bold py-3 px-8 rounded">
+          Ver Programa
+        </Link>
+      </div>
+
+      {/* Venue */}
+      {conferencia.venueNombre && (
+        <div className="py-16 px-6 bg-gray-50">
+          <div className="max-w-2xl mx-auto">
+            <h2 className="text-3xl font-bold mb-4">Sede del evento</h2>
+            <p className="text-lg mb-2">{conferencia.venueNombre}</p>
+            {conferencia.venueDireccion && (
+              <p className="text-gray-600 mb-4">{conferencia.venueDireccion}</p>
+            )}
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+      )}
     </div>
   );
 }
