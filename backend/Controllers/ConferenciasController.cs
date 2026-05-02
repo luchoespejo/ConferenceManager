@@ -93,6 +93,17 @@ public class ConferenciasController(IConferenciaService conferenciaService) : Co
         };
     }
 
+    [HttpGet("{id:guid}/overview")]
+    public async Task<IActionResult> GetOverview(Guid id)
+    {
+        var overview = await conferenciaService.GetOverviewAsync(id, UsuarioId);
+
+        if (overview is null)
+            return NotFound();
+
+        return Ok(overview);
+    }
+
     [HttpPut("{id:guid}/publicar")]
     public async Task<IActionResult> PublicarConferencia(Guid id)
     {

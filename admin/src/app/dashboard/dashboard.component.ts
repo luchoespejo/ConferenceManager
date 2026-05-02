@@ -70,7 +70,7 @@ import { CongresoListItemDto } from '../congresos/congreso.model';
                 <span class="card-slug">{{ c.slug }}</span>
                 <div class="card-footer-row">
                   <span class="sessions-count"><strong>{{ c.cantidadSesiones }}</strong> sesiones</span>
-                  <a [routerLink]="['/congreso', c.id, 'configuracion']" class="btn btn-primary btn-sm">Gestionar →</a>
+                  <a [routerLink]="['/congreso', c.id]" class="btn btn-primary btn-sm">Gestionar →</a>
                 </div>
               </div>
             }

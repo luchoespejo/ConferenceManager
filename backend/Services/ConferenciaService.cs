@@ -197,6 +197,65 @@ public class ConferenciaService(AppDbContext context) : IConferenciaService
         return ServiceResult<ConferenciaDetalleDto>.Ok(MapToDetalleDto(conferencia));
     }
 
+    public async Task<ConferenciaOverviewDto?> GetOverviewAsync(Guid id, Guid usuarioId)
+    {
+        var conferencia = await context.Conferencias
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.Id == id && c.UsuarioId == usuarioId);
+
+        if (conferencia is null)
+            return null;
+
+        var totalSesiones = await context.Sesiones
+            .AsNoTracking()
+            .CountAsync(s => s.ConferenciaId == id);
+
+        var totalExpositores = await context.Expositores
+            .AsNoTracking()
+            .CountAsync(e => e.ConferenciaId == id);
+
+        var totalSalas = await context.Salas
+            .AsNoTracking()
+            .CountAsync(s => s.ConferenciaId == id);
+
+        var proximasSesiones = await context.Sesiones
+            .AsNoTracking()
+            .Where(s => s.ConferenciaId == id)
+            .OrderBy(s => s.Fecha)
+            .ThenBy(s => s.HoraInicio)
+            .Take(3)
+            .Select(s => new SesionProximaDto
+            {
+                Id = s.Id,
+                Titulo = s.Titulo,
+                Fecha = s.Fecha,
+                HoraInicio = s.HoraInicio,
+                HoraFin = s.HoraFin,
+                SalaNombre = s.Sala.Nombre,
+                ExpositorNombre = s.Expositor.Nombre,
+                Track = s.Track
+            })
+            .ToListAsync();
+
+        return new ConferenciaOverviewDto
+        {
+            Id = conferencia.Id,
+            Nombre = conferencia.Nombre,
+            Slug = conferencia.Slug,
+            Estado = conferencia.Estado.ToString(),
+            FechaInicio = conferencia.FechaInicio,
+            FechaFin = conferencia.FechaFin,
+            ColorPrimario = conferencia.ColorPrimario,
+            VenueNombre = conferencia.VenueNombre,
+            VenueDireccion = conferencia.VenueDireccion,
+            TotalSesiones = totalSesiones,
+            TotalExpositores = totalExpositores,
+            TotalSalas = totalSalas,
+            TotalParticipantes = 0,
+            ProximasSesiones = proximasSesiones
+        };
+    }
+
     private static ConferenciaDetalleDto MapToDetalleDto(Conferencia c) => new()
     {
         Id = c.Id,
