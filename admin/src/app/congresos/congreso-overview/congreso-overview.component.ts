@@ -282,7 +282,7 @@ export class CongresoOverviewComponent implements OnInit {
     if (!confirm('¿Finalizar este congreso? Esta acción no se puede deshacer.')) return;
     this.finalizando.set(true);
     this.apiError.set(null);
-    this.congresoService.publicar(this.id).subscribe({
+    this.congresoService.finalizar(this.id).subscribe({
       next: (congreso) => {
         this.overview.update(o => o ? { ...o, estado: congreso.estado } : o);
         this.finalizando.set(false);

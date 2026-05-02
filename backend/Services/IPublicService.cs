@@ -8,4 +8,5 @@ public interface IPublicService
     Task<IEnumerable<SesionPublicaDto>> GetProgramaBySlugAsync(string slug);
     Task<IEnumerable<ExpositorPublicoDto>> GetExpositorsBySlugAsync(string slug);
     Task<SesionPublicaDto?> GetSesionByIdAsync(string slug, Guid id);
+    Task<IEnumerable<AvisoUrgentePublicoDto>> GetAvisosActivosBySlugAsync(string slug);
 }

@@ -43,4 +43,11 @@ public class PublicConferenciasController(IPublicService publicService) : Contro
 
         return Ok(sesion);
     }
+
+    [HttpGet("avisos")]
+    public async Task<ActionResult<IEnumerable<AvisoUrgentePublicoDto>>> GetAvisos(string slug)
+    {
+        var avisos = await publicService.GetAvisosActivosBySlugAsync(slug);
+        return Ok(avisos);
+    }
 }

@@ -82,6 +82,21 @@ public class PublicService(AppDbContext context) : IPublicService
         return expositores;
     }
 
+    public async Task<IEnumerable<AvisoUrgentePublicoDto>> GetAvisosActivosBySlugAsync(string slug)
+    {
+        return await context.AvisosUrgentes
+            .AsNoTracking()
+            .Where(a => a.Conferencia.Slug == slug && a.Activo)
+            .OrderByDescending(a => a.CreatedAt)
+            .Select(a => new AvisoUrgentePublicoDto
+            {
+                Id = a.Id,
+                Mensaje = a.Mensaje,
+                CreatedAt = a.CreatedAt
+            })
+            .ToListAsync();
+    }
+
     public async Task<SesionPublicaDto?> GetSesionByIdAsync(string slug, Guid id)
     {
         var sesion = await context.Sesiones

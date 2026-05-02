@@ -42,4 +42,8 @@ export class CongresoService {
   publicar(id: string): Observable<CongresoDetalleDto> {
     return this.http.put<CongresoDetalleDto>(`${this.baseUrl}/${id}/publicar`, {});
   }
+
+  finalizar(id: string): Observable<CongresoDetalleDto> {
+    return this.http.put<CongresoDetalleDto>(`${this.baseUrl}/${id}/finalizar`, {});
+  }
 }

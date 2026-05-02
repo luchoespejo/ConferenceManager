@@ -197,6 +197,27 @@ public class ConferenciaService(AppDbContext context) : IConferenciaService
         return ServiceResult<ConferenciaDetalleDto>.Ok(MapToDetalleDto(conferencia));
     }
 
+    public async Task<ServiceResult<ConferenciaDetalleDto>> FinalizarAsync(Guid id, Guid usuarioId)
+    {
+        var conferencia = await context.Conferencias
+            .FirstOrDefaultAsync(c => c.Id == id && c.UsuarioId == usuarioId);
+
+        if (conferencia is null)
+            return ServiceResult<ConferenciaDetalleDto>.Fail(
+                ConferenciaErrorCodes.ConferenciaNotFound,
+                "El congreso no existe o no pertenece al usuario autenticado.");
+
+        if (conferencia.Estado != ConferenciaEstado.Publicado)
+            return ServiceResult<ConferenciaDetalleDto>.Fail(
+                ConferenciaErrorCodes.CannotFinalizeNotPublished,
+                "Solo se pueden finalizar congresos en estado Publicado.");
+
+        conferencia.Estado = ConferenciaEstado.Finalizado;
+        await context.SaveChangesAsync();
+
+        return ServiceResult<ConferenciaDetalleDto>.Ok(MapToDetalleDto(conferencia));
+    }
+
     public async Task<ConferenciaOverviewDto?> GetOverviewAsync(Guid id, Guid usuarioId)
     {
         var conferencia = await context.Conferencias
@@ -217,6 +238,10 @@ public class ConferenciaService(AppDbContext context) : IConferenciaService
         var totalSalas = await context.Salas
             .AsNoTracking()
             .CountAsync(s => s.ConferenciaId == id);
+
+        var totalParticipantes = await context.Participantes
+            .AsNoTracking()
+            .CountAsync(p => p.ConferenciaId == id);
 
         var proximasSesiones = await context.Sesiones
             .AsNoTracking()
@@ -251,7 +276,7 @@ public class ConferenciaService(AppDbContext context) : IConferenciaService
             TotalSesiones = totalSesiones,
             TotalExpositores = totalExpositores,
             TotalSalas = totalSalas,
-            TotalParticipantes = 0,
+            TotalParticipantes = totalParticipantes,
             ProximasSesiones = proximasSesiones
         };
     }

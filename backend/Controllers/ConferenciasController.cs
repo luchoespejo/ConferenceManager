@@ -120,4 +120,21 @@ public class ConferenciasController(IConferenciaService conferenciaService) : Co
             _ => StatusCode(500, new { error = "INTERNAL_ERROR", message = "Error inesperado." })
         };
     }
+
+    [HttpPut("{id:guid}/finalizar")]
+    public async Task<IActionResult> FinalizarConferencia(Guid id)
+    {
+        var result = await conferenciaService.FinalizarAsync(id, UsuarioId);
+
+        if (result.Success)
+            return Ok(result.Data);
+
+        return result.ErrorCode switch
+        {
+            ConferenciaErrorCodes.ConferenciaNotFound => NotFound(),
+            ConferenciaErrorCodes.CannotFinalizeNotPublished =>
+                StatusCode(422, new { error = result.ErrorCode, message = result.ErrorMessage }),
+            _ => StatusCode(500, new { error = "INTERNAL_ERROR", message = "Error inesperado." })
+        };
+    }
 }

@@ -9,4 +9,5 @@ public static class ConferenciaErrorCodes
     public const string CannotDeleteNonDraft = "CANNOT_DELETE_NON_DRAFT";
     public const string CannotChangeSlugNonDraft = "CANNOT_CHANGE_SLUG_NON_DRAFT";
     public const string CannotPublishNotDraft = "CANNOT_PUBLISH_NOT_DRAFT";
+    public const string CannotFinalizeNotPublished = "CANNOT_FINALIZE_NOT_PUBLISHED";
 }

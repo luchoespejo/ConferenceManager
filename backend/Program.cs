@@ -147,7 +147,8 @@ if (app.Environment.IsDevelopment())
 app.UseCors("AllowAdminClient");
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+    app.UseHttpsRedirection();
 
 app.MapGet("/api/health", () => Results.Ok(new { status = "ok" }));
 
