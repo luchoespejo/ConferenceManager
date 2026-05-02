@@ -75,6 +75,11 @@ builder.Services.AddHttpClient("ResendClient");
 
 // ── Application Services ──────────────────────────────────────────────────────
 builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IQrService>(provider =>
+{
+    var logger = provider.GetRequiredService<ILogger<QrService>>();
+    return new QrService(logger);
+});
 
 if (builder.Configuration.GetValue<bool>("Email:UseFake"))
     builder.Services.AddScoped<IEmailService, FakeEmailService>();

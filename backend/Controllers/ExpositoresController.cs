@@ -17,7 +17,7 @@ public class ExpositoresController(IExpositorService expositorService) : Control
         var usuarioId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         var result = await expositorService.GetAllAsync(conferenciaId, usuarioId);
 
-        if (!result.IsSuccess)
+        if (!result.Success)
             return NotFound();
 
         return Ok(result.Data);
@@ -29,7 +29,7 @@ public class ExpositoresController(IExpositorService expositorService) : Control
         var usuarioId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         var result = await expositorService.GetByIdAsync(id, conferenciaId, usuarioId);
 
-        if (!result.IsSuccess)
+        if (!result.Success)
             return NotFound();
 
         return Ok(result.Data);
@@ -41,7 +41,7 @@ public class ExpositoresController(IExpositorService expositorService) : Control
         var usuarioId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         var result = await expositorService.CreateAsync(conferenciaId, usuarioId, dto);
 
-        if (!result.IsSuccess)
+        if (!result.Success)
             return StatusCode(400, new { error = result.ErrorCode });
 
         return CreatedAtAction(nameof(GetById), new { conferenciaId, id = result.Data!.Id }, result.Data);
@@ -53,7 +53,7 @@ public class ExpositoresController(IExpositorService expositorService) : Control
         var usuarioId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         var result = await expositorService.UpdateAsync(id, conferenciaId, usuarioId, dto);
 
-        if (!result.IsSuccess)
+        if (!result.Success)
             return NotFound();
 
         return Ok(result.Data);
@@ -65,7 +65,7 @@ public class ExpositoresController(IExpositorService expositorService) : Control
         var usuarioId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         var result = await expositorService.DeleteAsync(id, conferenciaId, usuarioId);
 
-        if (!result.IsSuccess)
+        if (!result.Success)
         {
             if (result.ErrorCode == ExpositorErrorCodes.CannotDeleteWithSessions)
                 return StatusCode(422, new { error = result.ErrorCode });

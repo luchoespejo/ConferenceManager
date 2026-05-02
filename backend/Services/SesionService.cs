@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ConferenceManager.Services;
 
-public class SesionService(AppDbContext context) : ISesionService
+public class SesionService(AppDbContext context, IQrService qrService, IConfiguration config) : ISesionService
 {
     private async Task<bool> VerifyOwnershipAsync(Guid conferenciaId, Guid usuarioId)
     {
@@ -31,7 +31,7 @@ public class SesionService(AppDbContext context) : ISesionService
     public async Task<ServiceResult<IEnumerable<SesionListItemDto>>> GetAllAsync(Guid conferenciaId, Guid usuarioId)
     {
         if (!await VerifyOwnershipAsync(conferenciaId, usuarioId))
-            return ServiceResult.Fail(SesionErrorCodes.ConferenciaNotFound);
+            return ServiceResult<IEnumerable<SesionListItemDto>>.Fail(SesionErrorCodes.ConferenciaNotFound);
 
         var sesiones = await context.Sesiones
             .AsNoTracking()
@@ -50,44 +50,44 @@ public class SesionService(AppDbContext context) : ISesionService
             })
             .ToListAsync();
 
-        return ServiceResult.Success(sesiones.AsEnumerable());
+        return ServiceResult<IEnumerable<SesionListItemDto>>.Ok(sesiones.AsEnumerable());
     }
 
     public async Task<ServiceResult<SesionDto>> GetByIdAsync(Guid id, Guid conferenciaId, Guid usuarioId)
     {
         if (!await VerifyOwnershipAsync(conferenciaId, usuarioId))
-            return ServiceResult.Fail(SesionErrorCodes.ConferenciaNotFound);
+            return ServiceResult<SesionDto>.Fail(SesionErrorCodes.ConferenciaNotFound);
 
         var sesion = await context.Sesiones
             .AsNoTracking()
             .FirstOrDefaultAsync(s => s.Id == id && s.ConferenciaId == conferenciaId);
 
         if (sesion == null)
-            return ServiceResult.Fail(SesionErrorCodes.NotFound);
+            return ServiceResult<SesionDto>.Fail(SesionErrorCodes.NotFound);
 
-        return ServiceResult.Success(MapToDto(sesion));
+        return ServiceResult<SesionDto>.Ok(MapToDto(sesion));
     }
 
     public async Task<ServiceResult<SesionDto>> CreateAsync(Guid conferenciaId, Guid usuarioId, CreateSesionDto dto)
     {
         if (!await VerifyOwnershipAsync(conferenciaId, usuarioId))
-            return ServiceResult.Fail(SesionErrorCodes.ConferenciaNotFound);
+            return ServiceResult<SesionDto>.Fail(SesionErrorCodes.ConferenciaNotFound);
 
         if (!await SalaInConferenciaAsync(dto.SalaId, conferenciaId))
-            return ServiceResult.Fail(SesionErrorCodes.SalaNotInConferencia);
+            return ServiceResult<SesionDto>.Fail(SesionErrorCodes.SalaNotInConferencia);
 
         if (!await ExpositorInConferenciaAsync(dto.ExpositorId, conferenciaId))
-            return ServiceResult.Fail(SesionErrorCodes.ExpositorNotInConferencia);
+            return ServiceResult<SesionDto>.Fail(SesionErrorCodes.ExpositorNotInConferencia);
 
         if (dto.HoraInicio >= dto.HoraFin)
-            return ServiceResult.Fail(SesionErrorCodes.InvalidTimeRange);
+            return ServiceResult<SesionDto>.Fail(SesionErrorCodes.InvalidTimeRange);
 
         var conferencia = await context.Conferencias
             .AsNoTracking()
             .FirstOrDefaultAsync(c => c.Id == conferenciaId);
 
         if (conferencia != null && (dto.Fecha < conferencia.FechaInicio || dto.Fecha > conferencia.FechaFin))
-            return ServiceResult.Fail(SesionErrorCodes.InvalidDateRange);
+            return ServiceResult<SesionDto>.Fail(SesionErrorCodes.InvalidDateRange);
 
         var sesion = new Sesion
         {
@@ -101,38 +101,46 @@ public class SesionService(AppDbContext context) : ISesionService
             HoraInicio = dto.HoraInicio,
             HoraFin = dto.HoraFin,
             Track = dto.Track,
-            EncuestaUrl = dto.EncuestaUrl,
-            QrCodeUrl = dto.QrCodeUrl
+            EncuestaUrl = dto.EncuestaUrl
         };
 
         context.Sesiones.Add(sesion);
         await context.SaveChangesAsync();
 
-        return ServiceResult.Success(MapToDto(sesion));
+        var siteUrl = config["App:SiteUrl"] ?? "http://localhost:3000";
+        var qrUrl = await qrService.GenerateAsync($"{siteUrl}/s/{sesion.Id}");
+        if (!string.IsNullOrEmpty(qrUrl))
+        {
+            sesion.QrCodeUrl = qrUrl;
+            context.Sesiones.Update(sesion);
+            await context.SaveChangesAsync();
+        }
+
+        return ServiceResult<SesionDto>.Ok(MapToDto(sesion));
     }
 
     public async Task<ServiceResult<SesionDto>> UpdateAsync(Guid id, Guid conferenciaId, Guid usuarioId, UpdateSesionDto dto)
     {
         if (!await VerifyOwnershipAsync(conferenciaId, usuarioId))
-            return ServiceResult.Fail(SesionErrorCodes.ConferenciaNotFound);
+            return ServiceResult<SesionDto>.Fail(SesionErrorCodes.ConferenciaNotFound);
 
         var sesion = await context.Sesiones
             .FirstOrDefaultAsync(s => s.Id == id && s.ConferenciaId == conferenciaId);
 
         if (sesion == null)
-            return ServiceResult.Fail(SesionErrorCodes.NotFound);
+            return ServiceResult<SesionDto>.Fail(SesionErrorCodes.NotFound);
 
         if (dto.SalaId.HasValue)
         {
             if (!await SalaInConferenciaAsync(dto.SalaId.Value, conferenciaId))
-                return ServiceResult.Fail(SesionErrorCodes.SalaNotInConferencia);
+                return ServiceResult<SesionDto>.Fail(SesionErrorCodes.SalaNotInConferencia);
             sesion.SalaId = dto.SalaId.Value;
         }
 
         if (dto.ExpositorId.HasValue)
         {
             if (!await ExpositorInConferenciaAsync(dto.ExpositorId.Value, conferenciaId))
-                return ServiceResult.Fail(SesionErrorCodes.ExpositorNotInConferencia);
+                return ServiceResult<SesionDto>.Fail(SesionErrorCodes.ExpositorNotInConferencia);
             sesion.ExpositorId = dto.ExpositorId.Value;
         }
 
@@ -143,38 +151,37 @@ public class SesionService(AppDbContext context) : ISesionService
         if (dto.HoraFin.HasValue) sesion.HoraFin = dto.HoraFin.Value;
         if (dto.Track != null) sesion.Track = dto.Track;
         if (dto.EncuestaUrl != null) sesion.EncuestaUrl = dto.EncuestaUrl;
-        if (dto.QrCodeUrl != null) sesion.QrCodeUrl = dto.QrCodeUrl;
 
         if (sesion.HoraInicio >= sesion.HoraFin)
-            return ServiceResult.Fail(SesionErrorCodes.InvalidTimeRange);
+            return ServiceResult<SesionDto>.Fail(SesionErrorCodes.InvalidTimeRange);
 
         var conferencia = await context.Conferencias
             .AsNoTracking()
             .FirstOrDefaultAsync(c => c.Id == conferenciaId);
 
         if (conferencia != null && (sesion.Fecha < conferencia.FechaInicio || sesion.Fecha > conferencia.FechaFin))
-            return ServiceResult.Fail(SesionErrorCodes.InvalidDateRange);
+            return ServiceResult<SesionDto>.Fail(SesionErrorCodes.InvalidDateRange);
 
         await context.SaveChangesAsync();
 
-        return ServiceResult.Success(MapToDto(sesion));
+        return ServiceResult<SesionDto>.Ok(MapToDto(sesion));
     }
 
     public async Task<ServiceResult<bool>> DeleteAsync(Guid id, Guid conferenciaId, Guid usuarioId)
     {
         if (!await VerifyOwnershipAsync(conferenciaId, usuarioId))
-            return ServiceResult.Fail(SesionErrorCodes.ConferenciaNotFound);
+            return ServiceResult<bool>.Fail(SesionErrorCodes.ConferenciaNotFound);
 
         var sesion = await context.Sesiones
             .FirstOrDefaultAsync(s => s.Id == id && s.ConferenciaId == conferenciaId);
 
         if (sesion == null)
-            return ServiceResult.Fail(SesionErrorCodes.NotFound);
+            return ServiceResult<bool>.Fail(SesionErrorCodes.NotFound);
 
         context.Sesiones.Remove(sesion);
         await context.SaveChangesAsync();
 
-        return ServiceResult.Success(true);
+        return ServiceResult<bool>.Ok(true);
     }
 
     private static SesionDto MapToDto(Sesion s)

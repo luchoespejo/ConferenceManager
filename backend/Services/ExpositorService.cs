@@ -18,7 +18,7 @@ public class ExpositorService(AppDbContext context) : IExpositorService
     public async Task<ServiceResult<IEnumerable<ExpositorListItemDto>>> GetAllAsync(Guid conferenciaId, Guid usuarioId)
     {
         if (!await VerifyOwnershipAsync(conferenciaId, usuarioId))
-            return ServiceResult.Fail(ExpositorErrorCodes.ConferenciaNotFound);
+            return ServiceResult<IEnumerable<ExpositorListItemDto>>.Fail(ExpositorErrorCodes.ConferenciaNotFound);
 
         var expositores = await context.Expositores
             .AsNoTracking()
@@ -33,28 +33,28 @@ public class ExpositorService(AppDbContext context) : IExpositorService
             })
             .ToListAsync();
 
-        return ServiceResult.Success(expositores.AsEnumerable());
+        return ServiceResult<IEnumerable<ExpositorListItemDto>>.Ok(expositores.AsEnumerable());
     }
 
     public async Task<ServiceResult<ExpositorDetalleDto>> GetByIdAsync(Guid id, Guid conferenciaId, Guid usuarioId)
     {
         if (!await VerifyOwnershipAsync(conferenciaId, usuarioId))
-            return ServiceResult.Fail(ExpositorErrorCodes.ConferenciaNotFound);
+            return ServiceResult<ExpositorDetalleDto>.Fail(ExpositorErrorCodes.ConferenciaNotFound);
 
         var expositor = await context.Expositores
             .AsNoTracking()
             .FirstOrDefaultAsync(e => e.Id == id && e.ConferenciaId == conferenciaId);
 
         if (expositor == null)
-            return ServiceResult.Fail(ExpositorErrorCodes.NotFound);
+            return ServiceResult<ExpositorDetalleDto>.Fail(ExpositorErrorCodes.NotFound);
 
-        return ServiceResult.Success(MapToDetalle(expositor));
+        return ServiceResult<ExpositorDetalleDto>.Ok(MapToDetalle(expositor));
     }
 
     public async Task<ServiceResult<ExpositorDetalleDto>> CreateAsync(Guid conferenciaId, Guid usuarioId, CreateExpositorDto dto)
     {
         if (!await VerifyOwnershipAsync(conferenciaId, usuarioId))
-            return ServiceResult.Fail(ExpositorErrorCodes.ConferenciaNotFound);
+            return ServiceResult<ExpositorDetalleDto>.Fail(ExpositorErrorCodes.ConferenciaNotFound);
 
         var expositor = new Expositor
         {
@@ -71,19 +71,19 @@ public class ExpositorService(AppDbContext context) : IExpositorService
         context.Expositores.Add(expositor);
         await context.SaveChangesAsync();
 
-        return ServiceResult.Success(MapToDetalle(expositor));
+        return ServiceResult<ExpositorDetalleDto>.Ok(MapToDetalle(expositor));
     }
 
     public async Task<ServiceResult<ExpositorDetalleDto>> UpdateAsync(Guid id, Guid conferenciaId, Guid usuarioId, UpdateExpositorDto dto)
     {
         if (!await VerifyOwnershipAsync(conferenciaId, usuarioId))
-            return ServiceResult.Fail(ExpositorErrorCodes.ConferenciaNotFound);
+            return ServiceResult<ExpositorDetalleDto>.Fail(ExpositorErrorCodes.ConferenciaNotFound);
 
         var expositor = await context.Expositores
             .FirstOrDefaultAsync(e => e.Id == id && e.ConferenciaId == conferenciaId);
 
         if (expositor == null)
-            return ServiceResult.Fail(ExpositorErrorCodes.NotFound);
+            return ServiceResult<ExpositorDetalleDto>.Fail(ExpositorErrorCodes.NotFound);
 
         if (dto.Nombre != null) expositor.Nombre = dto.Nombre;
         if (dto.Bio != null) expositor.Bio = dto.Bio;
@@ -93,28 +93,28 @@ public class ExpositorService(AppDbContext context) : IExpositorService
 
         await context.SaveChangesAsync();
 
-        return ServiceResult.Success(MapToDetalle(expositor));
+        return ServiceResult<ExpositorDetalleDto>.Ok(MapToDetalle(expositor));
     }
 
     public async Task<ServiceResult<bool>> DeleteAsync(Guid id, Guid conferenciaId, Guid usuarioId)
     {
         if (!await VerifyOwnershipAsync(conferenciaId, usuarioId))
-            return ServiceResult.Fail(ExpositorErrorCodes.ConferenciaNotFound);
+            return ServiceResult<bool>.Fail(ExpositorErrorCodes.ConferenciaNotFound);
 
         var expositor = await context.Expositores
             .FirstOrDefaultAsync(e => e.Id == id && e.ConferenciaId == conferenciaId);
 
         if (expositor == null)
-            return ServiceResult.Fail(ExpositorErrorCodes.NotFound);
+            return ServiceResult<bool>.Fail(ExpositorErrorCodes.NotFound);
 
         var tieneSesiones = await context.Sesiones.AnyAsync(s => s.ExpositorId == id);
         if (tieneSesiones)
-            return ServiceResult.Fail(ExpositorErrorCodes.CannotDeleteWithSessions);
+            return ServiceResult<bool>.Fail(ExpositorErrorCodes.CannotDeleteWithSessions);
 
         context.Expositores.Remove(expositor);
         await context.SaveChangesAsync();
 
-        return ServiceResult.Success(true);
+        return ServiceResult<bool>.Ok(true);
     }
 
     private static ExpositorDetalleDto MapToDetalle(Expositor e)

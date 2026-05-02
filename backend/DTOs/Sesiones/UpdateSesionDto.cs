@@ -11,5 +11,4 @@ public class UpdateSesionDto
     public TimeOnly? HoraFin { get; set; }
     public string? Track { get; set; }
     public string? EncuestaUrl { get; set; }
-    public string? QrCodeUrl { get; set; }
 }
