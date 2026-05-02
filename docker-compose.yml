@@ -67,7 +67,7 @@ services:
     volumes:
       - ./admin:/app
       - admin_node_modules:/app/node_modules
-    command: sh -c "npm install && npm install -g @angular/cli && ng serve --host 0.0.0.0"
+    command: sh -c "npm install && npx ng serve --host 0.0.0.0 --poll 500"
 
 volumes:
   postgres_data:
