@@ -108,7 +108,7 @@ export class SesionesComponent implements OnInit, OnDestroy {
 
   sesiones = signal<SesionListItem[]>([]);
   salas = signal<SalaDto[]>([]);
-  expositores = signal<ExpositorListItemDto[]>([]);
+  expositores = signal<ExpositorListItem[]>([]);
   mostrarForm = signal(false);
   conferenciaId!: string;
   form!: FormGroup;
