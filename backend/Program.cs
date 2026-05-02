@@ -122,6 +122,14 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
+// ── Seed (dev only) ───────────────────────────────────────────────────────────
+if (app.Environment.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await SeedData.SeedAsync(db);
+}
+
 // ── Pipeline ──────────────────────────────────────────────────────────────────
 if (app.Environment.IsDevelopment())
 {
