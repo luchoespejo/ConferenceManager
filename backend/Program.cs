@@ -92,6 +92,7 @@ builder.Services.AddScoped<ISalaService, SalaService>();
 builder.Services.AddScoped<IExpositorService, ExpositorService>();
 builder.Services.AddScoped<ISesionService, SesionService>();
 builder.Services.AddScoped<IPublicService, PublicService>();
+builder.Services.AddScoped<IParticipanteService, ParticipanteService>();
 
 // ── Controllers + Swagger ─────────────────────────────────────────────────────
 builder.Services.AddControllers()

@@ -6,7 +6,8 @@ import {
   CongresoListItemDto,
   CongresoDetalleDto,
   CreateCongresoDto,
-  UpdateCongresoDto
+  UpdateCongresoDto,
+  CongresoOverviewDto
 } from './congreso.model';
 
 @Injectable({ providedIn: 'root' })
@@ -32,6 +33,10 @@ export class CongresoService {
 
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
+
+  getOverview(id: string): Observable<CongresoOverviewDto> {
+    return this.http.get<CongresoOverviewDto>(`${this.baseUrl}/${id}/overview`);
   }
 
   publicar(id: string): Observable<CongresoDetalleDto> {

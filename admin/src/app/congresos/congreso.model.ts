@@ -47,3 +47,31 @@ export interface CreateCongresoDto {
 }
 
 export type UpdateCongresoDto = Partial<CreateCongresoDto>;
+
+export interface SesionProximaDto {
+  id: string;
+  titulo: string;
+  fecha: string;
+  horaInicio: string;
+  horaFin: string;
+  salaNombre: string;
+  expositorNombre: string;
+  track: string | null;
+}
+
+export interface CongresoOverviewDto {
+  id: string;
+  nombre: string;
+  slug: string;
+  estado: EstadoCongreso;
+  fechaInicio: string;
+  fechaFin: string;
+  colorPrimario: string | null;
+  venueNombre: string | null;
+  venueDireccion: string | null;
+  totalSesiones: number;
+  totalExpositores: number;
+  totalSalas: number;
+  totalParticipantes: number;
+  proximasSesiones: SesionProximaDto[];
+}

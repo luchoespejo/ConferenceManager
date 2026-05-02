@@ -41,5 +41,15 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () => import('./sesiones/sesiones.component').then(m => m.SesionesComponent)
   },
+  {
+    path: 'congreso/:id',
+    canActivate: [authGuard],
+    loadComponent: () => import('./congresos/congreso-overview/congreso-overview.component').then(m => m.CongresoOverviewComponent)
+  },
+  {
+    path: 'congreso/:id/participantes',
+    canActivate: [authGuard],
+    loadComponent: () => import('./participantes/participantes.component').then(m => m.ParticipantesComponent)
+  },
   { path: '**', redirectTo: 'dashboard' }
 ];

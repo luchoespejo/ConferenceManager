@@ -117,14 +117,14 @@ import { CongresoOverviewDto } from '../congreso.model';
               </div>
               <span class="action-arrow">→</span>
             </a>
-            <div class="action-card action-card--disabled">
+            <a [routerLink]="['/congreso', id, 'participantes']" class="action-card">
               <div class="action-icon">👥</div>
               <div class="action-content">
                 <div class="action-title">Participantes</div>
-                <div class="action-desc">Próximamente disponible</div>
+                <div class="action-desc">Gestioná los asistentes y sus certificados</div>
               </div>
-              <span class="badge badge-borrador" style="font-size:.65rem">Pronto</span>
-            </div>
+              <span class="action-arrow">→</span>
+            </a>
           </div>
 
           <!-- Proximas sesiones -->
