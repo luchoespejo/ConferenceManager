@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:16-alpine
@@ -19,10 +17,9 @@ services:
       retries: 5
 
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    image: mcr.microsoft.com/dotnet/sdk:10.0
     container_name: conference_backend
+    working_dir: /app
     ports:
       - "5000:5000"
     environment:
@@ -40,13 +37,12 @@ services:
         condition: service_healthy
     volumes:
       - ./backend:/app
-    command: dotnet watch run
+    command: sh -c "dotnet restore && dotnet watch run"
 
   site:
-    build:
-      context: ./site
-      dockerfile: Dockerfile
+    image: node:20-alpine
     container_name: conference_site
+    working_dir: /app
     ports:
       - "3000:3000"
     environment:
@@ -56,13 +52,12 @@ services:
     volumes:
       - ./site:/app
       - /app/node_modules
-    command: npm run dev
+    command: sh -c "npm install && npm run dev"
 
   admin:
-    build:
-      context: ./admin
-      dockerfile: Dockerfile
+    image: node:20-alpine
     container_name: conference_admin
+    working_dir: /app
     ports:
       - "4200:4200"
     depends_on:
@@ -70,7 +65,7 @@ services:
     volumes:
       - ./admin:/app
       - /app/node_modules
-    command: ng serve --host 0.0.0.0
+    command: sh -c "npm install && ng serve --host 0.0.0.0"
 
 volumes:
   postgres_data:
