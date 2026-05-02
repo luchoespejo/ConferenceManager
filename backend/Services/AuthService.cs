@@ -94,7 +94,8 @@ public class AuthService(
         context.RefreshTokens.Add(refreshToken);
         await context.SaveChangesAsync();
 
-        return ServiceResult<LoginResponse>.Ok(new LoginResponse(accessToken, refreshTokenRaw, 900));
+        var usuarioInfo = new UsuarioInfo(usuario.Id, usuario.Email, usuario.Nombre, usuario.Organizacion);
+        return ServiceResult<LoginResponse>.Ok(new LoginResponse(accessToken, refreshTokenRaw, 900, usuarioInfo));
     }
 
     public async Task<ServiceResult<LoginResponse>> RefreshAsync(string refreshTokenRaw)
@@ -130,7 +131,8 @@ public class AuthService(
 
         await context.SaveChangesAsync();
 
-        return ServiceResult<LoginResponse>.Ok(new LoginResponse(newAccessToken, newRefreshTokenRaw, 900));
+        var usuarioInfo = new UsuarioInfo(tokenEntity.Usuario.Id, tokenEntity.Usuario.Email, tokenEntity.Usuario.Nombre, tokenEntity.Usuario.Organizacion);
+        return ServiceResult<LoginResponse>.Ok(new LoginResponse(newAccessToken, newRefreshTokenRaw, 900, usuarioInfo));
     }
 
     public async Task<ServiceResult> VerificarEmailAsync(string token)

@@ -94,7 +94,8 @@ builder.Services.AddScoped<ISesionService, SesionService>();
 builder.Services.AddScoped<IPublicService, PublicService>();
 
 // ── Controllers + Swagger ─────────────────────────────────────────────────────
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(o => o.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {

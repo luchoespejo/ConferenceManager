@@ -17,9 +17,10 @@ export class AuthService {
   private apiUrl = environment.apiUrl;
 
   private _accessToken = signal<string | null>(localStorage.getItem('access_token'));
-  private _usuario = signal<UsuarioInfo | null>(
-    JSON.parse(localStorage.getItem('usuario') ?? 'null')
-  );
+  private _usuario = signal<UsuarioInfo | null>((() => {
+    try { return JSON.parse(localStorage.getItem('usuario') ?? 'null'); }
+    catch { localStorage.removeItem('usuario'); return null; }
+  })());
 
   accessToken = this._accessToken.asReadonly();
   usuario = this._usuario.asReadonly();
