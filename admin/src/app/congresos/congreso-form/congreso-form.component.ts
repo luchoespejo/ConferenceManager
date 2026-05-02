@@ -181,6 +181,11 @@ function slugFromNombre(nombre: string): string {
             <button type="submit" class="btn btn-primary" [disabled]="submitting()">
               {{ submitting() ? 'Guardando...' : (id ? 'Guardar cambios' : 'Crear congreso') }}
             </button>
+            @if (id && congresoEstado() === 'Borrador') {
+              <button type="button" class="btn btn-success" (click)="publicar()" [disabled]="publicando()">
+                {{ publicando() ? 'Publicando...' : 'Publicar' }}
+              </button>
+            }
           </div>
 
         </form>
@@ -200,9 +205,11 @@ export class CongresoFormComponent implements OnInit, OnDestroy {
   loading = signal(false);
   loadError = signal(false);
   submitting = signal(false);
+  publicando = signal(false);
   apiError = signal<string | null>(null);
   slugConflict = signal(false);
   fechasError = signal<string | null>(null);
+  congresoEstado = signal<string>('Borrador');
 
   form: FormGroup = this.fb.group(
     {
@@ -278,6 +285,8 @@ export class CongresoFormComponent implements OnInit, OnDestroy {
         if (congreso.estado !== 'Borrador') {
           this.form.get('slug')!.disable();
         }
+
+        this.congresoEstado.set(congreso.estado);
 
         // Slug was loaded from server — treat as manually set (don't overwrite)
         this.slugManuallyEdited = true;
@@ -374,5 +383,24 @@ export class CongresoFormComponent implements OnInit, OnDestroy {
     }
 
     this.apiError.set(err.error?.message ?? 'Ocurrió un error inesperado. Intente nuevamente.');
+  }
+
+  publicar(): void {
+    if (!this.id) return;
+    if (!confirm('¿Publicar este congreso? Será visible en el mini-sitio.')) return;
+
+    this.publicando.set(true);
+    this.apiError.set(null);
+
+    this.congresoService.publicar(this.id).subscribe({
+      next: (congreso) => {
+        this.congresoEstado.set(congreso.estado);
+        this.publicando.set(false);
+      },
+      error: (err) => {
+        this.publicando.set(false);
+        this.apiError.set(err.error?.message ?? 'Error publicando congreso.');
+      }
+    });
   }
 }

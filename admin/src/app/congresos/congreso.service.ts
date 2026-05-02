@@ -33,4 +33,8 @@ export class CongresoService {
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
+
+  publicar(id: string): Observable<CongresoDetalleDto> {
+    return this.http.put<CongresoDetalleDto>(`${this.baseUrl}/${id}/publicar`, {});
+  }
 }

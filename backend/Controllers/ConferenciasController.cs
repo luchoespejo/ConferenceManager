@@ -92,4 +92,21 @@ public class ConferenciasController(IConferenciaService conferenciaService) : Co
             _ => StatusCode(500, new { error = "INTERNAL_ERROR", message = "Error inesperado." })
         };
     }
+
+    [HttpPut("{id:guid}/publicar")]
+    public async Task<IActionResult> PublicarConferencia(Guid id)
+    {
+        var result = await conferenciaService.PublicarAsync(id, UsuarioId);
+
+        if (result.Success)
+            return Ok(result.Data);
+
+        return result.ErrorCode switch
+        {
+            ConferenciaErrorCodes.ConferenciaNotFound => NotFound(),
+            ConferenciaErrorCodes.CannotPublishNotDraft =>
+                StatusCode(422, new { error = result.ErrorCode, message = result.ErrorMessage }),
+            _ => StatusCode(500, new { error = "INTERNAL_ERROR", message = "Error inesperado." })
+        };
+    }
 }

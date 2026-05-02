@@ -9,4 +9,5 @@ public interface IConferenciaService
     Task<ServiceResult<ConferenciaDetalleDto>> CreateAsync(CreateConferenciaDto dto, Guid usuarioId);
     Task<ServiceResult<ConferenciaDetalleDto>> UpdateAsync(Guid id, UpdateConferenciaDto dto, Guid usuarioId);
     Task<ServiceResult> DeleteAsync(Guid id, Guid usuarioId);
+    Task<ServiceResult<ConferenciaDetalleDto>> PublicarAsync(Guid id, Guid usuarioId);
 }

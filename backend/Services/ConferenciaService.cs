@@ -176,6 +176,27 @@ public class ConferenciaService(AppDbContext context) : IConferenciaService
         return ServiceResult.Ok();
     }
 
+    public async Task<ServiceResult<ConferenciaDetalleDto>> PublicarAsync(Guid id, Guid usuarioId)
+    {
+        var conferencia = await context.Conferencias
+            .FirstOrDefaultAsync(c => c.Id == id && c.UsuarioId == usuarioId);
+
+        if (conferencia is null)
+            return ServiceResult<ConferenciaDetalleDto>.Fail(
+                ConferenciaErrorCodes.ConferenciaNotFound,
+                "El congreso no existe o no pertenece al usuario autenticado.");
+
+        if (conferencia.Estado != ConferenciaEstado.Borrador)
+            return ServiceResult<ConferenciaDetalleDto>.Fail(
+                ConferenciaErrorCodes.CannotPublishNotDraft,
+                "Solo se pueden publicar congresos en estado Borrador.");
+
+        conferencia.Estado = ConferenciaEstado.Publicado;
+        await context.SaveChangesAsync();
+
+        return ServiceResult<ConferenciaDetalleDto>.Ok(MapToDetalleDto(conferencia));
+    }
+
     private static ConferenciaDetalleDto MapToDetalleDto(Conferencia c) => new()
     {
         Id = c.Id,
