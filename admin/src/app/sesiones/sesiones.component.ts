@@ -228,11 +228,18 @@ export class SesionesComponent implements OnInit, OnDestroy {
 
   submit(): void {
     if (!this.form.valid) return;
+    const v = this.form.value;
     const dto: CreateSesionDto = {
-      ...this.form.value,
-      fecha: this.form.value.fecha,
-      horaInicio: this.form.value.horaInicio,
-      horaFin: this.form.value.horaFin
+      salaId: v.salaId,
+      expositorId: v.expositorId,
+      titulo: v.titulo,
+      descripcion: v.descripcion || undefined,
+      fecha: v.fecha,
+      horaInicio: v.horaInicio,
+      horaFin: v.horaFin,
+      track: v.track || undefined,
+      encuestaUrl: v.encuestaUrl || undefined,
+      qrCodeUrl: v.qrCodeUrl || undefined
     };
     this.subs.add(
       this.sesionService.create(this.conferenciaId, dto).subscribe({
@@ -241,7 +248,7 @@ export class SesionesComponent implements OnInit, OnDestroy {
           this.mostrarForm.set(false);
           this.cargarSesiones();
         },
-        error: (err) => console.error('Error creando sesión:', err)
+        error: (err) => console.error('Error creando sesión:', err.error ?? err)
       })
     );
   }
