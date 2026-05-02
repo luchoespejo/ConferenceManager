@@ -42,11 +42,6 @@ export const routes: Routes = [
     loadComponent: () => import('./sesiones/sesiones.component').then(m => m.SesionesComponent)
   },
   {
-    path: 'congreso/:id',
-    canActivate: [authGuard],
-    loadComponent: () => import('./congresos/congreso-overview/congreso-overview.component').then(m => m.CongresoOverviewComponent)
-  },
-  {
     path: 'congreso/:id/participantes',
     canActivate: [authGuard],
     loadComponent: () => import('./participantes/participantes.component').then(m => m.ParticipantesComponent)
@@ -60,6 +55,11 @@ export const routes: Routes = [
     path: 'congreso/:id/programa',
     canActivate: [authGuard],
     loadComponent: () => import('./programa/programa.component').then(m => m.ProgramaComponent)
+  },
+  {
+    path: 'congreso/:id',
+    canActivate: [authGuard],
+    loadComponent: () => import('./congresos/congreso-overview/congreso-overview.component').then(m => m.CongresoOverviewComponent)
   },
   { path: '**', redirectTo: 'dashboard' }
 ];
