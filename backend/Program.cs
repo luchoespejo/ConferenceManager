@@ -24,8 +24,11 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
     ?? throw new InvalidOperationException("ConnectionStrings:DefaultConnection is not configured.");
 
 builder.Services.AddDbContext<AppDbContext>(opt =>
+{
     opt.UseNpgsql(connectionString, npgsqlOpt =>
-        npgsqlOpt.EnableRetryOnFailure(maxRetryCount: 3)));
+        npgsqlOpt.EnableRetryOnFailure(maxRetryCount: 3));
+    opt.ConfigureWarnings(w => w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
+});
 
 // ── Authentication ────────────────────────────────────────────────────────────
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
