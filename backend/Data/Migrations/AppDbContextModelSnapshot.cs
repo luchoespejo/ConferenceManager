@@ -328,6 +328,11 @@ namespace ConferenceManager.Data.Migrations
                         .HasMaxLength(254)
                         .HasColumnType("character varying(254)");
 
+                    b.Property<bool>("Activo")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
                     b.Property<bool>("EmailVerificado")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")

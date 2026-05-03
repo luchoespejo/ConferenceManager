@@ -34,4 +34,5 @@ public static class AuthErrorCodes
     public const string TokenInvalid = "TOKEN_INVALID";
     public const string TokenExpired = "TOKEN_EXPIRED";
     public const string RefreshTokenInvalid = "REFRESH_TOKEN_INVALID";
+    public const string AccountDisabled = "ACCOUNT_DISABLED";
 }

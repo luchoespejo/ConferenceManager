@@ -32,6 +32,7 @@ services:
       App__BaseUrl: "http://localhost:5000"
       App__SiteUrl: "http://localhost:3000"
       Email__UseFake: "true"
+      Admin__SecretKey: "cambiar-en-produccion-clave-admin-secreta"
     depends_on:
       postgres:
         condition: service_healthy

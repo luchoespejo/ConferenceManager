@@ -36,6 +36,9 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
         builder.Property(u => u.EmailVerificado)
             .HasDefaultValue(false);
 
+        builder.Property(u => u.Activo)
+            .HasDefaultValue(true);
+
         builder.Property(u => u.VerificationToken)
             .HasMaxLength(32)
             .IsRequired(false);

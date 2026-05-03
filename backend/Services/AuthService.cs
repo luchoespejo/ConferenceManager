@@ -73,6 +73,9 @@ public class AuthService(
             return ServiceResult<LoginResponse>.Fail(AuthErrorCodes.InvalidCredentials, "Credenciales inválidas.");
         }
 
+        if (!usuario.Activo)
+            return ServiceResult<LoginResponse>.Fail(AuthErrorCodes.AccountDisabled, "Tu cuenta está deshabilitada. Contactá al administrador.");
+
         if (!usuario.EmailVerificado)
             return ServiceResult<LoginResponse>.Fail(AuthErrorCodes.EmailNotVerified, "Verificá tu email antes de iniciar sesión.");
 

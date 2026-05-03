@@ -8,6 +8,7 @@ public class Usuario
     public string Nombre { get; set; } = string.Empty;
     public string Organizacion { get; set; } = string.Empty;
     public bool EmailVerificado { get; set; } = false;
+    public bool Activo { get; set; } = true;
     public string? VerificationToken { get; set; }
     public DateTime? VerificationTokenExpiresAt { get; set; }
     public DateTime CreatedAt { get; set; }

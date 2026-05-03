@@ -61,5 +61,9 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () => import('./congresos/congreso-overview/congreso-overview.component').then(m => m.CongresoOverviewComponent)
   },
+  {
+    path: 'admin/usuarios',
+    loadComponent: () => import('./admin/admin-usuarios/admin-usuarios.component').then(m => m.AdminUsuariosComponent)
+  },
   { path: '**', redirectTo: 'dashboard' }
 ];
