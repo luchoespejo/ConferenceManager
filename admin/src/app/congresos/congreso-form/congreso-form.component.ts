@@ -19,6 +19,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { CongresoService } from '../congreso.service';
 import { CreateCongresoDto, UpdateCongresoDto } from '../congreso.model';
+import { ImageUploadComponent } from '../../shared/image-upload/image-upload.component';
 
 /** Cross-field validator: fechaFin must be >= fechaInicio */
 function fechasValidator(group: AbstractControl): ValidationErrors | null {
@@ -45,7 +46,7 @@ function slugFromNombre(nombre: string): string {
   selector: 'app-congreso-form',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, ImageUploadComponent],
   template: `
     <div class="page-shell">
       <nav class="topbar">
@@ -133,21 +134,36 @@ function slugFromNombre(nombre: string): string {
             <!-- Branding -->
             <div class="card" style="margin-bottom:1.25rem">
               <h3 style="margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:1px solid var(--border)">Branding</h3>
-              <div class="form-group" style="margin-bottom:1rem">
-                <label for="logoUrl">URL del logo</label>
-                <input id="logoUrl" type="url" formControlName="logoUrl" class="form-control" placeholder="https://..." />
+              <div class="form-row" style="margin-bottom:1rem">
+                <div class="form-group">
+                  <label>Logo principal</label>
+                  <app-image-upload
+                    label="logo"
+                    [currentUrl]="logoUrl()"
+                    (urlChange)="logoUrl.set($event)" />
+                </div>
+                <div class="form-group">
+                  <label>Logo secundario</label>
+                  <app-image-upload
+                    label="logo secundario"
+                    [currentUrl]="logoSecundarioUrl()"
+                    (urlChange)="logoSecundarioUrl.set($event)" />
+                </div>
               </div>
               <div class="form-group" style="margin-bottom:1rem">
-                <label for="logoSecundarioUrl">URL del logo secundario</label>
-                <input id="logoSecundarioUrl" type="url" formControlName="logoSecundarioUrl" class="form-control" placeholder="https://..." />
+                <label>Banner</label>
+                <app-image-upload
+                  label="banner"
+                  [currentUrl]="bannerUrl()"
+                  (urlChange)="bannerUrl.set($event)" />
               </div>
               <div class="form-group" style="margin-bottom:1rem">
-                <label for="bannerUrl">URL del banner</label>
-                <input id="bannerUrl" type="url" formControlName="bannerUrl" class="form-control" placeholder="https://..." />
-              </div>
-              <div class="form-group" style="margin-bottom:1rem">
-                <label for="faviconUrl">URL del favicon</label>
-                <input id="faviconUrl" type="url" formControlName="faviconUrl" class="form-control" placeholder="https://..." />
+                <label>Favicon</label>
+                <app-image-upload
+                  label="favicon"
+                  accept="image/jpeg,image/png,image/webp,image/x-icon,image/vnd.microsoft.icon"
+                  [currentUrl]="faviconUrl()"
+                  (urlChange)="faviconUrl.set($event)" />
               </div>
               <div class="form-row" style="margin-bottom:1rem">
                 <div class="form-group">
@@ -234,6 +250,12 @@ export class CongresoFormComponent implements OnInit, OnDestroy {
   fechasError = signal<string | null>(null);
   congresoEstado = signal<string>('Borrador');
 
+  // Image URL signals — managed outside reactive form
+  logoUrl = signal<string | null>(null);
+  logoSecundarioUrl = signal<string | null>(null);
+  bannerUrl = signal<string | null>(null);
+  faviconUrl = signal<string | null>(null);
+
   form: FormGroup = this.fb.group(
     {
       nombre: ['', [Validators.required]],
@@ -241,10 +263,6 @@ export class CongresoFormComponent implements OnInit, OnDestroy {
       fechaInicio: ['', [Validators.required]],
       fechaFin: ['', [Validators.required]],
       descripcion: [''],
-      logoUrl: [''],
-      logoSecundarioUrl: [''],
-      bannerUrl: [''],
-      faviconUrl: [''],
       colorPrimario: ['', [Validators.maxLength(7)]],
       colorSecundario: ['', [Validators.maxLength(7)]],
       tipografia: ['', [Validators.maxLength(100)]],
@@ -298,10 +316,6 @@ export class CongresoFormComponent implements OnInit, OnDestroy {
           fechaInicio: congreso.fechaInicio,
           fechaFin: congreso.fechaFin,
           descripcion: congreso.descripcion ?? '',
-          logoUrl: congreso.logoUrl ?? '',
-          logoSecundarioUrl: congreso.logoSecundarioUrl ?? '',
-          bannerUrl: congreso.bannerUrl ?? '',
-          faviconUrl: congreso.faviconUrl ?? '',
           colorPrimario: congreso.colorPrimario ?? '',
           colorSecundario: congreso.colorSecundario ?? '',
           tipografia: congreso.tipografia ?? '',
@@ -309,6 +323,10 @@ export class CongresoFormComponent implements OnInit, OnDestroy {
           venueDireccion: congreso.venueDireccion ?? '',
           venueLinkMaps: congreso.venueLinkMaps ?? ''
         });
+        this.logoUrl.set(congreso.logoUrl ?? null);
+        this.logoSecundarioUrl.set(congreso.logoSecundarioUrl ?? null);
+        this.bannerUrl.set(congreso.bannerUrl ?? null);
+        this.faviconUrl.set(congreso.faviconUrl ?? null);
 
         // Disable slug field when not in Borrador state
         if (congreso.estado !== 'Borrador') {
@@ -354,10 +372,10 @@ export class CongresoFormComponent implements OnInit, OnDestroy {
       fechaInicio: raw['fechaInicio'],
       fechaFin: raw['fechaFin'],
       descripcion: raw['descripcion'] || undefined,
-      logoUrl: raw['logoUrl'] || undefined,
-      logoSecundarioUrl: raw['logoSecundarioUrl'] || undefined,
-      bannerUrl: raw['bannerUrl'] || undefined,
-      faviconUrl: raw['faviconUrl'] || undefined,
+      logoUrl: this.logoUrl() ?? undefined,
+      logoSecundarioUrl: this.logoSecundarioUrl() ?? undefined,
+      bannerUrl: this.bannerUrl() ?? undefined,
+      faviconUrl: this.faviconUrl() ?? undefined,
       colorPrimario: raw['colorPrimario'] || undefined,
       colorSecundario: raw['colorSecundario'] || undefined,
       tipografia: raw['tipografia'] || undefined,
@@ -380,10 +398,10 @@ export class CongresoFormComponent implements OnInit, OnDestroy {
       fechaInicio: raw['fechaInicio'],
       fechaFin: raw['fechaFin'],
       descripcion: raw['descripcion'] || undefined,
-      logoUrl: raw['logoUrl'] || undefined,
-      logoSecundarioUrl: raw['logoSecundarioUrl'] || undefined,
-      bannerUrl: raw['bannerUrl'] || undefined,
-      faviconUrl: raw['faviconUrl'] || undefined,
+      logoUrl: this.logoUrl() ?? undefined,
+      logoSecundarioUrl: this.logoSecundarioUrl() ?? undefined,
+      bannerUrl: this.bannerUrl() ?? undefined,
+      faviconUrl: this.faviconUrl() ?? undefined,
       colorPrimario: raw['colorPrimario'] || undefined,
       colorSecundario: raw['colorSecundario'] || undefined,
       tipografia: raw['tipografia'] || undefined,

@@ -18,12 +18,13 @@ import { Subscription } from 'rxjs';
 import { ExpositorService } from './expositor.service';
 import { CongresoService } from '../congresos/congreso.service';
 import { ExpositorListItem, UpdateExpositorDto } from './expositor.model';
+import { ImageUploadComponent } from '../shared/image-upload/image-upload.component';
 
 @Component({
   selector: 'app-expositores',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, ImageUploadComponent],
   template: `
     <div class="page-shell">
       <nav class="topbar">
@@ -63,8 +64,11 @@ import { ExpositorListItem, UpdateExpositorDto } from './expositor.model';
                 <textarea class="form-control" formControlName="bio" placeholder="Breve descripción del expositor"></textarea>
               </div>
               <div class="form-group" style="margin-bottom:1rem">
-                <label>URL de foto</label>
-                <input class="form-control" type="text" formControlName="fotoUrl" placeholder="https://..." />
+                <label>Foto</label>
+                <app-image-upload
+                  label="foto"
+                  [currentUrl]="fotoUrl()"
+                  (urlChange)="fotoUrl.set($event)" />
               </div>
               <div class="form-actions">
                 <button type="button" class="btn btn-secondary" (click)="cancelar()">Cancelar</button>
@@ -117,6 +121,7 @@ export class ExpositoresComponent implements OnInit, OnDestroy {
   expositores = signal<ExpositorListItem[]>([]);
   mostrarForm = signal(false);
   editandoId = signal<string | null>(null);
+  fotoUrl = signal<string | null>(null);
   conferenciaId!: string;
   private slugCongreso = '';
   form!: FormGroup;
@@ -133,8 +138,7 @@ export class ExpositoresComponent implements OnInit, OnDestroy {
     this.form = this.fb.group({
       nombre: ['', [Validators.required, Validators.maxLength(255)]],
       bio: [''],
-      email: ['', [Validators.email, Validators.maxLength(255)]],
-      fotoUrl: ['']
+      email: ['', [Validators.email, Validators.maxLength(255)]]
     });
     this.cargar();
   }
@@ -160,18 +164,15 @@ export class ExpositoresComponent implements OnInit, OnDestroy {
 
   abrirCrear(): void {
     this.editandoId.set(null);
+    this.fotoUrl.set(null);
     this.form.reset();
     this.mostrarForm.set(true);
   }
 
   abrirEditar(expositor: ExpositorListItem): void {
     this.editandoId.set(expositor.id);
-    this.form.patchValue({
-      nombre: expositor.nombre,
-      email: expositor.email ?? '',
-      fotoUrl: expositor.fotoUrl ?? '',
-      bio: ''
-    });
+    this.fotoUrl.set(expositor.fotoUrl ?? null);
+    this.form.patchValue({ nombre: expositor.nombre, email: expositor.email ?? '', bio: '' });
     this.mostrarForm.set(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -179,6 +180,7 @@ export class ExpositoresComponent implements OnInit, OnDestroy {
   cancelar(): void {
     this.mostrarForm.set(false);
     this.editandoId.set(null);
+    this.fotoUrl.set(null);
     this.form.reset();
   }
 
@@ -192,7 +194,7 @@ export class ExpositoresComponent implements OnInit, OnDestroy {
         nombre: v.nombre,
         email: v.email || undefined,
         bio: v.bio || undefined,
-        fotoUrl: v.fotoUrl || undefined
+        fotoUrl: this.fotoUrl() ?? undefined
       };
       this.subs.add(
         this.expositorService.update(this.conferenciaId, id, dto).subscribe({
@@ -206,7 +208,7 @@ export class ExpositoresComponent implements OnInit, OnDestroy {
           nombre: v.nombre,
           email: v.email || undefined,
           bio: v.bio || undefined,
-          fotoUrl: v.fotoUrl || undefined
+          fotoUrl: this.fotoUrl() ?? undefined
         }).subscribe({
           next: () => { this.cancelar(); this.cargar(); },
           error: (err) => console.error('Error creando expositor:', err)

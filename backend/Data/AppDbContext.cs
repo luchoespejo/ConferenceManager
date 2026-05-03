@@ -13,6 +13,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Sesion> Sesiones => Set<Sesion>();
     public DbSet<Participante> Participantes => Set<Participante>();
     public DbSet<AvisoUrgente> AvisosUrgentes => Set<AvisoUrgente>();
+    public DbSet<ImagenAlmacenada> ImagenesAlmacenadas => Set<ImagenAlmacenada>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
