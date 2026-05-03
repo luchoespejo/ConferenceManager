@@ -4,6 +4,7 @@ export interface ExpositorListItem {
   nombre: string;
   email?: string;
   fotoUrl?: string;
+  tokenAcceso: string;
 }
 
 export interface ExpositorDetalle extends ExpositorListItem {

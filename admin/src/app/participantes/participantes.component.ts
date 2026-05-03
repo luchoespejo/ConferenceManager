@@ -37,7 +37,12 @@ import { Participante, CreateParticipanteDto, UpdateParticipanteDto } from './pa
             <h2>Participantes</h2>
             <p>{{ total() }} participante{{ total() !== 1 ? 's' : '' }} registrado{{ total() !== 1 ? 's' : '' }} · {{ conCertificado() }} con certificado habilitado</p>
           </div>
-          <button class="btn btn-primary" (click)="abrirFormNuevo()">+ Nuevo participante</button>
+          <div style="display:flex;gap:.5rem">
+            @if (participantes().length > 0) {
+              <button class="btn btn-secondary" (click)="exportarCsv()">↓ Exportar CSV</button>
+            }
+            <button class="btn btn-primary" (click)="abrirFormNuevo()">+ Nuevo participante</button>
+          </div>
         </div>
 
         @if (apiError()) {
@@ -378,6 +383,27 @@ export class ParticipantesComponent implements OnInit, OnDestroy {
         }
       })
     );
+  }
+
+  exportarCsv(): void {
+    const rows = [
+      ['Nombre', 'Email', 'Empresa', 'Certificado', 'Registrado'],
+      ...this.participantes().map(p => [
+        p.nombre,
+        p.email,
+        p.empresa ?? '',
+        p.puedeGenerarCertificado ? 'Sí' : 'No',
+        new Date(p.createdAt).toLocaleDateString('es-AR')
+      ])
+    ];
+    const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `participantes-${this.conferenciaId}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   eliminar(id: string): void {

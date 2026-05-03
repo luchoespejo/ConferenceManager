@@ -29,7 +29,8 @@ public class ExpositorService(AppDbContext context) : IExpositorService
                 ConferenciaId = e.ConferenciaId,
                 Nombre = e.Nombre,
                 Email = e.Email,
-                FotoUrl = e.FotoUrl
+                FotoUrl = e.FotoUrl,
+                TokenAcceso = e.TokenAcceso
             })
             .ToListAsync();
 

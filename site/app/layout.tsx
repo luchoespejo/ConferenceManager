@@ -2,7 +2,7 @@
 
 import './globals.css';
 import Link from 'next/link';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 
 interface ConferenciaBasic {
   nombre: string;
@@ -28,12 +28,10 @@ function getSlug(): string {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const [conf, setConf] = useState<ConferenciaBasic | null>(null);
   const [avisos, setAvisos] = useState<Aviso[]>([]);
-  const slugRef = useRef<string>('');
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
   useEffect(() => {
     const slug = getSlug();
-    slugRef.current = slug;
     if (!slug) return;
 
     fetch(`${apiUrl}/api/public/${slug}`)

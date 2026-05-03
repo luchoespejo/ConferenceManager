@@ -9,4 +9,5 @@ public interface IPublicService
     Task<IEnumerable<ExpositorPublicoDto>> GetExpositorsBySlugAsync(string slug);
     Task<SesionPublicaDto?> GetSesionByIdAsync(string slug, Guid id);
     Task<IEnumerable<AvisoUrgentePublicoDto>> GetAvisosActivosBySlugAsync(string slug);
+    Task<ExpositorPerfilDto?> GetExpositorPerfilByTokenAsync(string slug, string token);
 }

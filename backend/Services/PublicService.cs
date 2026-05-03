@@ -82,6 +82,49 @@ public class PublicService(AppDbContext context) : IPublicService
         return expositores;
     }
 
+    public async Task<ExpositorPerfilDto?> GetExpositorPerfilByTokenAsync(string slug, string token)
+    {
+        var expositor = await context.Expositores
+            .AsNoTracking()
+            .Include(e => e.Conferencia)
+            .FirstOrDefaultAsync(e => e.Conferencia.Slug == slug && e.TokenAcceso == token);
+
+        if (expositor is null)
+            return null;
+
+        var sesiones = await context.Sesiones
+            .AsNoTracking()
+            .Where(s => s.ExpositorId == expositor.Id)
+            .OrderBy(s => s.Fecha)
+            .ThenBy(s => s.HoraInicio)
+            .Select(s => new SesionPublicaDto
+            {
+                Id = s.Id,
+                Titulo = s.Titulo,
+                Descripcion = s.Descripcion,
+                Fecha = s.Fecha,
+                HoraInicio = s.HoraInicio,
+                HoraFin = s.HoraFin,
+                Track = s.Track,
+                SalaNombre = s.Sala.Nombre,
+                ExpositorNombre = s.Expositor.Nombre,
+                EncuestaUrl = s.EncuestaUrl,
+                QrCodeUrl = s.QrCodeUrl
+            })
+            .ToListAsync();
+
+        return new ExpositorPerfilDto
+        {
+            Id = expositor.Id,
+            Nombre = expositor.Nombre,
+            Bio = expositor.Bio,
+            FotoUrl = expositor.FotoUrl,
+            Email = expositor.Email,
+            ConferenciaNombre = expositor.Conferencia.Nombre,
+            Sesiones = sesiones
+        };
+    }
+
     public async Task<IEnumerable<AvisoUrgentePublicoDto>> GetAvisosActivosBySlugAsync(string slug)
     {
         return await context.AvisosUrgentes

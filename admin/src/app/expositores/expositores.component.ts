@@ -16,6 +16,7 @@ import {
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ExpositorService } from './expositor.service';
+import { CongresoService } from '../congresos/congreso.service';
 import { ExpositorListItem, UpdateExpositorDto } from './expositor.model';
 
 @Component({
@@ -95,6 +96,7 @@ import { ExpositorListItem, UpdateExpositorDto } from './expositor.model';
                   <div class="item-sub">{{ expositor.email || 'Sin email' }}</div>
                 </div>
                 <div class="item-actions">
+                  <button class="btn btn-secondary btn-sm" title="Copiar link de acceso" (click)="copiarLink(expositor)">🔗 Link</button>
                   <button class="btn btn-secondary btn-sm" (click)="abrirEditar(expositor)">Editar</button>
                   <button class="btn btn-danger btn-sm" (click)="eliminar(expositor.id)">Eliminar</button>
                 </div>
@@ -108,6 +110,7 @@ import { ExpositorListItem, UpdateExpositorDto } from './expositor.model';
 })
 export class ExpositoresComponent implements OnInit, OnDestroy {
   private expositorService = inject(ExpositorService);
+  private congresoService = inject(CongresoService);
   private route = inject(ActivatedRoute);
   private fb = inject(FormBuilder);
 
@@ -115,11 +118,18 @@ export class ExpositoresComponent implements OnInit, OnDestroy {
   mostrarForm = signal(false);
   editandoId = signal<string | null>(null);
   conferenciaId!: string;
+  private slugCongreso = '';
   form!: FormGroup;
   private subs = new Subscription();
 
   ngOnInit(): void {
     this.conferenciaId = this.route.snapshot.paramMap.get('id')!;
+    this.subs.add(
+      this.congresoService.getById(this.conferenciaId).subscribe({
+        next: (c) => { this.slugCongreso = c.slug; },
+        error: () => {}
+      })
+    );
     this.form = this.fb.group({
       nombre: ['', [Validators.required, Validators.maxLength(255)]],
       bio: [''],
@@ -135,6 +145,16 @@ export class ExpositoresComponent implements OnInit, OnDestroy {
         next: (data) => this.expositores.set(data),
         error: (err) => console.error('Error cargando expositores:', err)
       })
+    );
+  }
+
+  copiarLink(expositor: ExpositorListItem): void {
+    const siteUrl = this.slugCongreso
+      ? `http://${this.slugCongreso}.tuplataforma.com/mi-espacio?token=${expositor.tokenAcceso}`
+      : `http://localhost:3000/mi-espacio?token=${expositor.tokenAcceso}`;
+    navigator.clipboard.writeText(siteUrl).then(
+      () => alert(`Link copiado:\n${siteUrl}`),
+      () => prompt('Copiá este link:', siteUrl)
     );
   }
 

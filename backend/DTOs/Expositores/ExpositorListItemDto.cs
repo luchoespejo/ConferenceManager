@@ -7,4 +7,5 @@ public class ExpositorListItemDto
     public string Nombre { get; set; } = null!;
     public string? Email { get; set; }
     public string? FotoUrl { get; set; }
+    public string TokenAcceso { get; set; } = null!;
 }

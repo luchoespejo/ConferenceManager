@@ -50,4 +50,17 @@ public class PublicConferenciasController(IPublicService publicService) : Contro
         var avisos = await publicService.GetAvisosActivosBySlugAsync(slug);
         return Ok(avisos);
     }
+
+    [HttpGet("mi-espacio")]
+    public async Task<ActionResult<ExpositorPerfilDto>> GetMiEspacio(string slug, [FromQuery] string token)
+    {
+        if (string.IsNullOrWhiteSpace(token))
+            return BadRequest(new { error = "TOKEN_REQUIRED" });
+
+        var perfil = await publicService.GetExpositorPerfilByTokenAsync(slug, token);
+        if (perfil is null)
+            return NotFound(new { error = "TOKEN_INVALID" });
+
+        return Ok(perfil);
+    }
 }
