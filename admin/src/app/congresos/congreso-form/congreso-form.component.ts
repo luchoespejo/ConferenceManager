@@ -185,7 +185,7 @@ function slugFromNombre(nombre: string): string {
 
             <!-- Sticky footer actions -->
             <div style="position:sticky;bottom:0;background:var(--bg);border-top:1px solid var(--border);padding:1rem 0;display:flex;gap:.75rem;justify-content:flex-end;margin-top:1.5rem">
-              <a routerLink="/dashboard" class="btn btn-secondary">Cancelar</a>
+              <a [routerLink]="id ? ['/congreso', id] : ['/dashboard']" class="btn btn-secondary">Cancelar</a>
               @if (id && congresoEstado() === 'Borrador') {
                 <button type="button" class="btn btn-secondary" style="border-color:var(--success);color:var(--success)" (click)="publicar()" [disabled]="publicando()">
                   @if (publicando()) { <span class="spinner"></span> }
@@ -367,7 +367,7 @@ export class CongresoFormComponent implements OnInit, OnDestroy {
     };
 
     this.congresoService.update(id, dto).subscribe({
-      next: () => this.router.navigate(['/dashboard']),
+      next: () => this.router.navigate(['/congreso', id]),
       error: (err) => this.handleApiError(err)
     });
   }
