@@ -35,7 +35,7 @@ public class AuthService(
             Email = dto.Email,
             PasswordHash = passwordHash,
             Nombre = dto.Nombre,
-            Organizacion = dto.Organizacion,
+            Organizacion = dto.Organizacion ?? string.Empty,
             EmailVerificado = false,
             VerificationToken = verificationToken,
             VerificationTokenExpiresAt = DateTime.UtcNow.AddHours(24)

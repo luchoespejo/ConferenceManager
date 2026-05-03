@@ -6,5 +6,5 @@ public record RegistroRequest(
     [Required, EmailAddress, MaxLength(254)] string Email,
     [Required, MinLength(8)] string Password,
     [Required, MaxLength(200)] string Nombre,
-    [Required, MaxLength(200)] string Organizacion
+    [MaxLength(200)] string? Organizacion
 );
