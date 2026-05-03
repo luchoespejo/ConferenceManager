@@ -65,7 +65,7 @@ import { CongresoListItemDto } from '../congresos/congreso.model';
                   <span class="badge badge-{{ c.estado.toLowerCase() }}">{{ c.estado }}</span>
                 </div>
                 <div class="card-meta">
-                  <span>📅 {{ c.fechaInicio }} → {{ c.fechaFin }}</span>
+                  <span>📅 {{ c.fechaInicio | date:'dd/MM/yyyy' }} → {{ c.fechaFin | date:'dd/MM/yyyy' }}</span>
                 </div>
                 <span class="card-slug">{{ c.slug }}</span>
                 <div class="card-footer-row">

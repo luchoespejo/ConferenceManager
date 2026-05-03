@@ -137,6 +137,18 @@ function slugFromNombre(nombre: string): string {
                 <label for="logoUrl">URL del logo</label>
                 <input id="logoUrl" type="url" formControlName="logoUrl" class="form-control" placeholder="https://..." />
               </div>
+              <div class="form-group" style="margin-bottom:1rem">
+                <label for="logoSecundarioUrl">URL del logo secundario</label>
+                <input id="logoSecundarioUrl" type="url" formControlName="logoSecundarioUrl" class="form-control" placeholder="https://..." />
+              </div>
+              <div class="form-group" style="margin-bottom:1rem">
+                <label for="bannerUrl">URL del banner</label>
+                <input id="bannerUrl" type="url" formControlName="bannerUrl" class="form-control" placeholder="https://..." />
+              </div>
+              <div class="form-group" style="margin-bottom:1rem">
+                <label for="faviconUrl">URL del favicon</label>
+                <input id="faviconUrl" type="url" formControlName="faviconUrl" class="form-control" placeholder="https://..." />
+              </div>
               <div class="form-row" style="margin-bottom:1rem">
                 <div class="form-group">
                   <label for="colorPrimario">Color primario</label>
@@ -230,6 +242,9 @@ export class CongresoFormComponent implements OnInit, OnDestroy {
       fechaFin: ['', [Validators.required]],
       descripcion: [''],
       logoUrl: [''],
+      logoSecundarioUrl: [''],
+      bannerUrl: [''],
+      faviconUrl: [''],
       colorPrimario: ['', [Validators.maxLength(7)]],
       colorSecundario: ['', [Validators.maxLength(7)]],
       tipografia: ['', [Validators.maxLength(100)]],
@@ -284,6 +299,9 @@ export class CongresoFormComponent implements OnInit, OnDestroy {
           fechaFin: congreso.fechaFin,
           descripcion: congreso.descripcion ?? '',
           logoUrl: congreso.logoUrl ?? '',
+          logoSecundarioUrl: congreso.logoSecundarioUrl ?? '',
+          bannerUrl: congreso.bannerUrl ?? '',
+          faviconUrl: congreso.faviconUrl ?? '',
           colorPrimario: congreso.colorPrimario ?? '',
           colorSecundario: congreso.colorSecundario ?? '',
           tipografia: congreso.tipografia ?? '',
@@ -336,6 +354,10 @@ export class CongresoFormComponent implements OnInit, OnDestroy {
       fechaInicio: raw['fechaInicio'],
       fechaFin: raw['fechaFin'],
       descripcion: raw['descripcion'] || undefined,
+      logoUrl: raw['logoUrl'] || undefined,
+      logoSecundarioUrl: raw['logoSecundarioUrl'] || undefined,
+      bannerUrl: raw['bannerUrl'] || undefined,
+      faviconUrl: raw['faviconUrl'] || undefined,
       colorPrimario: raw['colorPrimario'] || undefined,
       colorSecundario: raw['colorSecundario'] || undefined,
       tipografia: raw['tipografia'] || undefined,
@@ -358,6 +380,10 @@ export class CongresoFormComponent implements OnInit, OnDestroy {
       fechaInicio: raw['fechaInicio'],
       fechaFin: raw['fechaFin'],
       descripcion: raw['descripcion'] || undefined,
+      logoUrl: raw['logoUrl'] || undefined,
+      logoSecundarioUrl: raw['logoSecundarioUrl'] || undefined,
+      bannerUrl: raw['bannerUrl'] || undefined,
+      faviconUrl: raw['faviconUrl'] || undefined,
       colorPrimario: raw['colorPrimario'] || undefined,
       colorSecundario: raw['colorSecundario'] || undefined,
       tipografia: raw['tipografia'] || undefined,

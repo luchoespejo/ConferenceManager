@@ -81,6 +81,10 @@ public class ConferenciaService(AppDbContext context) : IConferenciaService
             ColorPrimario = dto.ColorPrimario,
             ColorSecundario = dto.ColorSecundario,
             Tipografia = dto.Tipografia,
+            LogoUrl = dto.LogoUrl,
+            LogoSecundarioUrl = dto.LogoSecundarioUrl,
+            BannerUrl = dto.BannerUrl,
+            FaviconUrl = dto.FaviconUrl,
             VenueNombre = dto.VenueNombre,
             VenueDireccion = dto.VenueDireccion,
             VenueLinkMaps = dto.VenueLinkMaps
@@ -145,6 +149,10 @@ public class ConferenciaService(AppDbContext context) : IConferenciaService
         if (dto.ColorPrimario is not null) conferencia.ColorPrimario = dto.ColorPrimario;
         if (dto.ColorSecundario is not null) conferencia.ColorSecundario = dto.ColorSecundario;
         if (dto.Tipografia is not null) conferencia.Tipografia = dto.Tipografia;
+        if (dto.LogoUrl is not null) conferencia.LogoUrl = dto.LogoUrl;
+        if (dto.LogoSecundarioUrl is not null) conferencia.LogoSecundarioUrl = dto.LogoSecundarioUrl;
+        if (dto.BannerUrl is not null) conferencia.BannerUrl = dto.BannerUrl;
+        if (dto.FaviconUrl is not null) conferencia.FaviconUrl = dto.FaviconUrl;
         if (dto.VenueNombre is not null) conferencia.VenueNombre = dto.VenueNombre;
         if (dto.VenueDireccion is not null) conferencia.VenueDireccion = dto.VenueDireccion;
         if (dto.VenueLinkMaps is not null) conferencia.VenueLinkMaps = dto.VenueLinkMaps;

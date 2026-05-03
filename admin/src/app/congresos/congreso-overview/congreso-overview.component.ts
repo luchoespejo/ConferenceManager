@@ -39,6 +39,12 @@ import { CongresoOverviewDto } from '../congreso.model';
                 Finalizar
               </button>
             }
+            @if (overview()!.estado === 'Borrador') {
+              <button class="btn btn-sm" style="border-color:var(--danger,#dc3545);color:var(--danger,#dc3545);background:transparent" (click)="eliminar()" [disabled]="eliminando()">
+                @if (eliminando()) { <span class="spinner"></span> }
+                Eliminar
+              </button>
+            }
           }
           <a routerLink="/dashboard" class="btn btn-ghost btn-sm">← Dashboard</a>
         </div>
@@ -236,6 +242,7 @@ export class CongresoOverviewComponent implements OnInit {
   loadError = signal(false);
   publicando = signal(false);
   finalizando = signal(false);
+  eliminando = signal(false);
   apiError = signal<string | null>(null);
 
   ngOnInit(): void {
@@ -290,6 +297,19 @@ export class CongresoOverviewComponent implements OnInit {
       error: (err) => {
         this.finalizando.set(false);
         this.apiError.set(err.error?.message ?? 'Error al finalizar el congreso.');
+      }
+    });
+  }
+
+  eliminar(): void {
+    if (!confirm('¿Eliminar este congreso? Esta acción no se puede deshacer.')) return;
+    this.eliminando.set(true);
+    this.apiError.set(null);
+    this.congresoService.delete(this.id).subscribe({
+      next: () => this.router.navigate(['/dashboard']),
+      error: (err) => {
+        this.eliminando.set(false);
+        this.apiError.set(err.error?.message ?? 'Error al eliminar el congreso.');
       }
     });
   }

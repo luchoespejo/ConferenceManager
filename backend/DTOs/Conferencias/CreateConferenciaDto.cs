@@ -28,6 +28,11 @@ public class CreateConferenciaDto
     [MaxLength(100)]
     public string? Tipografia { get; set; }
 
+    public string? LogoUrl { get; set; }
+    public string? LogoSecundarioUrl { get; set; }
+    public string? BannerUrl { get; set; }
+    public string? FaviconUrl { get; set; }
+
     public string? VenueNombre { get; set; }
     public string? VenueDireccion { get; set; }
     public string? VenueLinkMaps { get; set; }

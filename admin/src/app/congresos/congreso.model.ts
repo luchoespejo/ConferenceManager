@@ -38,6 +38,10 @@ export interface CreateCongresoDto {
   fechaInicio: string;
   fechaFin: string;
   descripcion?: string;
+  logoUrl?: string;
+  logoSecundarioUrl?: string;
+  bannerUrl?: string;
+  faviconUrl?: string;
   colorPrimario?: string;
   colorSecundario?: string;
   tipografia?: string;
