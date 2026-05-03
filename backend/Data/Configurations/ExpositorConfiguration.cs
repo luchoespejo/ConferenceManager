@@ -1,6 +1,8 @@
+using System.Text.Json;
 using ConferenceManager.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ConferenceManager.Data.Configurations;
 
@@ -25,8 +27,13 @@ public class ExpositorConfiguration : IEntityTypeConfiguration<Expositor>
             .IsRequired()
             .HasMaxLength(36);
 
+        var jsonDocConverter = new ValueConverter<JsonDocument?, string?>(
+            v => v == null ? null : v.RootElement.GetRawText(),
+            v => v == null ? null : JsonDocument.Parse(v));
+
         builder.Property(e => e.RedesSociales)
-            .HasColumnType("jsonb");
+            .HasColumnType("jsonb")
+            .HasConversion(jsonDocConverter);
 
         builder.Property(e => e.CreatedAt)
             .HasColumnType("timestamptz")

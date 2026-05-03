@@ -63,7 +63,7 @@ public class AvisoUrgenteService(AppDbContext context) : IAvisoUrgenteService
         if (aviso is null)
             return ServiceResult<AvisoUrgenteDto>.Fail("NOT_FOUND", "Aviso no encontrado.");
 
-        if (dto.Mensaje is not null) aviso.Mensaje = dto.Mensaje;
+        if (!string.IsNullOrWhiteSpace(dto.Mensaje)) aviso.Mensaje = dto.Mensaje;
         if (dto.Activo is not null) aviso.Activo = dto.Activo.Value;
 
         await context.SaveChangesAsync();

@@ -120,9 +120,12 @@ public class ExpositorService(AppDbContext context) : IExpositorService
 
     private static ExpositorDetalleDto MapToDetalle(Expositor e)
     {
-        var redesSociales = e.RedesSociales != null
-            ? JsonSerializer.Deserialize<Dictionary<string, string>>(e.RedesSociales.RootElement.GetRawText())
-            : null;
+        Dictionary<string, string>? redesSociales = null;
+        if (e.RedesSociales != null)
+        {
+            try { redesSociales = JsonSerializer.Deserialize<Dictionary<string, string>>(e.RedesSociales.RootElement.GetRawText()); }
+            catch (JsonException) { }
+        }
 
         return new ExpositorDetalleDto
         {
