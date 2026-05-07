@@ -137,10 +137,16 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-if (!app.Environment.IsDevelopment())
+app.UseCors(policy =>
 {
-    app.UseCors("AllowAllDev");
-}
+    if (app.Environment.IsDevelopment())
+    {
+        policy
+            .AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    }
+});
 app.UseAuthentication();
 app.UseAuthorization();
 if (!app.Environment.IsDevelopment())
