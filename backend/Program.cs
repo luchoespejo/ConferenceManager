@@ -51,24 +51,17 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 
 // ── CORS ──────────────────────────────────────────────────────────────────────
-var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAdminClient", policy =>
+    options.AddPolicy("AllowAllDev", policy =>
     {
         if (builder.Environment.IsDevelopment())
         {
             policy
-                .WithOrigins("http://localhost:3000", "http://localhost:4200", "http://localhost:3001")
+                .SetIsOriginAllowed(origin => true)
                 .AllowAnyHeader()
-                .AllowAnyMethod();
-        }
-        else
-        {
-            policy
-                .WithOrigins(allowedOrigins)
-                .AllowAnyHeader()
-                .AllowAnyMethod();
+                .AllowAnyMethod()
+                .AllowCredentials();
         }
     });
 });
@@ -144,7 +137,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors("AllowAdminClient");
+if (!app.Environment.IsDevelopment())
+{
+    app.UseCors("AllowAllDev");
+}
 app.UseAuthentication();
 app.UseAuthorization();
 if (!app.Environment.IsDevelopment())
@@ -159,6 +155,15 @@ app.MapPost("/api/seed", async (AppDbContext db) =>
     return Results.Ok(new { message = "Seeded OK" });
 });
 
-app.MapControllers();
+try
+{
+    app.MapControllers();
+    app.Logger.LogInformation("Controllers mapped successfully");
+}
+catch (Exception ex)
+{
+    app.Logger.LogError(ex, "Failed to map controllers");
+    throw;
+}
 
 app.Run();
