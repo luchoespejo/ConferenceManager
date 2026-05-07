@@ -127,7 +127,8 @@ if (app.Environment.IsDevelopment())
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await db.Database.MigrateAsync();
-    await SeedData.SeedAsync(db);
+    // TODO: Seed causes migration issues. Seed manually via /api/seed endpoint or DB migration.
+    // await SeedData.SeedAsync(db);
 }
 
 // ── Pipeline ──────────────────────────────────────────────────────────────────
@@ -153,6 +154,8 @@ if (!app.Environment.IsDevelopment())
     app.UseHttpsRedirection();
 
 app.MapGet("/api/health", () => Results.Ok(new { status = "ok" }));
+app.MapGet("/api/test-endpoint", () => Results.Ok(new { test = "endpoint works" }));
+app.MapPost("/api/test-post", () => Results.Ok(new { test = "post works" }));
 
 app.MapPost("/api/seed", async (AppDbContext db) =>
 {
@@ -163,8 +166,8 @@ app.MapPost("/api/seed", async (AppDbContext db) =>
 
 try
 {
-    app.MapControllers();
-    app.Logger.LogInformation("Controllers mapped successfully");
+    var endpoint = app.MapControllers();
+    app.Logger.LogInformation($"Controllers mapped successfully. Endpoint: {endpoint}");
 }
 catch (Exception ex)
 {
