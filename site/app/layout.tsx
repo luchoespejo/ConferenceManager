@@ -53,6 +53,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   const primary = conf?.colorPrimario || '#1a1a2e';
   const secondary = conf?.colorSecundario || '#16213e';
+  const logoUrl = conf?.logoUrl?.startsWith('http')
+    ? conf.logoUrl
+    : `${apiUrl}${conf?.logoUrl}`;
 
   return (
     <html lang="es">
@@ -70,7 +73,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         }}>
           <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none', color: '#fff' }}>
             {conf?.logoUrl && (
-              <img src={conf.logoUrl} alt="Logo" style={{ height: '36px', objectFit: 'contain' }} />
+              <img src={logoUrl} alt="Logo" style={{ height: '36px', objectFit: 'contain' }} />
             )}
             <span style={{ fontWeight: 700, fontSize: '1.05rem' }}>
               {conf?.nombre || 'ConferenceManager'}

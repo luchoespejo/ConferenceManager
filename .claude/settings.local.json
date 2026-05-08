@@ -107,7 +107,9 @@
       "Bash(timeout 40 sh -c ' *)",
       "Bash(curl -s http://localhost:5000/api/auth/login -H 'Content-Type: application/json' -d '{\"email\":\"demo@example.com\",\"password\":\"Demo@1234\"}')",
       "Bash(pkill -9 dotnet)",
-      "Bash(curl -s http://localhost:5001/api/auth/login -H 'Content-Type: application/json' -d '{\"email\":\"test@test.com\",\"password\":\"test\"}')"
+      "Bash(curl -s http://localhost:5001/api/auth/login -H 'Content-Type: application/json' -d '{\"email\":\"test@test.com\",\"password\":\"test\"}')",
+      "Bash(curl -s http://localhost:3000/)",
+      "Bash(xargs cat *)"
     ]
   }
 }
