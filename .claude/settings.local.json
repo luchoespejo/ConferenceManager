@@ -109,7 +109,8 @@
       "Bash(pkill -9 dotnet)",
       "Bash(curl -s http://localhost:5001/api/auth/login -H 'Content-Type: application/json' -d '{\"email\":\"test@test.com\",\"password\":\"test\"}')",
       "Bash(curl -s http://localhost:3000/)",
-      "Bash(xargs cat *)"
+      "Bash(xargs cat *)",
+      "Bash(curl -s http://localhost:4200/)"
     ]
   }
 }

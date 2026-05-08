@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 import { CongresoService } from '../congreso.service';
 import { CongresoOverviewDto } from '../congreso.model';
 
@@ -27,6 +28,9 @@ import { CongresoOverviewDto } from '../congreso.model';
             <span class="badge badge-{{ overview()!.estado.toLowerCase() }}">{{ overview()!.estado }}</span>
             <a [routerLink]="['/congreso', id, 'configuracion']" class="btn btn-secondary btn-sm">Configuración</a>
             <a [href]="'https://' + overview()!.slug + '.tuplataforma.com'" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">Ver sitio ↗</a>
+            <button class="btn btn-warning btn-sm" (click)="resetDemo()" [disabled]="resetLoading()">
+              {{ resetLoading() ? '⏳...' : '🔄 Demo' }}
+            </button>
             @if (overview()!.estado === 'Borrador') {
               <button class="btn btn-sm" style="border-color:var(--success);color:var(--success);background:transparent" (click)="publicar()" [disabled]="publicando()">
                 @if (publicando()) { <span class="spinner"></span> }
@@ -235,6 +239,7 @@ export class CongresoOverviewComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private congresoService = inject(CongresoService);
+  private http = inject(HttpClient);
 
   id = '';
   overview = signal<CongresoOverviewDto | null>(null);
@@ -243,6 +248,7 @@ export class CongresoOverviewComponent implements OnInit {
   publicando = signal(false);
   finalizando = signal(false);
   eliminando = signal(false);
+  resetLoading = signal(false);
   apiError = signal<string | null>(null);
 
   ngOnInit(): void {
@@ -310,6 +316,22 @@ export class CongresoOverviewComponent implements OnInit {
       error: (err) => {
         this.eliminando.set(false);
         this.apiError.set(err.error?.message ?? 'Error al eliminar el congreso.');
+      }
+    });
+  }
+
+  resetDemo(): void {
+    if (!confirm('¿Reiniciar demo de este congreso? Se pierden cambios no guardados.')) return;
+    this.resetLoading.set(true);
+    this.http.post('/api/seed', {}).subscribe({
+      next: () => {
+        this.resetLoading.set(false);
+        alert('✓ Demo reiniciado');
+        this.loadOverview();
+      },
+      error: (err) => {
+        this.resetLoading.set(false);
+        alert('✗ Error: ' + (err.error?.message || 'No se pudo reiniciar'));
       }
     });
   }
