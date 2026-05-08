@@ -1,6 +1,7 @@
 import { Component, ChangeDetectionStrategy, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../auth/auth.service';
 import { CongresoService } from '../congresos/congreso.service';
 import { CongresoListItemDto } from '../congresos/congreso.model';
@@ -21,6 +22,9 @@ import { CongresoListItemDto } from '../congresos/congreso.model';
           <span style="font-size:.875rem;color:var(--muted)">{{ auth.usuario()?.nombre }}</span>
           <div class="avatar">{{ auth.usuario()?.nombre?.[0]?.toUpperCase() }}</div>
           <a routerLink="/congreso/nuevo" class="btn btn-primary btn-sm">+ Nuevo</a>
+          <button class="btn btn-warning btn-sm" (click)="resetDemo()" [disabled]="resetLoading()">
+            {{ resetLoading() ? '⏳ Reiniciando...' : '🔄 Reset Demo' }}
+          </button>
           <button class="btn btn-ghost btn-sm" (click)="auth.logout()">Salir</button>
         </div>
       </nav>
@@ -83,13 +87,19 @@ import { CongresoListItemDto } from '../congresos/congreso.model';
 export class DashboardComponent implements OnInit {
   auth = inject(AuthService);
   private congresoService = inject(CongresoService);
+  private http = inject(HttpClient);
 
   congresos = signal<CongresoListItemDto[]>([]);
   loading = signal<boolean>(true);
+  resetLoading = signal<boolean>(false);
   publicados = computed(() => this.congresos().filter(c => c.estado === 'Publicado').length);
   borradores = computed(() => this.congresos().filter(c => c.estado === 'Borrador').length);
 
   ngOnInit(): void {
+    this.loadCongresos();
+  }
+
+  private loadCongresos(): void {
     this.congresoService.getMisCongresos().subscribe({
       next: data => {
         this.congresos.set(data);
@@ -97,6 +107,23 @@ export class DashboardComponent implements OnInit {
       },
       error: () => {
         this.loading.set(false);
+      }
+    });
+  }
+
+  resetDemo(): void {
+    if (!confirm('¿Reiniciar BD con datos demo? Se pierden cambios no guardados.')) return;
+
+    this.resetLoading.set(true);
+    this.http.post('/api/seed', {}).subscribe({
+      next: () => {
+        this.resetLoading.set(false);
+        alert('✓ Demo reiniciado');
+        this.loadCongresos();
+      },
+      error: (err) => {
+        this.resetLoading.set(false);
+        alert('✗ Error: ' + (err.error?.message || 'No se pudo reiniciar'));
       }
     });
   }
