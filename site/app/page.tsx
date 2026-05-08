@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { getSlug } from '@/lib/getSlug';
 
 interface Conferencia {
   id: string;
@@ -23,16 +24,11 @@ export default function Home() {
   const [slug, setSlug] = useState<string>('');
 
   useEffect(() => {
-    const host = typeof window !== 'undefined' ? window.location.hostname : '';
-    const extractedSlug = host.split('.')[0];
-    setSlug(extractedSlug);
-
-    if (['localhost', 'www', 'tuplataforma'].includes(extractedSlug)) {
-      setSlug('reactconf');
-    }
+    const slug = getSlug();
+    setSlug(slug);
 
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-    fetch(`${apiUrl}/api/public/${extractedSlug || 'reactconf'}`)
+    fetch(`${apiUrl}/api/public/${slug}`)
       .then((res) => res.json())
       .then((data) => {
         setConferencia(data);
@@ -51,6 +47,11 @@ export default function Home() {
     return <div className="flex items-center justify-center h-screen">Congreso no encontrado.</div>;
   }
 
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+  const logoUrl = conferencia.logoUrl?.startsWith('http')
+    ? conferencia.logoUrl
+    : `${apiUrl}${conferencia.logoUrl}`;
+
   return (
     <div
       className="min-h-screen"
@@ -62,7 +63,7 @@ export default function Home() {
       {/* Hero */}
       <div className="bg-[var(--color-primary)] text-white py-20 px-6 text-center">
         {conferencia.logoUrl && (
-          <img src={conferencia.logoUrl} alt="Logo" className="h-16 mx-auto mb-6" />
+          <img src={logoUrl} alt="Logo" className="h-16 mx-auto mb-6" />
         )}
         <h1 className="text-4xl font-bold mb-4">{conferencia.nombre}</h1>
         {conferencia.descripcion && (

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
+import { getSlug } from '@/lib/getSlug';
 
 interface Sesion {
   id: string;
@@ -25,17 +26,12 @@ export default function SesionDetail() {
   const [slug, setSlug] = useState<string>('');
 
   useEffect(() => {
-    const host = typeof window !== 'undefined' ? window.location.hostname : '';
-    const extractedSlug = host.split('.')[0];
-    setSlug(extractedSlug);
-
-    if (['localhost', 'www', 'tuplataforma'].includes(extractedSlug)) {
-      setSlug('reactconf');
-    }
+    const slug = getSlug();
+    setSlug(slug);
 
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
-    fetch(`${apiUrl}/api/public/${extractedSlug || 'reactconf'}/sesiones/${id}`)
+    fetch(`${apiUrl}/api/public/${slug}/sesiones/${id}`)
       .then((res) => res.json())
       .then((data) => {
         setSesion(data);
