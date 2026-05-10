@@ -3,6 +3,8 @@ backend/bin/
 backend/obj/
 backend/*.user
 backend/appsettings.Development.json
+tests/bin/
+tests/obj/
 
 # Angular
 admin/node_modules/

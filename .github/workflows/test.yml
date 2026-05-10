@@ -1,0 +1,58 @@
+name: Backend Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'backend/**'
+      - 'tests/**'
+      - '.github/workflows/test.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'backend/**'
+      - 'tests/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: conferencemanager_test
+          POSTGRES_PASSWORD: testpass
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore tests/ConferenceManager.Tests.csproj
+
+    - name: Build
+      run: dotnet build tests/ConferenceManager.Tests.csproj --no-restore --configuration Release
+
+    - name: Run tests
+      run: dotnet test tests/ConferenceManager.Tests.csproj --no-build --verbosity normal --logger "trx;LogFileName=test-results.trx"
+      env:
+        ConnectionStrings__DefaultConnection: "Host=localhost;Port=5432;Database=conferencemanager_test;Username=postgres;Password=testpass"
+
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results
+        path: '**/test-results.trx'
