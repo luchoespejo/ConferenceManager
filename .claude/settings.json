@@ -14,5 +14,14 @@
     "mode": "lean",
     "devPlanReview": false
   },
+  "permissions": {
+    "allowedTools": ["Bash", "Edit", "Write", "Read", "Glob", "Grep", "Agent"],
+    "autoApprove": {
+      "Bash": true,
+      "Edit": true,
+      "Write": true,
+      "Agent": true
+    }
+  },
   "language": "es"
 }

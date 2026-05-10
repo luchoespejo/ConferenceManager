@@ -147,7 +147,8 @@
       "Bash(dotnet test *)",
       "Bash(rm -rf ConferenceManager.Tests)",
       "Bash(dotnet sln *)",
-      "Bash(rm d:/PROYECTS/ConferenceManager/backend/ConferenceManager.Tests/Unit/*)"
+      "Bash(rm d:/PROYECTS/ConferenceManager/backend/ConferenceManager.Tests/Unit/*)",
+      "Bash(bash d:/PROYECTS/ConferenceManager/backend/run-tests.sh)"
     ]
   }
 }
