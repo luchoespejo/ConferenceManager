@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ConferenceManager.Tests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ea8240046b5e2b2ffc827ebc6b5b3b67d4e94bbc")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c925328dcd2a788b1a6963cbdbff03868ea5ad49")]
 [assembly: System.Reflection.AssemblyProductAttribute("ConferenceManager.Tests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ConferenceManager.Tests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
