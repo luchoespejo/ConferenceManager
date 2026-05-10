@@ -1,6 +1,8 @@
 <Solution>
   <Folder Name="/backend/">
     <Project Path="backend/ConferenceManager.csproj" />
-    <Project Path="backend/ConferenceManager.Tests/ConferenceManager.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/ConferenceManager.Tests.csproj" />
   </Folder>
 </Solution>

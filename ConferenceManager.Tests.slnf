@@ -1,0 +1,9 @@
+{
+  "solution": {
+    "path": "ConferenceManager.sln",
+    "projects": [
+      "backend/ConferenceManager.Tests/ConferenceManager.Tests.csproj",
+      "backend/ConferenceManager.csproj"
+    ]
+  }
+}
