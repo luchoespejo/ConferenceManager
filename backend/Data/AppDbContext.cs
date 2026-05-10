@@ -1,5 +1,6 @@
 using ConferenceManager.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace ConferenceManager.Data;
 
@@ -10,10 +11,17 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Conferencia> Conferencias => Set<Conferencia>();
     public DbSet<Sala> Salas => Set<Sala>();
     public DbSet<Expositor> Expositores => Set<Expositor>();
+    public DbSet<ExpositorCredencial> ExpositorCredenciales => Set<ExpositorCredencial>();
     public DbSet<Sesion> Sesiones => Set<Sesion>();
     public DbSet<Participante> Participantes => Set<Participante>();
     public DbSet<AvisoUrgente> AvisosUrgentes => Set<AvisoUrgente>();
     public DbSet<ImagenAlmacenada> ImagenesAlmacenadas => Set<ImagenAlmacenada>();
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        base.OnConfiguring(optionsBuilder);
+        optionsBuilder.ConfigureWarnings(w => w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -73,6 +81,13 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         }
 
         foreach (var entry in ChangeTracker.Entries<AvisoUrgente>()
+            .Where(e => e.State == EntityState.Added))
+        {
+            if (entry.Entity.CreatedAt == default)
+                entry.Entity.CreatedAt = DateTime.UtcNow;
+        }
+
+        foreach (var entry in ChangeTracker.Entries<ExpositorCredencial>()
             .Where(e => e.State == EntityState.Added))
         {
             if (entry.Entity.CreatedAt == default)

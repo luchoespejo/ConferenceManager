@@ -48,4 +48,45 @@ public class ResendEmailService(
                 $"Failed to send verification email. Status: {response.StatusCode}");
         }
     }
+
+    public async Task<ServiceResult> SendAsync(string toEmail, string subject, string body)
+    {
+        try
+        {
+            var apiKey = configuration["Resend:ApiKey"]
+                ?? throw new InvalidOperationException("Resend:ApiKey is not configured.");
+            var fromAddress = configuration["Resend:FromAddress"]
+                ?? throw new InvalidOperationException("Resend:FromAddress is not configured.");
+
+            var payload = new
+            {
+                from = fromAddress,
+                to = new[] { toEmail },
+                subject,
+                text = body
+            };
+
+            var json = JsonSerializer.Serialize(payload);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var client = httpClientFactory.CreateClient("ResendClient");
+            client.DefaultRequestHeaders.Clear();
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
+
+            var response = await client.PostAsync("https://api.resend.com/emails", content);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                logger.LogWarning("Failed to send email to {Email}. Status: {Status}", toEmail, response.StatusCode);
+                return ServiceResult.Fail("EMAIL_FAILED", "No se pudo enviar el email");
+            }
+
+            return ServiceResult.Ok();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Exception sending email to {Email}", toEmail);
+            return ServiceResult.Fail("EMAIL_ERROR", "Error enviando email");
+        }
+    }
 }

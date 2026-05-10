@@ -10,4 +10,13 @@ public class FakeEmailService(ILogger<FakeEmailService> logger) : IEmailService
 
         return Task.CompletedTask;
     }
+
+    public Task<ServiceResult> SendAsync(string toEmail, string subject, string body)
+    {
+        logger.LogInformation(
+            "FAKE EMAIL — To: {Email} | Subject: {Subject} | Body: {Body}",
+            toEmail, subject, body);
+
+        return Task.FromResult(ServiceResult.Ok());
+    }
 }

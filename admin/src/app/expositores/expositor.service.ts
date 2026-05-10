@@ -31,4 +31,11 @@ export class ExpositorService {
   delete(conferenciaId: string, id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl(conferenciaId)}/${id}`);
   }
+
+  sendCredentials(conferenciaId: string, expositorIds: string[]): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(
+      `${this.baseUrl(conferenciaId)}/send-credentials`,
+      { expositorIds }
+    );
+  }
 }

@@ -70,4 +70,11 @@ public class AuthController(IAuthService authService) : ControllerBase
 
         return Unauthorized(new { error = result.ErrorCode, message = result.ErrorMessage });
     }
+
+    [HttpGet("debug/hash")]
+    public IActionResult GetHash([FromQuery] string password)
+    {
+        var hash = BCrypt.Net.BCrypt.HashPassword(password);
+        return Ok(new { password, hash });
+    }
 }

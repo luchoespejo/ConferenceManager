@@ -57,6 +57,11 @@ export const routes: Routes = [
     loadComponent: () => import('./programa/programa.component').then(m => m.ProgramaComponent)
   },
   {
+    path: 'congreso/:id/demo',
+    canActivate: [authGuard],
+    loadComponent: () => import('./congresos/demo-view/demo-view.component').then(m => m.DemoViewComponent)
+  },
+  {
     path: 'congreso/:id',
     canActivate: [authGuard],
     loadComponent: () => import('./congresos/congreso-overview/congreso-overview.component').then(m => m.CongresoOverviewComponent)

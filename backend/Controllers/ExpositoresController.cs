@@ -1,7 +1,9 @@
 using ConferenceManager.DTOs.Expositores;
 using ConferenceManager.Services;
+using ConferenceManager.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.JsonWebTokens;
 using System.Security.Claims;
 
@@ -10,7 +12,7 @@ namespace ConferenceManager.Controllers;
 [ApiController]
 [Route("api/dashboard/conferencias/{conferenciaId}/expositores")]
 [Authorize]
-public class ExpositoresController(IExpositorService expositorService) : ControllerBase
+public class ExpositoresController(IExpositorService expositorService, IEmailService emailService, AppDbContext context, IConfiguration config) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ExpositorListItemDto>>> GetAll(Guid conferenciaId)
@@ -75,4 +77,71 @@ public class ExpositoresController(IExpositorService expositorService) : Control
 
         return NoContent();
     }
+
+    [HttpPost("send-credentials")]
+    public async Task<IActionResult> SendCredentials(Guid conferenciaId, [FromBody] SendCredentialsRequest req)
+    {
+        var usuarioId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        // Verificar propiedad de conferencia
+        var confOwned = await context.Conferencias
+            .AsNoTracking()
+            .AnyAsync(c => c.Id == conferenciaId && c.UsuarioId == usuarioId);
+
+        if (!confOwned)
+            return NotFound(new { error = "CONFERENCIA_NOT_FOUND" });
+
+        var conferencia = await context.Conferencias
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.Id == conferenciaId);
+
+        var expositorIds = req.ExpositorIds?.Any() == true
+            ? req.ExpositorIds.ToList()
+            : await context.Expositores
+                .AsNoTracking()
+                .Where(e => e.ConferenciaId == conferenciaId)
+                .Select(e => e.Id)
+                .ToListAsync();
+
+        var expositores = await context.Expositores
+            .AsNoTracking()
+            .Where(e => e.ConferenciaId == conferenciaId && expositorIds.Contains(e.Id))
+            .ToListAsync();
+
+        if (!expositores.Any())
+            return BadRequest(new { error = "NO_EXPOSITORES" });
+
+        var siteUrl = config["App:SiteUrl"] ?? "http://localhost:3000";
+        var successCount = 0;
+
+        foreach (var expositor in expositores)
+        {
+            if (string.IsNullOrEmpty(expositor.Email))
+                continue;
+
+            var accessUrl = $"{siteUrl}/expositor/{expositor.TokenAcceso}";
+            var subject = $"Credenciales de acceso - {conferencia!.Nombre}";
+            var body = $@"
+Hola {expositor.Nombre},
+
+Te invitamos a acceder al panel de expositores de {conferencia.Nombre}.
+
+Link de acceso: {accessUrl}
+
+Este link es único para ti. No lo compartas.
+
+¡Saludos!
+";
+
+            var emailResult = await emailService.SendAsync(expositor.Email, subject, body);
+            if (emailResult.Success)
+                successCount++;
+        }
+
+        return Ok(new { message = $"Se enviaron {successCount} de {expositores.Count} emails" });
+    }
 }
+
+public record SendCredentialsRequest(
+    Guid[] ExpositorIds
+);

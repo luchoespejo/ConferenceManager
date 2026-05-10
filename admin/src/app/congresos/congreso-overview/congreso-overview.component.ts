@@ -7,15 +7,15 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
 import { CongresoService } from '../congreso.service';
 import { CongresoOverviewDto } from '../congreso.model';
+import { SitePreviewComponent } from '../site-preview/site-preview.component';
 
 @Component({
   selector: 'app-congreso-overview',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, SitePreviewComponent],
   template: `
     <div class="page-shell">
       <nav class="topbar">
@@ -27,10 +27,8 @@ import { CongresoOverviewDto } from '../congreso.model';
           @if (overview()) {
             <span class="badge badge-{{ overview()!.estado.toLowerCase() }}">{{ overview()!.estado }}</span>
             <a [routerLink]="['/congreso', id, 'configuracion']" class="btn btn-secondary btn-sm">Configuración</a>
-            <a [href]="'https://' + overview()!.slug + '.tuplataforma.com'" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">Ver sitio ↗</a>
-            <button class="btn btn-warning btn-sm" (click)="resetDemo()" [disabled]="resetLoading()">
-              {{ resetLoading() ? '⏳...' : '🔄 Demo' }}
-            </button>
+            <a [href]="'https://' + overview()!.slug + '.tuplataforma.com'" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">🌍 Sitio publicado ↗</a>
+            <a [routerLink]="['/congreso', id, 'demo']" class="btn btn-warning btn-sm">👁️ Demo</a>
             @if (overview()!.estado === 'Borrador') {
               <button class="btn btn-sm" style="border-color:var(--success);color:var(--success);background:transparent" (click)="publicar()" [disabled]="publicando()">
                 @if (publicando()) { <span class="spinner"></span> }
@@ -54,7 +52,7 @@ import { CongresoOverviewDto } from '../congreso.model';
         </div>
       </nav>
 
-      <div class="page-body">
+      <div class="page-body" style="max-height:calc(100vh - 120px);overflow-y:auto;padding:0 1.5rem">
         @if (loading()) {
           <div style="display:flex;align-items:center;gap:12px;padding:3rem;color:var(--muted)">
             <div class="spinner"></div> Cargando...
@@ -153,7 +151,7 @@ import { CongresoOverviewDto } from '../congreso.model';
             </a>
           </div>
 
-          <!-- Proximas sesiones -->
+          <!-- Próximas sesiones -->
           @if (overview()!.proximasSesiones.length > 0) {
             <h3 style="margin-bottom:1rem">Próximas sesiones</h3>
             <div class="item-list">
@@ -239,7 +237,6 @@ export class CongresoOverviewComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private congresoService = inject(CongresoService);
-  private http = inject(HttpClient);
 
   id = '';
   overview = signal<CongresoOverviewDto | null>(null);
@@ -248,7 +245,6 @@ export class CongresoOverviewComponent implements OnInit {
   publicando = signal(false);
   finalizando = signal(false);
   eliminando = signal(false);
-  resetLoading = signal(false);
   apiError = signal<string | null>(null);
 
   ngOnInit(): void {
@@ -320,19 +316,4 @@ export class CongresoOverviewComponent implements OnInit {
     });
   }
 
-  resetDemo(): void {
-    if (!confirm('¿Reiniciar demo de este congreso? Se pierden cambios no guardados.')) return;
-    this.resetLoading.set(true);
-    this.http.post('/api/seed', {}).subscribe({
-      next: () => {
-        this.resetLoading.set(false);
-        alert('✓ Demo reiniciado');
-        this.loadOverview();
-      },
-      error: (err) => {
-        this.resetLoading.set(false);
-        alert('✗ Error: ' + (err.error?.message || 'No se pudo reiniciar'));
-      }
-    });
-  }
 }

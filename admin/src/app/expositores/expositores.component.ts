@@ -42,7 +42,10 @@ import { ImageUploadComponent } from '../shared/image-upload/image-upload.compon
             <h2>Expositores</h2>
             <p>Gestioná los expositores del congreso</p>
           </div>
-          <button class="btn btn-primary" (click)="abrirCrear()">+ Nuevo expositor</button>
+          <div style="display:flex;gap:0.5rem">
+            <button class="btn btn-secondary" (click)="resendTodos()" [disabled]="expositores().length === 0">📧 Enviar a todos</button>
+            <button class="btn btn-primary" (click)="abrirCrear()">+ Nuevo expositor</button>
+          </div>
         </div>
 
         @if (mostrarForm()) {
@@ -101,6 +104,7 @@ import { ImageUploadComponent } from '../shared/image-upload/image-upload.compon
                 </div>
                 <div class="item-actions">
                   <button class="btn btn-secondary btn-sm" title="Copiar link de acceso" (click)="copiarLink(expositor)">🔗 Link</button>
+                  <button class="btn btn-secondary btn-sm" (click)="resendUno(expositor)" [disabled]="enviando()">📧 Enviar</button>
                   <button class="btn btn-secondary btn-sm" (click)="abrirEditar(expositor)">Editar</button>
                   <button class="btn btn-danger btn-sm" (click)="eliminar(expositor.id)">Eliminar</button>
                 </div>
@@ -122,6 +126,7 @@ export class ExpositoresComponent implements OnInit, OnDestroy {
   mostrarForm = signal(false);
   editandoId = signal<string | null>(null);
   fotoUrl = signal<string | null>(null);
+  enviando = signal(false);
   conferenciaId!: string;
   private slugCongreso = '';
   form!: FormGroup;
@@ -153,12 +158,49 @@ export class ExpositoresComponent implements OnInit, OnDestroy {
   }
 
   copiarLink(expositor: ExpositorListItem): void {
-    const siteUrl = this.slugCongreso
-      ? `http://${this.slugCongreso}.tuplataforma.com/mi-espacio?token=${expositor.tokenAcceso}`
-      : `http://localhost:3000/mi-espacio?token=${expositor.tokenAcceso}`;
-    navigator.clipboard.writeText(siteUrl).then(
-      () => alert(`Link copiado:\n${siteUrl}`),
-      () => prompt('Copiá este link:', siteUrl)
+    const baseUrl = this.slugCongreso
+      ? `https://${this.slugCongreso}.tuplataforma.com`
+      : `http://localhost:3000`;
+    const accessUrl = `${baseUrl}/expositor/${expositor.tokenAcceso}`;
+    navigator.clipboard.writeText(accessUrl).then(
+      () => alert(`Link copiado:\n${accessUrl}`),
+      () => prompt('Copiá este link:', accessUrl)
+    );
+  }
+
+  resendUno(expositor: ExpositorListItem): void {
+    this.enviando.set(true);
+    this.subs.add(
+      this.expositorService.sendCredentials(this.conferenciaId, [expositor.id]).subscribe({
+        next: () => {
+          this.enviando.set(false);
+          alert(`✓ Email enviado a ${expositor.nombre}`);
+        },
+        error: (err) => {
+          this.enviando.set(false);
+          alert('✗ Error al enviar email');
+          console.error(err);
+        }
+      })
+    );
+  }
+
+  resendTodos(): void {
+    if (!confirm('¿Enviar credenciales a todos los expositores?')) return;
+    this.enviando.set(true);
+    const ids = this.expositores().map(e => e.id);
+    this.subs.add(
+      this.expositorService.sendCredentials(this.conferenciaId, ids).subscribe({
+        next: () => {
+          this.enviando.set(false);
+          alert(`✓ Emails enviados a ${ids.length} expositores`);
+        },
+        error: (err) => {
+          this.enviando.set(false);
+          alert('✗ Error al enviar emails');
+          console.error(err);
+        }
+      })
     );
   }
 
