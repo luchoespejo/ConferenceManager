@@ -17,66 +17,54 @@ services:
       retries: 5
 
   backend:
-    image: mcr.microsoft.com/dotnet/sdk:10.0
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     container_name: conference_backend
-    working_dir: /app
     ports:
-      - "5000:5000"
+      - "5000:8080"
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
-      ASPNETCORE_URLS: http://0.0.0.0:5000
-      ConnectionStrings__DefaultConnection: "Host=postgres;Database=conference_db;Username=postgres;Password=postgres"
-      Jwt__SecretKey: "this-is-a-very-long-secret-key-for-jwt-testing-32-chars-min"
-      Jwt__Issuer: "ConferenceManager"
-      Jwt__Audience: "ConferenceManager"
-      App__BaseUrl: "http://localhost:5000"
-      App__SiteUrl: "http://localhost:3000"
-      Email__UseFake: "true"
-      Admin__SecretKey: "cambiar-en-produccion-clave-admin-secreta"
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Production}
+      ASPNETCORE_URLS: http://0.0.0.0:8080
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=conference_db;Username=postgres;Password=${DB_PASSWORD:-postgres}"
+      Jwt__SecretKey: ${JWT_SECRET_KEY:-this-is-a-very-long-secret-key-for-jwt-testing-32-chars-min}
+      Jwt__Issuer: ConferenceManager
+      Jwt__Audience: ConferenceManager
+      Resend__ApiKey: ${RESEND_API_KEY}
+      Resend__FromAddress: ${RESEND_FROM_ADDRESS:-noreply@tuplataforma.com}
+      Email__UseFake: ${EMAIL_USE_FAKE:-false}
+      Cors__AllowedOrigins__0: ${CORS_ORIGIN:-http://localhost:3000}
+      App__BaseUrl: ${APP_BASE_URL:-http://localhost:5000}
+      App__SiteUrl: ${APP_SITE_URL:-http://localhost:3000}
     depends_on:
       postgres:
         condition: service_healthy
-    volumes:
-      - ./backend:/app
-      - backend_bin:/app/bin
-      - backend_obj:/app/obj
-    command: sh -c "dotnet restore && dotnet run -c Debug"
+    restart: unless-stopped
 
-  site:
-    image: node:20-alpine
-    container_name: conference_site
-    working_dir: /app
-    ports:
-      - "3000:3000"
-    environment:
-      NEXT_PUBLIC_API_URL: "http://localhost:5000"
-    depends_on:
-      - backend
-    volumes:
-      - ./site:/app
-      - site_node_modules:/app/node_modules
-    command: sh -c "npm install && npm run dev"
-
-  admin:
-    image: node:20-alpine
-    container_name: conference_admin
-    working_dir: /app
-    ports:
-      - "4200:4200"
-    depends_on:
-      - backend
-    volumes:
-      - ./admin:/app
-      - admin_node_modules:/app/node_modules
-    command: sh -c "npm install && npx ng serve --host 0.0.0.0 --poll 500"
+  # Note: Render deploys Next.js site separately via Vercel
+  # Local development only:
+  # site:
+  #   image: node:20-alpine
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     NEXT_PUBLIC_API_URL: "http://backend:8080"
+  #   depends_on:
+  #     - backend
+  #   volumes:
+  #     - ./site:/app
+  #   command: sh -c "npm install && npm run dev"
+  #
+  # admin:
+  #   image: node:20-alpine
+  #   ports:
+  #     - "4200:4200"
+  #   depends_on:
+  #     - backend
+  #   volumes:
+  #     - ./admin:/app
+  #   command: sh -c "npm install && npx ng serve --host 0.0.0.0 --poll 500"
 
 volumes:
   postgres_data:
-  backend_bin:
-  backend_obj:
-  site_node_modules:
-  admin_node_modules:
 
-networks:
-  default:
-    name: conference_network

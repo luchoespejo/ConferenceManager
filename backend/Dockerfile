@@ -1,11 +1,17 @@
-FROM mcr.microsoft.com/dotnet/sdk:10.0
-
+# Build stage
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /app
-
 COPY . .
-
 RUN dotnet restore
+RUN dotnet publish -c Release -o /app/publish
 
-EXPOSE 5000
+# Runtime stage
+FROM mcr.microsoft.com/dotnet/aspnet:10.0
+WORKDIR /app
+COPY --from=build /app/publish .
 
-ENTRYPOINT ["dotnet", "watch", "run"]
+EXPOSE 8080
+ENV ASPNETCORE_URLS=http://+:8080
+ENV ASPNETCORE_ENVIRONMENT=Production
+
+ENTRYPOINT ["dotnet", "ConferenceManager.dll"]
