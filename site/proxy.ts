@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const host = req.headers.get('host') ?? '';
   const slug = host.split('.')[0];
   if (['www', 'tuplataforma', 'localhost'].includes(slug)) {
