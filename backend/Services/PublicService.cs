@@ -119,7 +119,6 @@ public class PublicService(AppDbContext context) : IPublicService
             Nombre = expositor.Nombre,
             Bio = expositor.Bio,
             FotoUrl = expositor.FotoUrl,
-            Email = expositor.Email,
             ConferenciaNombre = expositor.Conferencia.Nombre,
             Sesiones = sesiones
         };
