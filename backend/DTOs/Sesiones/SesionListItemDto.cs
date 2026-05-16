@@ -11,4 +11,5 @@ public class SesionListItemDto
     public string? Track { get; set; }
     public string SalaNombre { get; set; } = null!;
     public string ExpositorNombre { get; set; } = null!;
+    public string? QrCodeUrl { get; set; }
 }

@@ -10,6 +10,8 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CongresoService } from '../congreso.service';
 import { CongresoOverviewDto } from '../congreso.model';
 import { SitePreviewComponent } from '../site-preview/site-preview.component';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-congreso-overview',
@@ -29,6 +31,9 @@ import { SitePreviewComponent } from '../site-preview/site-preview.component';
             <a [routerLink]="['/congreso', id, 'configuracion']" class="btn btn-secondary btn-sm">Configuración</a>
             <a href="https://conference-manager-irl1.vercel.app" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">🌍 Sitio publicado ↗</a>
             <a [routerLink]="['/congreso', id, 'demo']" class="btn btn-warning btn-sm">👁️ Demo</a>
+            <button class="btn btn-secondary btn-sm" (click)="imprimirQrs()" [disabled]="imprimiendoQrs()">
+              @if (imprimiendoQrs()) { <span class="spinner"></span> } 🖨️ QRs
+            </button>
             @if (overview()!.estado === 'Borrador') {
               <button class="btn btn-sm" style="border-color:var(--success);color:var(--success);background:transparent" (click)="publicar()" [disabled]="publicando()">
                 @if (publicando()) { <span class="spinner"></span> }
@@ -237,6 +242,7 @@ export class CongresoOverviewComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private congresoService = inject(CongresoService);
+  private http = inject(HttpClient);
 
   id = '';
   overview = signal<CongresoOverviewDto | null>(null);
@@ -245,6 +251,7 @@ export class CongresoOverviewComponent implements OnInit {
   publicando = signal(false);
   finalizando = signal(false);
   eliminando = signal(false);
+  imprimiendoQrs = signal(false);
   apiError = signal<string | null>(null);
 
   ngOnInit(): void {
@@ -314,6 +321,74 @@ export class CongresoOverviewComponent implements OnInit {
         this.apiError.set(err.error?.message ?? 'Error al eliminar el congreso.');
       }
     });
+  }
+
+  imprimirQrs(): void {
+    this.imprimiendoQrs.set(true);
+    const token = localStorage.getItem('access_token') ?? sessionStorage.getItem('access_token') ?? '';
+    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+
+    this.http.get<any[]>(`${environment.apiUrl}/api/dashboard/conferencias/${this.id}/sesiones`, { headers })
+      .subscribe({
+        next: (sesiones) => {
+          this.imprimiendoQrs.set(false);
+          const nombre = this.overview()?.nombre ?? 'Congreso';
+          const html = this.buildQrHtml(nombre, sesiones);
+          const win = window.open('', '_blank');
+          if (win) { win.document.write(html); win.document.close(); }
+        },
+        error: () => {
+          this.imprimiendoQrs.set(false);
+          this.apiError.set('No se pudieron cargar los QRs. Intentá de nuevo.');
+        }
+      });
+  }
+
+  private buildQrHtml(congreso: string, sesiones: any[]): string {
+    const conNombre = congreso.replace(/</g, '&lt;');
+    const cards = sesiones.map(s => {
+      const titulo = (s.titulo ?? '').replace(/</g, '&lt;');
+      const sala = (s.salaNombre ?? '').replace(/</g, '&lt;');
+      const expositor = (s.expositorNombre ?? '').replace(/</g, '&lt;');
+      const track = s.track ? `<span class="track">${s.track.replace(/</g, '&lt;')}</span>` : '';
+      const fecha = s.fecha ? new Date(s.fecha).toLocaleDateString('es-AR') : '';
+      const hora = s.horaInicio && s.horaFin ? `${s.horaInicio.slice(0,5)} – ${s.horaFin.slice(0,5)}` : '';
+      const qr = s.qrCodeUrl
+        ? `<img src="${s.qrCodeUrl}" alt="QR" class="qr-img" />`
+        : `<div class="qr-placeholder">Sin QR<br><small>Regenerar desde el panel</small></div>`;
+      return `
+        <div class="card">
+          ${qr}
+          <div class="info">
+            <div class="title">${titulo}</div>
+            ${track}
+            <div class="meta">📅 ${fecha} &nbsp; ⏰ ${hora}</div>
+            <div class="meta">📍 ${sala} &nbsp; 🎤 ${expositor}</div>
+          </div>
+        </div>`;
+    }).join('');
+
+    return `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+<title>QRs — ${conNombre}</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; background: #fff; padding: 1.5rem; }
+  h1 { font-size: 1.25rem; margin-bottom: 1.5rem; color: #333; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+  .card { border: 1px solid #ddd; border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; align-items: center; gap: .75rem; page-break-inside: avoid; }
+  .qr-img { width: 160px; height: 160px; }
+  .qr-placeholder { width: 160px; height: 160px; border: 2px dashed #ccc; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #999; font-size: .8rem; text-align: center; border-radius: 4px; }
+  .info { width: 100%; text-align: center; }
+  .title { font-weight: 700; font-size: .95rem; margin-bottom: .4rem; }
+  .track { display: inline-block; background: #f0f0f0; padding: 2px 8px; border-radius: 4px; font-size: .75rem; margin-bottom: .4rem; }
+  .meta { font-size: .78rem; color: #555; margin-top: .2rem; }
+  .print-btn { position: fixed; top: 1rem; right: 1rem; background: #1a1a2e; color: #fff; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-size: .9rem; font-weight: 600; }
+  @media print { .print-btn { display: none; } }
+</style></head><body>
+<button class="print-btn" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+<h1>QRs — ${conNombre}</h1>
+<div class="grid">${cards}</div>
+</body></html>`;
   }
 
 }

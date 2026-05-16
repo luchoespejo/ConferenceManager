@@ -46,7 +46,8 @@ public class SesionService(AppDbContext context, IQrService qrService, IConfigur
                 HoraFin = s.HoraFin,
                 Track = s.Track,
                 SalaNombre = s.Sala.Nombre,
-                ExpositorNombre = s.Expositor.Nombre
+                ExpositorNombre = s.Expositor.Nombre,
+                QrCodeUrl = s.QrCodeUrl
             })
             .ToListAsync();
 
