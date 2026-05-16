@@ -27,7 +27,7 @@ import { SitePreviewComponent } from '../site-preview/site-preview.component';
           @if (overview()) {
             <span class="badge badge-{{ overview()!.estado.toLowerCase() }}">{{ overview()!.estado }}</span>
             <a [routerLink]="['/congreso', id, 'configuracion']" class="btn btn-secondary btn-sm">Configuración</a>
-            <a [href]="'https://' + overview()!.slug + '.tuplataforma.com'" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">🌍 Sitio publicado ↗</a>
+            <a href="https://conference-manager-irl1.vercel.app" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">🌍 Sitio publicado ↗</a>
             <a [routerLink]="['/congreso', id, 'demo']" class="btn btn-warning btn-sm">👁️ Demo</a>
             @if (overview()!.estado === 'Borrador') {
               <button class="btn btn-sm" style="border-color:var(--success);color:var(--success);background:transparent" (click)="publicar()" [disabled]="publicando()">
