@@ -1,13 +1,7 @@
 'use client';
 
 import { useState, FormEvent } from 'react';
-
-function getSlug(): string {
-  if (typeof window === 'undefined') return '';
-  const host = window.location.hostname;
-  const slug = host.split('.')[0];
-  return ['localhost', 'www', 'tuplataforma'].includes(slug) ? 'reactconf' : slug;
-}
+import { getSlug } from '@/lib/getSlug';
 
 export default function Certificado() {
   const [email, setEmail] = useState('');
