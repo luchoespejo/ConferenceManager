@@ -168,14 +168,26 @@ function slugFromNombre(nombre: string): string {
               <div class="form-row" style="margin-bottom:1rem">
                 <div class="form-group">
                   <label for="colorPrimario">Color primario</label>
-                  <input id="colorPrimario" type="text" formControlName="colorPrimario" class="form-control" placeholder="#rrggbb" maxlength="7" />
+                  <div style="display:flex;align-items:center;gap:.5rem">
+                    <input type="color"
+                      [value]="f['colorPrimario'].value || '#1a1a2e'"
+                      (input)="f['colorPrimario'].setValue($any($event.target).value)"
+                      style="width:42px;height:38px;padding:2px;border:1px solid var(--border);border-radius:6px;cursor:pointer;flex-shrink:0" />
+                    <input id="colorPrimario" type="text" formControlName="colorPrimario" class="form-control" placeholder="#rrggbb" maxlength="7" />
+                  </div>
                   @if (f['colorPrimario'].errors?.['maxlength']) {
                     <div class="error-msg">Máximo 7 caracteres.</div>
                   }
                 </div>
                 <div class="form-group">
                   <label for="colorSecundario">Color secundario</label>
-                  <input id="colorSecundario" type="text" formControlName="colorSecundario" class="form-control" placeholder="#rrggbb" maxlength="7" />
+                  <div style="display:flex;align-items:center;gap:.5rem">
+                    <input type="color"
+                      [value]="f['colorSecundario'].value || '#16213e'"
+                      (input)="f['colorSecundario'].setValue($any($event.target).value)"
+                      style="width:42px;height:38px;padding:2px;border:1px solid var(--border);border-radius:6px;cursor:pointer;flex-shrink:0" />
+                    <input id="colorSecundario" type="text" formControlName="colorSecundario" class="form-control" placeholder="#rrggbb" maxlength="7" />
+                  </div>
                   @if (f['colorSecundario'].errors?.['maxlength']) {
                     <div class="error-msg">Máximo 7 caracteres.</div>
                   }
