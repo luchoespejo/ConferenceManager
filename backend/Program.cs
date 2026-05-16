@@ -127,14 +127,12 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
-// ── Migrate + Seed (dev only) ─────────────────────────────────────────────────
-if (app.Environment.IsDevelopment())
+// ── Migrate + Seed ────────────────────────────────────────────────────────────
 {
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await db.Database.MigrateAsync();
-    // TODO: Seed causes migration issues. Seed manually via /api/seed endpoint or DB migration.
-    // await SeedData.SeedAsync(db);
+    await SeedData.SeedAsync(db);
 }
 
 // ── Pipeline ──────────────────────────────────────────────────────────────────
