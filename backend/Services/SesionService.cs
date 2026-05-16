@@ -203,4 +203,30 @@ public class SesionService(AppDbContext context, IQrService qrService, IConfigur
             CreatedAt = s.CreatedAt
         };
     }
+
+    public async Task<ServiceResult<int>> RegenerarQrsAsync(Guid conferenciaId, Guid usuarioId)
+    {
+        if (!await VerifyOwnershipAsync(conferenciaId, usuarioId))
+            return ServiceResult<int>.Fail("ConferenciaNotFound", "El congreso no existe o no pertenece al usuario.");
+
+        var sesiones = await context.Sesiones
+            .Where(s => s.ConferenciaId == conferenciaId)
+            .ToListAsync();
+
+        var siteUrl = config["App:SiteUrl"] ?? "http://localhost:3000";
+        var count = 0;
+
+        foreach (var sesion in sesiones)
+        {
+            var qr = await qrService.GenerateAsync($"{siteUrl}/s/{sesion.Id}");
+            if (qr is not null)
+            {
+                sesion.QrCodeUrl = qr;
+                count++;
+            }
+        }
+
+        await context.SaveChangesAsync();
+        return ServiceResult<int>.Ok(count);
+    }
 }

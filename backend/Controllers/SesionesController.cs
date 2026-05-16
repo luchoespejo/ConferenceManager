@@ -69,4 +69,15 @@ public class SesionesController(ISesionService sesionService) : ControllerBase
 
         return NoContent();
     }
+
+    [HttpPost("regenerar-qrs")]
+    public async Task<IActionResult> RegenerarQrs(Guid conferenciaId)
+    {
+        var result = await sesionService.RegenerarQrsAsync(conferenciaId, UsuarioId);
+
+        if (!result.Success)
+            return NotFound(new { error = result.ErrorCode });
+
+        return Ok(new { regenerated = result.Data });
+    }
 }
