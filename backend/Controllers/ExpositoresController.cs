@@ -84,16 +84,18 @@ public class ExpositoresController(IExpositorService expositorService, IEmailSer
         var usuarioId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
         // Verificar propiedad de conferencia
-        var confOwned = await context.Conferencias
-            .AsNoTracking()
-            .AnyAsync(c => c.Id == conferenciaId && c.UsuarioId == usuarioId);
-
-        if (!confOwned)
-            return NotFound(new { error = "CONFERENCIA_NOT_FOUND" });
-
         var conferencia = await context.Conferencias
             .AsNoTracking()
-            .FirstOrDefaultAsync(c => c.Id == conferenciaId);
+            .FirstOrDefaultAsync(c => c.Id == conferenciaId && c.UsuarioId == usuarioId);
+
+        if (conferencia is null)
+            return NotFound(new { error = "CONFERENCIA_NOT_FOUND" });
+
+        var organizadorEmail = await context.Usuarios
+            .AsNoTracking()
+            .Where(u => u.Id == usuarioId)
+            .Select(u => u.Email)
+            .FirstOrDefaultAsync();
 
         var expositorIds = req.ExpositorIds?.Any() == true
             ? req.ExpositorIds.ToList()
@@ -120,7 +122,7 @@ public class ExpositoresController(IExpositorService expositorService, IEmailSer
                 continue;
 
             var accessUrl = $"{siteUrl}/expositor/{expositor.TokenAcceso}";
-            var subject = $"Credenciales de acceso - {conferencia!.Nombre}";
+            var subject = $"Credenciales de acceso - {conferencia.Nombre}";
             var body = $@"
 Hola {expositor.Nombre},
 
@@ -133,7 +135,7 @@ Este link es único para ti. No lo compartas.
 ¡Saludos!
 ";
 
-            var emailResult = await emailService.SendAsync(expositor.Email, subject, body);
+            var emailResult = await emailService.SendAsync(expositor.Email, subject, body, replyTo: organizadorEmail, fromDisplayName: conferencia.Nombre);
             if (emailResult.Success)
                 successCount++;
         }

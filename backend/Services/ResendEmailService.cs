@@ -49,7 +49,7 @@ public class ResendEmailService(
         }
     }
 
-    public async Task<ServiceResult> SendAsync(string toEmail, string subject, string body)
+    public async Task<ServiceResult> SendAsync(string toEmail, string subject, string body, string? replyTo = null, string? fromDisplayName = null)
     {
         try
         {
@@ -58,13 +58,13 @@ public class ResendEmailService(
             var fromAddress = configuration["Resend:FromAddress"]
                 ?? throw new InvalidOperationException("Resend:FromAddress is not configured.");
 
-            var payload = new
-            {
-                from = fromAddress,
-                to = new[] { toEmail },
-                subject,
-                text = body
-            };
+            var fromField = string.IsNullOrEmpty(fromDisplayName)
+                ? fromAddress
+                : $"{fromDisplayName} via ConferenceManager <{fromAddress}>";
+
+            var payload = string.IsNullOrEmpty(replyTo)
+                ? (object)new { from = fromField, to = new[] { toEmail }, subject, text = body }
+                : (object)new { from = fromField, to = new[] { toEmail }, subject, text = body, reply_to = replyTo };
 
             var json = JsonSerializer.Serialize(payload);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
