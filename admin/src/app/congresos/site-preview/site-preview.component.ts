@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 interface ConferenciaPreview {
   id: string;
@@ -276,7 +277,7 @@ export class SitePreviewComponent implements OnInit {
     this.loading.set(true);
     this.error.set(null);
 
-    const apiUrl = 'http://localhost:5000';
+    const apiUrl = environment.apiUrl;
     this.http.get<ConferenciaPreview>(
       `${apiUrl}/api/dashboard/preview/${this.conferenciaId}`
     ).subscribe({
@@ -294,7 +295,7 @@ export class SitePreviewComponent implements OnInit {
   resolveUrl(url: string): string {
     if (!url) return '';
     if (url.startsWith('http')) return url;
-    const apiUrl = 'http://localhost:5000';
+    const apiUrl = environment.apiUrl;
     return `${apiUrl}${url}`;
   }
 
