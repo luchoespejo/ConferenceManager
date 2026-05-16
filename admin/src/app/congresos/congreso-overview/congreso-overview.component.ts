@@ -12,6 +12,7 @@ import { CongresoOverviewDto } from '../congreso.model';
 import { SitePreviewComponent } from '../site-preview/site-preview.component';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
+import { ToastService } from '../../core/toast.service';
 
 @Component({
   selector: 'app-congreso-overview',
@@ -243,6 +244,7 @@ export class CongresoOverviewComponent implements OnInit {
   private router = inject(Router);
   private congresoService = inject(CongresoService);
   private http = inject(HttpClient);
+  private toast = inject(ToastService);
 
   id = '';
   overview = signal<CongresoOverviewDto | null>(null);
@@ -286,10 +288,11 @@ export class CongresoOverviewComponent implements OnInit {
       next: (congreso) => {
         this.overview.update(o => o ? { ...o, estado: congreso.estado } : o);
         this.publicando.set(false);
+        this.toast.success('Congreso publicado correctamente.');
       },
       error: (err) => {
         this.publicando.set(false);
-        this.apiError.set(err.error?.message ?? 'Error al publicar el congreso.');
+        this.toast.error(err.error?.message ?? 'Error al publicar el congreso.');
       }
     });
   }
@@ -302,10 +305,11 @@ export class CongresoOverviewComponent implements OnInit {
       next: (congreso) => {
         this.overview.update(o => o ? { ...o, estado: congreso.estado } : o);
         this.finalizando.set(false);
+        this.toast.success('Congreso finalizado.');
       },
       error: (err) => {
         this.finalizando.set(false);
-        this.apiError.set(err.error?.message ?? 'Error al finalizar el congreso.');
+        this.toast.error(err.error?.message ?? 'Error al finalizar el congreso.');
       }
     });
   }

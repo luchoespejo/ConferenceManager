@@ -13,6 +13,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ParticipanteService } from './participante.service';
 import { Participante, CreateParticipanteDto, UpdateParticipanteDto } from './participante.model';
+import { ToastService } from '../core/toast.service';
 
 @Component({
   selector: 'app-participantes',
@@ -245,6 +246,7 @@ export class ParticipantesComponent implements OnInit, OnDestroy {
   private participanteService = inject(ParticipanteService);
   private route = inject(ActivatedRoute);
   private fb = inject(FormBuilder);
+  private toast = inject(ToastService);
 
   conferenciaId!: string;
   participantes = signal<Participante[]>([]);
@@ -335,13 +337,15 @@ export class ParticipantesComponent implements OnInit, OnDestroy {
             this.participantes.update(list => list.map(p => p.id === editandoId ? updated : p));
             this.guardando.set(false);
             this.cancelarForm();
+            this.toast.success('Participante actualizado.');
           },
           error: (err) => {
             this.guardando.set(false);
-            const code = err.error?.error;
-            this.apiError.set(code === 'EMAIL_ALREADY_EXISTS'
+            const msg = err.error?.error === 'EMAIL_ALREADY_EXISTS'
               ? 'Ya existe otro participante con ese email en este congreso.'
-              : 'Error al actualizar el participante.');
+              : 'Error al actualizar el participante.';
+            this.apiError.set(msg);
+            this.toast.error(msg);
           }
         })
       );
@@ -358,13 +362,15 @@ export class ParticipantesComponent implements OnInit, OnDestroy {
             this.participantes.update(list => [...list, nuevo].sort((a, b) => a.nombre.localeCompare(b.nombre)));
             this.guardando.set(false);
             this.cancelarForm();
+            this.toast.success('Participante agregado.');
           },
           error: (err) => {
             this.guardando.set(false);
-            const code = err.error?.error;
-            this.apiError.set(code === 'EMAIL_ALREADY_EXISTS'
+            const msg = err.error?.error === 'EMAIL_ALREADY_EXISTS'
               ? 'Ya existe un participante con ese email en este congreso.'
-              : 'Error al crear el participante.');
+              : 'Error al crear el participante.';
+            this.apiError.set(msg);
+            this.toast.error(msg);
           }
         })
       );
@@ -410,8 +416,8 @@ export class ParticipantesComponent implements OnInit, OnDestroy {
     if (!confirm('¿Eliminar este participante? Esta acción no se puede deshacer.')) return;
     this.subs.add(
       this.participanteService.delete(this.conferenciaId, id).subscribe({
-        next: () => this.participantes.update(list => list.filter(p => p.id !== id)),
-        error: () => this.apiError.set('Error al eliminar el participante.')
+        next: () => { this.participantes.update(list => list.filter(p => p.id !== id)); this.toast.success('Participante eliminado.'); },
+        error: () => { this.apiError.set('Error al eliminar el participante.'); this.toast.error('Error al eliminar el participante.'); }
       })
     );
   }

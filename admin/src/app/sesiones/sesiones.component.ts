@@ -18,6 +18,7 @@ import { Subscription } from 'rxjs';
 import { SesionService } from './sesion.service';
 import { SalaService } from '../salas/sala.service';
 import { ExpositorService } from '../expositores/expositor.service';
+import { ToastService } from '../core/toast.service';
 import { SesionListItem, CreateSesionDto, UpdateSesionDto } from './sesion.model';
 import { SalaDto } from '../salas/sala.model';
 import { ExpositorListItem } from '../expositores/expositor.model';
@@ -172,6 +173,7 @@ export class SesionesComponent implements OnInit, OnDestroy {
   private expositorService = inject(ExpositorService);
   private route = inject(ActivatedRoute);
   private fb = inject(FormBuilder);
+  private toast = inject(ToastService);
 
   sesiones = signal<SesionListItem[]>([]);
   salas = signal<SalaDto[]>([]);
@@ -285,8 +287,8 @@ export class SesionesComponent implements OnInit, OnDestroy {
       };
       this.subs.add(
         this.sesionService.update(this.conferenciaId, id, dto).subscribe({
-          next: () => { this.cancelar(); this.cargarSesiones(); },
-          error: (err) => console.error('Error actualizando sesión:', err.error ?? err)
+          next: () => { this.toast.success('Sesión actualizada.'); this.cancelar(); this.cargarSesiones(); },
+          error: (err) => { this.toast.error('Error al actualizar la sesión.'); console.error(err.error ?? err); }
         })
       );
     } else {
@@ -304,8 +306,8 @@ export class SesionesComponent implements OnInit, OnDestroy {
       };
       this.subs.add(
         this.sesionService.create(this.conferenciaId, dto).subscribe({
-          next: () => { this.cancelar(); this.cargarSesiones(); },
-          error: (err) => console.error('Error creando sesión:', err.error ?? err)
+          next: () => { this.toast.success('Sesión creada.'); this.cancelar(); this.cargarSesiones(); },
+          error: (err) => { this.toast.error('Error al crear la sesión.'); console.error(err.error ?? err); }
         })
       );
     }
@@ -315,8 +317,8 @@ export class SesionesComponent implements OnInit, OnDestroy {
     if (confirm('¿Eliminar esta sesión?')) {
       this.subs.add(
         this.sesionService.delete(this.conferenciaId, id).subscribe({
-          next: () => this.cargarSesiones(),
-          error: (err) => console.error('Error eliminando:', err)
+          next: () => { this.toast.success('Sesión eliminada.'); this.cargarSesiones(); },
+          error: () => this.toast.error('Error al eliminar la sesión.')
         })
       );
     }

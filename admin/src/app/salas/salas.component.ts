@@ -12,6 +12,7 @@ import { RouterLink, ActivatedRoute } from '@angular/router';
 import { SalaService } from './sala.service';
 import { SalaDto } from './sala.model';
 import { HttpErrorResponse } from '@angular/common/http';
+import { ToastService } from '../core/toast.service';
 
 @Component({
   selector: 'app-salas',
@@ -132,6 +133,7 @@ export class SalasComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private fb = inject(FormBuilder);
   private cdr = inject(ChangeDetectorRef);
+  private toast = inject(ToastService);
 
   private conferenciaId = '';
 
@@ -203,6 +205,7 @@ export class SalasComponent implements OnInit {
           this.editingId.set(null);
           this.salaForm.reset();
           this.loadSalas();
+          this.toast.success('Sala actualizada.');
         },
         error: (err: HttpErrorResponse) => {
           this.submitting.set(false);
@@ -218,6 +221,7 @@ export class SalasComponent implements OnInit {
           this.submitting.set(false);
           this.salaForm.reset();
           this.loadSalas();
+          this.toast.success('Sala creada.');
         },
         error: (err: HttpErrorResponse) => {
           this.submitting.set(false);
@@ -238,6 +242,7 @@ export class SalasComponent implements OnInit {
       next: () => {
         this.submitting.set(false);
         this.loadSalas();
+        this.toast.success('Sala eliminada.');
       },
       error: (err: HttpErrorResponse) => {
         this.submitting.set(false);

@@ -20,6 +20,7 @@ import { Subscription } from 'rxjs';
 import { CongresoService } from '../congreso.service';
 import { CreateCongresoDto, UpdateCongresoDto } from '../congreso.model';
 import { ImageUploadComponent } from '../../shared/image-upload/image-upload.component';
+import { ToastService } from '../../core/toast.service';
 
 /** Cross-field validator: fechaFin must be >= fechaInicio */
 function fechasValidator(group: AbstractControl): ValidationErrors | null {
@@ -249,6 +250,7 @@ export class CongresoFormComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private congresoService = inject(CongresoService);
+  private toast = inject(ToastService);
 
   id: string | null = null;
   slugManuallyEdited = false;
@@ -397,7 +399,7 @@ export class CongresoFormComponent implements OnInit, OnDestroy {
     };
 
     this.congresoService.create(dto).subscribe({
-      next: () => this.router.navigate(['/dashboard']),
+      next: () => { this.toast.success('Congreso creado.'); this.router.navigate(['/dashboard']); },
       error: (err) => this.handleApiError(err)
     });
   }
@@ -423,7 +425,7 @@ export class CongresoFormComponent implements OnInit, OnDestroy {
     };
 
     this.congresoService.update(id, dto).subscribe({
-      next: () => this.router.navigate(['/congreso', id]),
+      next: () => { this.toast.success('Cambios guardados.'); this.router.navigate(['/congreso', id]); },
       error: (err) => this.handleApiError(err)
     });
   }
@@ -449,7 +451,9 @@ export class CongresoFormComponent implements OnInit, OnDestroy {
       }
     }
 
-    this.apiError.set(err.error?.message ?? 'Ocurrió un error inesperado. Intente nuevamente.');
+    const msg = err.error?.message ?? 'Ocurrió un error inesperado. Intente nuevamente.';
+    this.apiError.set(msg);
+    this.toast.error(msg);
   }
 
   publicar(): void {

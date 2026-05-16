@@ -19,6 +19,7 @@ import { ExpositorService } from './expositor.service';
 import { CongresoService } from '../congresos/congreso.service';
 import { ExpositorListItem, UpdateExpositorDto } from './expositor.model';
 import { ImageUploadComponent } from '../shared/image-upload/image-upload.component';
+import { ToastService } from '../core/toast.service';
 
 @Component({
   selector: 'app-expositores',
@@ -119,6 +120,7 @@ import { ImageUploadComponent } from '../shared/image-upload/image-upload.compon
 export class ExpositoresComponent implements OnInit, OnDestroy {
   private expositorService = inject(ExpositorService);
   private congresoService = inject(CongresoService);
+  private toast = inject(ToastService);
   private route = inject(ActivatedRoute);
   private fb = inject(FormBuilder);
 
@@ -245,8 +247,8 @@ export class ExpositoresComponent implements OnInit, OnDestroy {
       };
       this.subs.add(
         this.expositorService.update(this.conferenciaId, id, dto).subscribe({
-          next: () => { this.cancelar(); this.cargar(); },
-          error: (err) => console.error('Error actualizando expositor:', err)
+          next: () => { this.toast.success('Expositor actualizado.'); this.cancelar(); this.cargar(); },
+          error: () => this.toast.error('Error al actualizar el expositor.')
         })
       );
     } else {
@@ -257,8 +259,8 @@ export class ExpositoresComponent implements OnInit, OnDestroy {
           bio: v.bio || undefined,
           fotoUrl: this.fotoUrl() ?? undefined
         }).subscribe({
-          next: () => { this.cancelar(); this.cargar(); },
-          error: (err) => console.error('Error creando expositor:', err)
+          next: () => { this.toast.success('Expositor creado.'); this.cancelar(); this.cargar(); },
+          error: () => this.toast.error('Error al crear el expositor.')
         })
       );
     }
@@ -268,8 +270,8 @@ export class ExpositoresComponent implements OnInit, OnDestroy {
     if (confirm('¿Eliminar este expositor?')) {
       this.subs.add(
         this.expositorService.delete(this.conferenciaId, id).subscribe({
-          next: () => this.cargar(),
-          error: (err) => console.error('Error eliminando:', err)
+          next: () => { this.toast.success('Expositor eliminado.'); this.cargar(); },
+          error: () => this.toast.error('Error al eliminar el expositor.')
         })
       );
     }
