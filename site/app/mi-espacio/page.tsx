@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
@@ -34,7 +34,7 @@ function getSlug(): string {
   return ['localhost', 'www', 'tuplataforma'].includes(slug) ? 'reactconf' : slug;
 }
 
-export default function MiEspacio() {
+function MiEspacioContent() {
   const searchParams = useSearchParams();
   const token = searchParams.get('token') ?? '';
 
@@ -168,5 +168,13 @@ export default function MiEspacio() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function MiEspacio() {
+  return (
+    <Suspense fallback={<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px', color: '#888' }}>Cargando...</div>}>
+      <MiEspacioContent />
+    </Suspense>
   );
 }
