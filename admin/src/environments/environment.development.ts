@@ -1,1 +1,1 @@
-export const environment = { apiUrl: 'http://localhost:5000' };
+export const environment = { apiUrl: 'https://conference-api-lk09.onrender.com' };
