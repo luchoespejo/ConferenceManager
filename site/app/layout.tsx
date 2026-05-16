@@ -55,42 +55,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="es">
       <body style={{ margin: 0, fontFamily: 'Arial, Helvetica, sans-serif', background: '#f8fafc', color: '#1a1a1a' }}>
         {/* Navbar */}
-        <nav style={{
-          background: primary,
-          color: '#fff',
-          padding: '0 1.5rem',
-          display: 'flex',
-          alignItems: 'center',
-          height: '60px',
-          gap: '1.5rem',
-          boxShadow: '0 2px 8px rgba(0,0,0,.2)'
-        }}>
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none', color: '#fff' }}>
+        <nav className="site-nav" style={{ background: primary }}>
+          <Link href="/" className="site-nav-brand">
             {conf?.logoUrl && (
               <img src={logoUrl} alt="Logo" style={{ height: '36px', objectFit: 'contain' }} />
             )}
-            <span style={{ fontWeight: 700, fontSize: '1.05rem' }}>
-              {conf?.nombre || 'ConferenceManager'}
-            </span>
+            <span>{conf?.nombre || 'ConferenceManager'}</span>
           </Link>
-          <div style={{ flex: 1 }} />
-          <Link href="/programa" style={{ color: 'rgba(255,255,255,.85)', textDecoration: 'none', fontSize: '.9rem', fontWeight: 500 }}>
-            Programa
-          </Link>
-          <Link href="/expositores" style={{ color: 'rgba(255,255,255,.85)', textDecoration: 'none', fontSize: '.9rem', fontWeight: 500 }}>
-            Expositores
-          </Link>
-          <Link href="/certificado" style={{
-            background: 'rgba(255,255,255,.15)',
-            color: '#fff',
-            padding: '6px 14px',
-            borderRadius: '6px',
-            textDecoration: 'none',
-            fontSize: '.85rem',
-            fontWeight: 600
-          }}>
-            Certificado
-          </Link>
+          <div className="site-nav-spacer" />
+          <div className="site-nav-links">
+            <Link href="/programa" className="site-nav-link">Programa</Link>
+            <Link href="/expositores" className="site-nav-link">Expositores</Link>
+            <Link href="/certificado" className="site-nav-link-cert">Certificado</Link>
+          </div>
         </nav>
 
         {/* Avisos urgentes */}
