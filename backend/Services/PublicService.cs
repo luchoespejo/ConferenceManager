@@ -67,19 +67,19 @@ public class PublicService(AppDbContext context) : IPublicService
         var expositores = await context.Expositores
             .AsNoTracking()
             .Where(e => e.Conferencia.Slug == slug && e.Conferencia.Estado == ConferenciaEstado.Publicado)
-            .Select(e => new ExpositorPublicoDto
-            {
-                Id = e.Id,
-                Nombre = e.Nombre,
-                Bio = e.Bio,
-                FotoUrl = e.FotoUrl,
-                RedesSociales = e.RedesSociales != null
-                    ? JsonSerializer.Deserialize<Dictionary<string, string>>(e.RedesSociales.RootElement.GetRawText())
-                    : null
-            })
+            .Select(e => new { e.Id, e.Nombre, e.Bio, e.FotoUrl, e.RedesSociales })
             .ToListAsync();
 
-        return expositores;
+        return expositores.Select(e => new ExpositorPublicoDto
+        {
+            Id = e.Id,
+            Nombre = e.Nombre,
+            Bio = e.Bio,
+            FotoUrl = e.FotoUrl,
+            RedesSociales = e.RedesSociales != null
+                ? JsonSerializer.Deserialize<Dictionary<string, string>>(e.RedesSociales.RootElement.GetRawText())
+                : null
+        });
     }
 
     public async Task<ExpositorPerfilDto?> GetExpositorPerfilByTokenAsync(string slug, string token)

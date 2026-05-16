@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { getSlug } from '@/lib/getSlug';
 
 interface Sesion {
   id: string;
@@ -24,16 +25,11 @@ export default function Programa() {
   const [filterExpositor, setFilterExpositor] = useState<string>('');
 
   useEffect(() => {
-    const host = typeof window !== 'undefined' ? window.location.hostname : '';
-    const extractedSlug = host.split('.')[0];
-    setSlug(extractedSlug);
-
-    if (['localhost', 'www', 'tuplataforma'].includes(extractedSlug)) {
-      setSlug('reactconf');
-    }
+    const slug = getSlug();
+    setSlug(slug);
 
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-    fetch(`${apiUrl}/api/public/${extractedSlug || 'reactconf'}/programa`)
+    fetch(`${apiUrl}/api/public/${slug}/programa`)
       .then((res) => res.json())
       .then((data) => {
         setSesiones(data);
