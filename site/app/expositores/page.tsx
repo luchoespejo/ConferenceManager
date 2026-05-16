@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { getSlug } from '@/lib/getSlug';
 
 interface Expositor {
   id: string;
@@ -9,13 +10,6 @@ interface Expositor {
   bio?: string;
   fotoUrl?: string;
   redesSociales?: Record<string, string>;
-}
-
-function getSlug(): string {
-  if (typeof window === 'undefined') return '';
-  const host = window.location.hostname;
-  const slug = host.split('.')[0];
-  return ['localhost', 'www', 'tuplataforma'].includes(slug) ? 'reactconf' : slug;
 }
 
 export default function Expositores() {
