@@ -146,15 +146,52 @@ textarea.form-control { resize:vertical; min-height:90px; }
 .form-panel h3 { margin-bottom:1.25rem; padding-bottom:1rem; border-bottom:1px solid var(--border); }
 .form-actions { display:flex; gap:.75rem; justify-content:flex-end; padding-top:1.25rem; border-top:1px solid var(--border); margin-top:1.25rem; }
 
+/* ── Hamburger button ────────────────────────────────────── */
+.hamburger-btn {
+  display:none;
+  align-items:center;
+  justify-content:center;
+  width:40px;
+  height:40px;
+  background:transparent;
+  border:1px solid var(--border);
+  border-radius:var(--r-sm);
+  color:var(--text);
+  font-size:1.2rem;
+  cursor:pointer;
+  margin-left:auto;
+  flex-shrink:0;
+  transition:background var(--t);
+  &:hover { background:var(--surface2); }
+}
+
 /* ── Responsive ──────────────────────────────────────────── */
 html, body { max-width:100%; overflow-x:hidden; }
 
 @media (max-width:640px) {
-  .topbar { padding:.625rem 1rem; height:auto; min-height:56px; align-items:flex-start; flex-wrap:wrap; gap:.5rem; }
-  .topbar-brand { height:44px; align-items:center; }
+  .topbar { padding:.625rem 1rem; height:auto; min-height:56px; align-items:center; flex-wrap:wrap; gap:.5rem; }
   .brand-name { font-size:.875rem; }
-  .topbar-right { gap:.375rem; flex-wrap:wrap; max-width:100%; }
-  .topbar-right .btn-sm { padding:.3rem .6rem; font-size:.75rem; }
+  .hamburger-btn { display:flex; }
+
+  .topbar-right {
+    display:none;
+    width:100%;
+    flex-direction:column;
+    align-items:stretch;
+    gap:.375rem;
+    padding:.5rem 0;
+    border-top:1px solid var(--border);
+    margin-top:.25rem;
+  }
+  .topbar-right--open { display:flex; }
+  .topbar-right--open .btn {
+    width:100%;
+    justify-content:flex-start;
+    min-height:44px;
+    padding:.625rem .75rem;
+    font-size:.9rem;
+  }
+  .topbar-right--open .badge { align-self:flex-start; margin-bottom:.25rem; }
 
   .page-body { padding:1rem; }
 

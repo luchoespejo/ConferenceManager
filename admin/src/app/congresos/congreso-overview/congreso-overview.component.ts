@@ -13,50 +13,45 @@ import { SitePreviewComponent } from '../site-preview/site-preview.component';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { ToastService } from '../../core/toast.service';
+import { TopbarComponent } from '../../shared/topbar/topbar.component';
 
 @Component({
   selector: 'app-congreso-overview',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterLink, SitePreviewComponent],
+  imports: [CommonModule, RouterLink, SitePreviewComponent, TopbarComponent],
   template: `
     <div class="page-shell">
-      <nav class="topbar">
-        <a routerLink="/dashboard" class="topbar-brand">
-          <div class="brand-icon">🎪</div>
-          <span class="brand-name">ConferenceManager</span>
-        </a>
-        <div class="topbar-right">
-          @if (overview()) {
-            <span class="badge badge-{{ overview()!.estado.toLowerCase() }}">{{ overview()!.estado }}</span>
-            <a [routerLink]="['/congreso', id, 'configuracion']" class="btn btn-secondary btn-sm">Configuración</a>
-            <a href="https://conference-manager-irl1.vercel.app" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">🌍 Sitio publicado ↗</a>
-            <a [routerLink]="['/congreso', id, 'demo']" class="btn btn-warning btn-sm">👁️ Demo</a>
-            <button class="btn btn-secondary btn-sm" (click)="imprimirQrs()" [disabled]="imprimiendoQrs()">
-              @if (imprimiendoQrs()) { <span class="spinner"></span> } 🖨️ QRs
+      <app-topbar>
+        @if (overview()) {
+          <span class="badge badge-{{ overview()!.estado.toLowerCase() }}">{{ overview()!.estado }}</span>
+          <a [routerLink]="['/congreso', id, 'configuracion']" class="btn btn-secondary btn-sm">Configuración</a>
+          <a href="https://conference-manager-irl1.vercel.app" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">🌍 Sitio publicado ↗</a>
+          <a [routerLink]="['/congreso', id, 'demo']" class="btn btn-warning btn-sm">👁️ Demo</a>
+          <button class="btn btn-secondary btn-sm" (click)="imprimirQrs()" [disabled]="imprimiendoQrs()">
+            @if (imprimiendoQrs()) { <span class="spinner"></span> } 🖨️ QRs
+          </button>
+          @if (overview()!.estado === 'Borrador') {
+            <button class="btn btn-sm" style="border-color:var(--success);color:var(--success);background:transparent" (click)="publicar()" [disabled]="publicando()">
+              @if (publicando()) { <span class="spinner"></span> }
+              Publicar
             </button>
-            @if (overview()!.estado === 'Borrador') {
-              <button class="btn btn-sm" style="border-color:var(--success);color:var(--success);background:transparent" (click)="publicar()" [disabled]="publicando()">
-                @if (publicando()) { <span class="spinner"></span> }
-                Publicar
-              </button>
-            }
-            @if (overview()!.estado === 'Publicado') {
-              <button class="btn btn-sm" style="border-color:var(--primary);color:var(--primary);background:transparent" (click)="finalizar()" [disabled]="finalizando()">
-                @if (finalizando()) { <span class="spinner"></span> }
-                Finalizar
-              </button>
-            }
-            @if (overview()!.estado === 'Borrador') {
-              <button class="btn btn-sm" style="border-color:var(--danger,#dc3545);color:var(--danger,#dc3545);background:transparent" (click)="eliminar()" [disabled]="eliminando()">
-                @if (eliminando()) { <span class="spinner"></span> }
-                Eliminar
-              </button>
-            }
           }
-          <a routerLink="/dashboard" class="btn btn-ghost btn-sm">← Dashboard</a>
-        </div>
-      </nav>
+          @if (overview()!.estado === 'Publicado') {
+            <button class="btn btn-sm" style="border-color:var(--primary);color:var(--primary);background:transparent" (click)="finalizar()" [disabled]="finalizando()">
+              @if (finalizando()) { <span class="spinner"></span> }
+              Finalizar
+            </button>
+          }
+          @if (overview()!.estado === 'Borrador') {
+            <button class="btn btn-sm" style="border-color:var(--danger,#dc3545);color:var(--danger,#dc3545);background:transparent" (click)="eliminar()" [disabled]="eliminando()">
+              @if (eliminando()) { <span class="spinner"></span> }
+              Eliminar
+            </button>
+          }
+        }
+        <a routerLink="/dashboard" class="btn btn-ghost btn-sm">← Dashboard</a>
+      </app-topbar>
 
       <div class="page-body" style="max-height:calc(100vh - 120px);overflow-y:auto;padding:0 1.5rem">
         @if (loading()) {

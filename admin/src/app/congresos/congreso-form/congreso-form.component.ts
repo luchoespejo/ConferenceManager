@@ -21,6 +21,7 @@ import { CongresoService } from '../congreso.service';
 import { CreateCongresoDto, UpdateCongresoDto } from '../congreso.model';
 import { ImageUploadComponent } from '../../shared/image-upload/image-upload.component';
 import { ToastService } from '../../core/toast.service';
+import { TopbarComponent } from '../../shared/topbar/topbar.component';
 
 /** Cross-field validator: fechaFin must be >= fechaInicio */
 function fechasValidator(group: AbstractControl): ValidationErrors | null {
@@ -47,21 +48,15 @@ function slugFromNombre(nombre: string): string {
   selector: 'app-congreso-form',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, ImageUploadComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, ImageUploadComponent, TopbarComponent],
   template: `
     <div class="page-shell">
-      <nav class="topbar">
-        <a routerLink="/dashboard" class="topbar-brand">
-          <div class="brand-icon">🎪</div>
-          <span class="brand-name">ConferenceManager</span>
-        </a>
-        <div class="topbar-right">
-          @if (id) {
-            <span class="badge badge-{{ congresoEstado().toLowerCase() }}">{{ congresoEstado() }}</span>
-          }
-          <a routerLink="/dashboard" class="btn btn-secondary btn-sm">← Dashboard</a>
-        </div>
-      </nav>
+      <app-topbar>
+        @if (id) {
+          <span class="badge badge-{{ congresoEstado().toLowerCase() }}">{{ congresoEstado() }}</span>
+        }
+        <a routerLink="/dashboard" class="btn btn-secondary btn-sm">← Dashboard</a>
+      </app-topbar>
 
       <div class="page-body">
         <div class="page-header">

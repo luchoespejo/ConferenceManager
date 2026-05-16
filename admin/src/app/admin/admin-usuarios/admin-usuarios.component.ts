@@ -9,6 +9,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 import { environment } from '../../../environments/environment';
+import { TopbarComponent } from '../../shared/topbar/topbar.component';
 
 interface UsuarioAdmin {
   id: string;
@@ -25,19 +26,13 @@ interface UsuarioAdmin {
   selector: 'app-admin-usuarios',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TopbarComponent],
   template: `
     <div class="page-shell">
-      <nav class="topbar">
-        <a routerLink="/dashboard" class="topbar-brand">
-          <div class="brand-icon">🎪</div>
-          <span class="brand-name">ConferenceManager</span>
-        </a>
-        <div class="topbar-right">
-          <span style="font-size:.8rem;color:var(--muted);font-family:monospace">SUPERADMIN</span>
-          <a routerLink="/dashboard" class="btn btn-secondary btn-sm">← Dashboard</a>
-        </div>
-      </nav>
+      <app-topbar>
+        <span style="font-size:.8rem;color:var(--muted);font-family:monospace">SUPERADMIN</span>
+        <a routerLink="/dashboard" class="btn btn-secondary btn-sm">← Dashboard</a>
+      </app-topbar>
 
       <div class="page-body">
         <div class="page-header">

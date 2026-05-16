@@ -22,23 +22,18 @@ import { ToastService } from '../core/toast.service';
 import { SesionListItem, CreateSesionDto, UpdateSesionDto } from './sesion.model';
 import { SalaDto } from '../salas/sala.model';
 import { ExpositorListItem } from '../expositores/expositor.model';
+import { TopbarComponent } from '../shared/topbar/topbar.component';
 
 @Component({
   selector: 'app-sesiones',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, TopbarComponent],
   template: `
     <div class="page-shell">
-      <nav class="topbar">
-        <a routerLink="/dashboard" class="topbar-brand">
-          <div class="brand-icon">🎪</div>
-          <span class="brand-name">ConferenceManager</span>
-        </a>
-        <div class="topbar-right">
-          <a [routerLink]="['/congreso', conferenciaId]" class="btn btn-secondary btn-sm">← Volver</a>
-        </div>
-      </nav>
+      <app-topbar>
+        <a [routerLink]="['/congreso', conferenciaId]" class="btn btn-secondary btn-sm">← Volver</a>
+      </app-topbar>
       <div class="page-body">
         <div class="page-header">
           <div class="page-title">

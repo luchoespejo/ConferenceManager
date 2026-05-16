@@ -12,6 +12,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { SesionService } from '../sesiones/sesion.service';
 import { SesionListItem } from '../sesiones/sesion.model';
+import { TopbarComponent } from '../shared/topbar/topbar.component';
 
 interface SesionPorDia {
   fecha: string;
@@ -22,19 +23,13 @@ interface SesionPorDia {
   selector: 'app-programa',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TopbarComponent],
   template: `
     <div class="page-shell">
-      <nav class="topbar">
-        <a routerLink="/dashboard" class="topbar-brand">
-          <div class="brand-icon">🎪</div>
-          <span class="brand-name">ConferenceManager</span>
-        </a>
-        <div class="topbar-right">
-          <a [routerLink]="['/congreso', conferenciaId, 'sesiones']" class="btn btn-secondary btn-sm">Editar sesiones</a>
-          <a [routerLink]="['/congreso', conferenciaId]" class="btn btn-ghost btn-sm">← Volver</a>
-        </div>
-      </nav>
+      <app-topbar>
+        <a [routerLink]="['/congreso', conferenciaId, 'sesiones']" class="btn btn-secondary btn-sm">Editar sesiones</a>
+        <a [routerLink]="['/congreso', conferenciaId]" class="btn btn-ghost btn-sm">← Volver</a>
+      </app-topbar>
 
       <div class="page-body">
         <div class="page-header">

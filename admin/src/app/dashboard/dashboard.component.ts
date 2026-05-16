@@ -4,26 +4,21 @@ import { RouterLink } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
 import { CongresoService } from '../congresos/congreso.service';
 import { CongresoListItemDto } from '../congresos/congreso.model';
+import { TopbarComponent } from '../shared/topbar/topbar.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TopbarComponent],
   template: `
     <div class="page-shell">
-      <nav class="topbar">
-        <a routerLink="/dashboard" class="topbar-brand">
-          <div class="brand-icon">🎪</div>
-          <span class="brand-name">ConferenceManager</span>
-        </a>
-        <div class="topbar-right">
-          <span style="font-size:.875rem;color:var(--muted)">{{ auth.usuario()?.nombre }}</span>
-          <div class="avatar">{{ auth.usuario()?.nombre?.[0]?.toUpperCase() }}</div>
-          <a routerLink="/congreso/nuevo" class="btn btn-primary btn-sm">+ Nuevo</a>
-          <button class="btn btn-ghost btn-sm" (click)="auth.logout()">Salir</button>
-        </div>
-      </nav>
+      <app-topbar>
+        <span style="font-size:.875rem;color:var(--muted)">{{ auth.usuario()?.nombre }}</span>
+        <div class="avatar">{{ auth.usuario()?.nombre?.[0]?.toUpperCase() }}</div>
+        <a routerLink="/congreso/nuevo" class="btn btn-primary btn-sm">+ Nuevo</a>
+        <button class="btn btn-ghost btn-sm" (click)="auth.logout()">Salir</button>
+      </app-topbar>
       <div class="page-body">
         <div class="page-header">
           <div class="page-title">

@@ -20,23 +20,18 @@ import { CongresoService } from '../congresos/congreso.service';
 import { ExpositorListItem, UpdateExpositorDto } from './expositor.model';
 import { ImageUploadComponent } from '../shared/image-upload/image-upload.component';
 import { ToastService } from '../core/toast.service';
+import { TopbarComponent } from '../shared/topbar/topbar.component';
 
 @Component({
   selector: 'app-expositores',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, ImageUploadComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, ImageUploadComponent, TopbarComponent],
   template: `
     <div class="page-shell">
-      <nav class="topbar">
-        <a routerLink="/dashboard" class="topbar-brand">
-          <div class="brand-icon">🎪</div>
-          <span class="brand-name">ConferenceManager</span>
-        </a>
-        <div class="topbar-right">
-          <a [routerLink]="['/congreso', conferenciaId]" class="btn btn-secondary btn-sm">← Volver</a>
-        </div>
-      </nav>
+      <app-topbar>
+        <a [routerLink]="['/congreso', conferenciaId]" class="btn btn-secondary btn-sm">← Volver</a>
+      </app-topbar>
       <div class="page-body">
         <div class="page-header">
           <div class="page-title">
