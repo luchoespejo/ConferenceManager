@@ -80,6 +80,18 @@ export default function SesionDetail() {
           <p className="text-xl font-bold">{sesion.expositorNombre}</p>
         </div>
 
+        {/* QR Code */}
+        {sesion.qrCodeUrl && (
+          <div className="mb-8">
+            <h2 className="text-xl font-bold mb-4">Código QR de la sesión</h2>
+            <img
+              src={sesion.qrCodeUrl}
+              alt={`QR de ${sesion.titulo}`}
+              className="w-48 h-48"
+            />
+          </div>
+        )}
+
         {/* Actions */}
         <div className="flex gap-4">
           {sesion.encuestaUrl && (
@@ -90,16 +102,6 @@ export default function SesionDetail() {
               className="inline-block bg-blue-600 text-white font-bold py-3 px-6 rounded hover:bg-blue-700"
             >
               Responder Encuesta
-            </a>
-          )}
-          {sesion.qrCodeUrl && (
-            <a
-              href={sesion.qrCodeUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block bg-gray-300 text-black font-bold py-3 px-6 rounded hover:bg-gray-400"
-            >
-              Ver QR
             </a>
           )}
         </div>
