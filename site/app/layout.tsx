@@ -3,6 +3,7 @@
 import './globals.css';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { getSlug } from '@/lib/getSlug';
 
 interface ConferenciaBasic {
   nombre: string;
@@ -16,13 +17,6 @@ interface Aviso {
   id: string;
   mensaje: string;
   createdAt: string;
-}
-
-function getSlug(): string {
-  if (typeof window === 'undefined') return '';
-  const host = window.location.hostname;
-  const slug = host.split('.')[0];
-  return ['localhost', 'www', 'tuplataforma'].includes(slug) ? 'reactconf' : slug;
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
