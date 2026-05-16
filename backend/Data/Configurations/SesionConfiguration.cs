@@ -37,7 +37,7 @@ public class SesionConfiguration : IEntityTypeConfiguration<Sesion>
             .HasMaxLength(500);
 
         builder.Property(e => e.QrCodeUrl)
-            .HasMaxLength(500);
+            .HasColumnType("text");
 
         builder.Property(e => e.CreatedAt)
             .HasColumnType("timestamptz")
