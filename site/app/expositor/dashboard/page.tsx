@@ -47,7 +47,8 @@ export default function ExpositorDashboard() {
 
     const fetchData = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/public/expositor/me', {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+        const res = await fetch(`${apiUrl}/api/public/expositor/me`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
 
@@ -124,7 +125,7 @@ export default function ExpositorDashboard() {
           <div style={{ display: 'flex', gap: '2rem', alignItems: 'flex-start' }}>
             {expositor.fotoUrl && (
               <img
-                src={expositor.fotoUrl.startsWith('http') ? expositor.fotoUrl : `http://localhost:5000${expositor.fotoUrl}`}
+                src={expositor.fotoUrl.startsWith('http') ? expositor.fotoUrl : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}${expositor.fotoUrl}`}
                 alt={expositor.nombre}
                 style={{ width: '150px', height: '150px', borderRadius: '0.5rem', objectFit: 'cover' }}
               />

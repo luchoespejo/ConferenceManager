@@ -217,6 +217,11 @@ export class ExpositoresComponent implements OnInit, OnDestroy {
     this.form.patchValue({ nombre: expositor.nombre, email: expositor.email ?? '', bio: '' });
     this.mostrarForm.set(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    this.expositorService.getById(this.conferenciaId, expositor.id).subscribe({
+      next: (detalle) => this.form.patchValue({ bio: detalle.bio ?? '' }),
+      error: () => {}
+    });
   }
 
   cancelar(): void {

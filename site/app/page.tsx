@@ -52,7 +52,6 @@ export default function Home() {
     ? conferencia.logoUrl
     : `${apiUrl}${conferencia.logoUrl}`;
 
-  console.log('Logo data:', { apiUrl, rawUrl: conferencia.logoUrl, finalUrl: logoUrl });
 
   return (
     <div

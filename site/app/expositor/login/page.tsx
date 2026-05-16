@@ -23,7 +23,8 @@ export default function ExpositorLogin() {
     setLoading(true);
 
     try {
-      const res = await fetch('http://localhost:5000/api/public/expositor/login', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      const res = await fetch(`${apiUrl}/api/public/expositor/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
