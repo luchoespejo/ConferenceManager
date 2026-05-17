@@ -353,19 +353,28 @@ export class CongresoOverviewComponent implements OnInit {
     this.imprimiendoQrs.set(true);
     const token = localStorage.getItem('access_token') ?? sessionStorage.getItem('access_token') ?? '';
     const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+    const base = `${environment.apiUrl}/api/dashboard/conferencias/${this.id}/sesiones`;
 
-    this.http.get<any[]>(`${environment.apiUrl}/api/dashboard/conferencias/${this.id}/sesiones`, { headers })
+    this.http.post<{ regenerated: number }>(`${base}/regenerar-qrs`, {}, { headers })
       .subscribe({
-        next: (sesiones) => {
-          this.imprimiendoQrs.set(false);
-          const nombre = this.overview()?.nombre ?? 'Congreso';
-          const html = this.buildQrHtml(nombre, sesiones);
-          const win = window.open('', '_blank');
-          if (win) { win.document.write(html); win.document.close(); }
+        next: () => {
+          this.http.get<any[]>(base, { headers }).subscribe({
+            next: (sesiones) => {
+              this.imprimiendoQrs.set(false);
+              const nombre = this.overview()?.nombre ?? 'Congreso';
+              const html = this.buildQrHtml(nombre, sesiones);
+              const win = window.open('', '_blank');
+              if (win) { win.document.write(html); win.document.close(); }
+            },
+            error: () => {
+              this.imprimiendoQrs.set(false);
+              this.apiError.set('No se pudieron cargar los QRs. Intentá de nuevo.');
+            }
+          });
         },
         error: () => {
           this.imprimiendoQrs.set(false);
-          this.apiError.set('No se pudieron cargar los QRs. Intentá de nuevo.');
+          this.apiError.set('Error al regenerar los QRs. Intentá de nuevo.');
         }
       });
   }
