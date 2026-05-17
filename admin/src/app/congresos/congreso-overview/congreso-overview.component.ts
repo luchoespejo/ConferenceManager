@@ -33,6 +33,11 @@ import { CongresoNavComponent } from '../../shared/congreso-nav/congreso-nav.com
           <button class="btn btn-secondary btn-sm" (click)="imprimirQrs()" [disabled]="imprimiendoQrs()">
             @if (imprimiendoQrs()) { <span class="spinner"></span> } 🖨️ QRs
           </button>
+          @if (overview()!.estado !== 'Borrador') {
+            <button class="btn btn-secondary btn-sm" (click)="descargarSitio()" [disabled]="descargandoSitio()">
+              @if (descargandoSitio()) { <span class="spinner"></span> } ⬇️ Sitio ZIP
+            </button>
+          }
           @if (overview()!.estado === 'Borrador') {
             <button class="btn btn-outline-success btn-sm" (click)="publicar()" [disabled]="publicando()">
               @if (publicando()) { <span class="spinner"></span> }
@@ -258,6 +263,7 @@ export class CongresoOverviewComponent implements OnInit {
   finalizando = signal(false);
   eliminando = signal(false);
   imprimiendoQrs = signal(false);
+  descargandoSitio = signal(false);
   apiError = signal<string | null>(null);
 
   ngOnInit(): void {
@@ -345,6 +351,33 @@ export class CongresoOverviewComponent implements OnInit {
       error: (err) => {
         this.eliminando.set(false);
         this.apiError.set(err.error?.message ?? 'Error al eliminar el congreso.');
+      }
+    });
+  }
+
+  descargarSitio(): void {
+    this.descargandoSitio.set(true);
+    const token = localStorage.getItem('access_token') ?? sessionStorage.getItem('access_token') ?? '';
+    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+
+    this.http.get(
+      `${environment.apiUrl}/api/dashboard/conferencias/${this.id}/sitio-estatico`,
+      { headers, responseType: 'blob' }
+    ).subscribe({
+      next: (blob) => {
+        this.descargandoSitio.set(false);
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${this.id}-sitio.zip`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      },
+      error: () => {
+        this.descargandoSitio.set(false);
+        this.toast.error('Error al generar el sitio estático. Intentá de nuevo.');
       }
     });
   }
