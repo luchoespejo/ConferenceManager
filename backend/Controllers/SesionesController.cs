@@ -78,6 +78,6 @@ public class SesionesController(ISesionService sesionService) : ControllerBase
         if (!result.Success)
             return NotFound(new { error = result.ErrorCode });
 
-        return Ok(new { regenerated = result.Data });
+        return Ok(result.Data);
     }
 }

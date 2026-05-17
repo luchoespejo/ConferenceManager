@@ -205,29 +205,42 @@ public class SesionService(AppDbContext context, IQrService qrService, IConfigur
         };
     }
 
-    public async Task<ServiceResult<int>> RegenerarQrsAsync(Guid conferenciaId, Guid usuarioId)
+    public async Task<ServiceResult<IEnumerable<SesionListItemDto>>> RegenerarQrsAsync(Guid conferenciaId, Guid usuarioId)
     {
         if (!await VerifyOwnershipAsync(conferenciaId, usuarioId))
-            return ServiceResult<int>.Fail("ConferenciaNotFound", "El congreso no existe o no pertenece al usuario.");
+            return ServiceResult<IEnumerable<SesionListItemDto>>.Fail("ConferenciaNotFound", "El congreso no existe o no pertenece al usuario.");
 
         var sesiones = await context.Sesiones
+            .Include(s => s.Sala)
+            .Include(s => s.Expositor)
             .Where(s => s.ConferenciaId == conferenciaId)
             .ToListAsync();
 
         var siteUrl = config["App:SiteUrl"] ?? "http://localhost:3000";
-        var count = 0;
 
         foreach (var sesion in sesiones)
         {
             var qr = await qrService.GenerateAsync($"{siteUrl}/s/{sesion.Id}");
             if (qr is not null)
-            {
                 sesion.QrCodeUrl = qr;
-                count++;
-            }
         }
 
         await context.SaveChangesAsync();
-        return ServiceResult<int>.Ok(count);
+
+        var result = sesiones.Select(s => new SesionListItemDto
+        {
+            Id = s.Id,
+            ConferenciaId = s.ConferenciaId,
+            Titulo = s.Titulo,
+            Fecha = s.Fecha,
+            HoraInicio = s.HoraInicio,
+            HoraFin = s.HoraFin,
+            Track = s.Track,
+            SalaNombre = s.Sala.Nombre,
+            ExpositorNombre = s.Expositor.Nombre,
+            QrCodeUrl = s.QrCodeUrl
+        });
+
+        return ServiceResult<IEnumerable<SesionListItemDto>>.Ok(result);
     }
 }

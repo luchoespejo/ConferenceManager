@@ -9,5 +9,5 @@ public interface ISesionService
     Task<ServiceResult<SesionDto>> CreateAsync(Guid conferenciaId, Guid usuarioId, CreateSesionDto dto);
     Task<ServiceResult<SesionDto>> UpdateAsync(Guid id, Guid conferenciaId, Guid usuarioId, UpdateSesionDto dto);
     Task<ServiceResult<bool>> DeleteAsync(Guid id, Guid conferenciaId, Guid usuarioId);
-    Task<ServiceResult<int>> RegenerarQrsAsync(Guid conferenciaId, Guid usuarioId);
+    Task<ServiceResult<IEnumerable<SesionListItemDto>>> RegenerarQrsAsync(Guid conferenciaId, Guid usuarioId);
 }
