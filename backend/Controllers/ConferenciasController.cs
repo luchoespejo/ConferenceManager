@@ -129,6 +129,20 @@ public class ConferenciasController(
         };
     }
 
+    [HttpPost("{id:guid}/redeployar")]
+    public async Task<IActionResult> RedeployarSitio(Guid id)
+    {
+        var conferencia = await conferenciaService.GetByIdAsync(id, UsuarioId);
+        if (conferencia is null) return NotFound();
+
+        var hookUrl = config["App:VercelDeployHookUrl"];
+        if (string.IsNullOrEmpty(hookUrl))
+            return BadRequest(new { error = "VERCEL_HOOK_NOT_CONFIGURED" });
+
+        TriggerVercelDeploy();
+        return Ok(new { triggered = true });
+    }
+
     [HttpGet("{id:guid}/sitio-estatico")]
     public async Task<IActionResult> DescargarSitioEstatico(Guid id)
     {
