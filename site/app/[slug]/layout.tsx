@@ -55,7 +55,6 @@ export default async function SlugLayout({
         <div className="site-nav-links">
           <Link href={`/${slug}/programa`} className="site-nav-link">Programa</Link>
           <Link href={`/${slug}/expositores`} className="site-nav-link">Expositores</Link>
-          <Link href={`/${slug}/certificado`} className="site-nav-link-cert">Certificado</Link>
         </div>
       </nav>
       <AvisosUrgentes slug={slug} />
