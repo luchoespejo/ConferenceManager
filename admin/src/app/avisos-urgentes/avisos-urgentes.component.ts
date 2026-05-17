@@ -14,17 +14,18 @@ import { Subscription } from 'rxjs';
 import { AvisoUrgenteService } from './aviso-urgente.service';
 import { AvisoUrgente, CreateAvisoUrgenteDto } from './aviso-urgente.model';
 import { TopbarComponent } from '../shared/topbar/topbar.component';
+import { CongresoNavComponent } from '../shared/congreso-nav/congreso-nav.component';
 
 @Component({
   selector: 'app-avisos-urgentes',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, TopbarComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, TopbarComponent, CongresoNavComponent],
   template: `
     <div class="page-shell">
       <app-topbar>
-        <a [routerLink]="['/congreso', conferenciaId]" class="btn btn-secondary btn-sm">← Volver al congreso</a>
       </app-topbar>
+      <app-congreso-nav [id]="conferenciaId" />
 
       <div class="page-body">
         <div class="page-header">

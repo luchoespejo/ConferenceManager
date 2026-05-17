@@ -23,17 +23,18 @@ import { SesionListItem, CreateSesionDto, UpdateSesionDto } from './sesion.model
 import { SalaDto } from '../salas/sala.model';
 import { ExpositorListItem } from '../expositores/expositor.model';
 import { TopbarComponent } from '../shared/topbar/topbar.component';
+import { CongresoNavComponent } from '../shared/congreso-nav/congreso-nav.component';
 
 @Component({
   selector: 'app-sesiones',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, TopbarComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, TopbarComponent, CongresoNavComponent],
   template: `
     <div class="page-shell">
       <app-topbar>
-        <a [routerLink]="['/congreso', conferenciaId]" class="btn btn-secondary btn-sm">← Volver</a>
       </app-topbar>
+      <app-congreso-nav [id]="conferenciaId" />
       <div class="page-body">
         <div class="page-header">
           <div class="page-title">

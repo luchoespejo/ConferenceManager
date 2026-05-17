@@ -39,22 +39,22 @@ import { TopbarComponent } from '../shared/topbar/topbar.component';
           </div>
         } @else {
           <div class="stats-grid">
-            <div class="stat-card stat-primary">
+            <div class="stat-card stat-primary animate-in animate-in-1">
               <div class="stat-label">Total</div>
               <div class="stat-value">{{ congresos().length }}</div>
             </div>
-            <div class="stat-card stat-success">
+            <div class="stat-card stat-success animate-in animate-in-2">
               <div class="stat-label">Publicados</div>
               <div class="stat-value">{{ publicados() }}</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card animate-in animate-in-3">
               <div class="stat-label">Borradores</div>
               <div class="stat-value">{{ borradores() }}</div>
             </div>
           </div>
           <div class="cards-grid">
-            @for (c of congresos(); track c.id) {
-              <div class="congreso-card">
+            @for (c of congresos(); track c.id; let i = $index) {
+              <div class="congreso-card animate-in" [style.animation-delay]="(i * 0.05) + 's'">
                 <div class="card-header-row">
                   <span class="card-title">{{ c.nombre }}</span>
                   <span class="badge badge-{{ c.estado.toLowerCase() }}">{{ c.estado }}</span>
