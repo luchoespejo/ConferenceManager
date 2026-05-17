@@ -407,21 +407,20 @@ export class CongresoOverviewComponent implements OnInit {
 <title>QRs — ${conNombre}</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: Arial, sans-serif; background: #fff; padding: 1.5rem; }
-  h1 { font-size: 1.25rem; margin-bottom: 1.5rem; color: #333; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
-  .card { border: 1px solid #ddd; border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; align-items: center; gap: .75rem; page-break-inside: avoid; }
-  .qr-img { width: 160px; height: 160px; }
-  .qr-placeholder { width: 160px; height: 160px; border: 2px dashed #ccc; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #999; font-size: .8rem; text-align: center; border-radius: 4px; }
+  @page { margin: 8mm; }
+  body { font-family: Arial, sans-serif; background: #fff; padding: .5rem; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .75rem; }
+  .card { border: 1px solid #ddd; border-radius: 6px; padding: .625rem; display: flex; flex-direction: column; align-items: center; gap: .5rem; break-inside: avoid; page-break-inside: avoid; }
+  .qr-img { width: 130px; height: 130px; }
+  .qr-placeholder { width: 130px; height: 130px; border: 2px dashed #ccc; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #999; font-size: .75rem; text-align: center; border-radius: 4px; }
   .info { width: 100%; text-align: center; }
-  .title { font-weight: 700; font-size: .95rem; margin-bottom: .4rem; }
-  .track { display: inline-block; background: #f0f0f0; padding: 2px 8px; border-radius: 4px; font-size: .75rem; margin-bottom: .4rem; }
-  .meta { font-size: .78rem; color: #555; margin-top: .2rem; }
-  .print-btn { position: fixed; top: 1rem; right: 1rem; background: #1a1a2e; color: #fff; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-size: .9rem; font-weight: 600; }
+  .title { font-weight: 700; font-size: .85rem; margin-bottom: .3rem; line-height: 1.3; }
+  .track { display: inline-block; background: #f0f0f0; padding: 1px 6px; border-radius: 4px; font-size: .7rem; margin-bottom: .3rem; }
+  .meta { font-size: .72rem; color: #555; margin-top: .15rem; }
+  .print-btn { position: fixed; top: .75rem; right: .75rem; background: #1a1a2e; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: .875rem; font-weight: 600; z-index: 10; }
   @media print { .print-btn { display: none; } }
 </style></head><body>
 <button class="print-btn" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
-<h1>QRs — ${conNombre}</h1>
 <div class="grid">${cards}</div>
 </body></html>`;
   }
