@@ -14,12 +14,14 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { ToastService } from '../../core/toast.service';
 import { TopbarComponent } from '../../shared/topbar/topbar.component';
+import { ConfirmModalService } from '../../shared/confirm-modal/confirm-modal.service';
+import { CongresoNavComponent } from '../../shared/congreso-nav/congreso-nav.component';
 
 @Component({
   selector: 'app-congreso-overview',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterLink, SitePreviewComponent, TopbarComponent],
+  imports: [CommonModule, RouterLink, SitePreviewComponent, TopbarComponent, CongresoNavComponent],
   template: `
     <div class="page-shell">
       <app-topbar>
@@ -32,28 +34,28 @@ import { TopbarComponent } from '../../shared/topbar/topbar.component';
             @if (imprimiendoQrs()) { <span class="spinner"></span> } 🖨️ QRs
           </button>
           @if (overview()!.estado === 'Borrador') {
-            <button class="btn btn-sm" style="border-color:var(--success);color:var(--success);background:transparent" (click)="publicar()" [disabled]="publicando()">
+            <button class="btn btn-outline-success btn-sm" (click)="publicar()" [disabled]="publicando()">
               @if (publicando()) { <span class="spinner"></span> }
               Publicar
             </button>
           }
           @if (overview()!.estado === 'Publicado') {
-            <button class="btn btn-sm" style="border-color:var(--primary);color:var(--primary);background:transparent" (click)="finalizar()" [disabled]="finalizando()">
+            <button class="btn btn-outline-primary btn-sm" (click)="finalizar()" [disabled]="finalizando()">
               @if (finalizando()) { <span class="spinner"></span> }
               Finalizar
             </button>
           }
           @if (overview()!.estado === 'Borrador') {
-            <button class="btn btn-sm" style="border-color:var(--danger,#dc3545);color:var(--danger,#dc3545);background:transparent" (click)="eliminar()" [disabled]="eliminando()">
+            <button class="btn btn-outline-danger btn-sm" (click)="eliminar()" [disabled]="eliminando()">
               @if (eliminando()) { <span class="spinner"></span> }
               Eliminar
             </button>
           }
         }
-        <a routerLink="/dashboard" class="btn btn-ghost btn-sm">← Dashboard</a>
       </app-topbar>
+      <app-congreso-nav [id]="id" />
 
-      <div class="page-body" style="max-height:calc(100vh - 120px);overflow-y:auto;padding:0 1.5rem">
+      <div class="page-body">
         @if (loading()) {
           <div style="display:flex;align-items:center;gap:12px;padding:3rem;color:var(--muted)">
             <div class="spinner"></div> Cargando...
@@ -185,6 +187,12 @@ import { TopbarComponent } from '../../shared/topbar/topbar.component';
     </div>
   `,
   styles: [`
+    .btn-outline-success { background:transparent; color:var(--success); border-color:var(--success); }
+    .btn-outline-success:hover { background:var(--success-sub); }
+    .btn-outline-primary { background:transparent; color:var(--primary); border-color:var(--primary); }
+    .btn-outline-primary:hover { background:var(--primary-sub); }
+    .btn-outline-danger { background:transparent; color:var(--danger); border-color:var(--danger); }
+    .btn-outline-danger:hover { background:var(--danger-sub); }
     .action-card {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -240,6 +248,7 @@ export class CongresoOverviewComponent implements OnInit {
   private congresoService = inject(CongresoService);
   private http = inject(HttpClient);
   private toast = inject(ToastService);
+  private confirmSvc = inject(ConfirmModalService);
 
   id = '';
   overview = signal<CongresoOverviewDto | null>(null);
@@ -275,8 +284,14 @@ export class CongresoOverviewComponent implements OnInit {
     });
   }
 
-  publicar(): void {
-    if (!confirm('¿Publicar este congreso? Será visible en el mini-sitio.')) return;
+  async publicar(): Promise<void> {
+    const ok = await this.confirmSvc.ask({
+      title: '¿Publicar congreso?',
+      message: 'El congreso será visible en el mini-sitio público.',
+      type: 'primary',
+      confirmLabel: 'Publicar'
+    });
+    if (!ok) return;
     this.publicando.set(true);
     this.apiError.set(null);
     this.congresoService.publicar(this.id).subscribe({
@@ -292,8 +307,14 @@ export class CongresoOverviewComponent implements OnInit {
     });
   }
 
-  finalizar(): void {
-    if (!confirm('¿Finalizar este congreso? Esta acción no se puede deshacer.')) return;
+  async finalizar(): Promise<void> {
+    const ok = await this.confirmSvc.ask({
+      title: '¿Finalizar congreso?',
+      message: 'Esta acción no se puede deshacer.',
+      type: 'danger',
+      confirmLabel: 'Finalizar'
+    });
+    if (!ok) return;
     this.finalizando.set(true);
     this.apiError.set(null);
     this.congresoService.finalizar(this.id).subscribe({
@@ -309,8 +330,14 @@ export class CongresoOverviewComponent implements OnInit {
     });
   }
 
-  eliminar(): void {
-    if (!confirm('¿Eliminar este congreso? Esta acción no se puede deshacer.')) return;
+  async eliminar(): Promise<void> {
+    const ok = await this.confirmSvc.ask({
+      title: '¿Eliminar congreso?',
+      message: 'Esta acción no se puede deshacer. Se perderán todos los datos del congreso.',
+      type: 'danger',
+      confirmLabel: 'Eliminar'
+    });
+    if (!ok) return;
     this.eliminando.set(true);
     this.apiError.set(null);
     this.congresoService.delete(this.id).subscribe({

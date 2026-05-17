@@ -13,6 +13,7 @@ import { Subscription } from 'rxjs';
 import { SesionService } from '../sesiones/sesion.service';
 import { SesionListItem } from '../sesiones/sesion.model';
 import { TopbarComponent } from '../shared/topbar/topbar.component';
+import { CongresoNavComponent } from '../shared/congreso-nav/congreso-nav.component';
 
 interface SesionPorDia {
   fecha: string;
@@ -23,13 +24,13 @@ interface SesionPorDia {
   selector: 'app-programa',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterLink, TopbarComponent],
+  imports: [CommonModule, RouterLink, TopbarComponent, CongresoNavComponent],
   template: `
     <div class="page-shell">
       <app-topbar>
         <a [routerLink]="['/congreso', conferenciaId, 'sesiones']" class="btn btn-secondary btn-sm">Editar sesiones</a>
-        <a [routerLink]="['/congreso', conferenciaId]" class="btn btn-ghost btn-sm">← Volver</a>
       </app-topbar>
+      <app-congreso-nav [id]="conferenciaId" />
 
       <div class="page-body">
         <div class="page-header">

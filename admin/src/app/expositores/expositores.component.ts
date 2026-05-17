@@ -21,17 +21,18 @@ import { ExpositorListItem, UpdateExpositorDto } from './expositor.model';
 import { ImageUploadComponent } from '../shared/image-upload/image-upload.component';
 import { ToastService } from '../core/toast.service';
 import { TopbarComponent } from '../shared/topbar/topbar.component';
+import { CongresoNavComponent } from '../shared/congreso-nav/congreso-nav.component';
 
 @Component({
   selector: 'app-expositores',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, ImageUploadComponent, TopbarComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, ImageUploadComponent, TopbarComponent, CongresoNavComponent],
   template: `
     <div class="page-shell">
       <app-topbar>
-        <a [routerLink]="['/congreso', conferenciaId]" class="btn btn-secondary btn-sm">← Volver</a>
       </app-topbar>
+      <app-congreso-nav [id]="conferenciaId" />
       <div class="page-body">
         <div class="page-header">
           <div class="page-title">

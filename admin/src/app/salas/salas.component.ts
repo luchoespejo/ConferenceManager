@@ -14,17 +14,18 @@ import { SalaDto } from './sala.model';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ToastService } from '../core/toast.service';
 import { TopbarComponent } from '../shared/topbar/topbar.component';
+import { CongresoNavComponent } from '../shared/congreso-nav/congreso-nav.component';
 
 @Component({
   selector: 'app-salas',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, TopbarComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, TopbarComponent, CongresoNavComponent],
   template: `
     <div class="page-shell">
       <app-topbar>
-        <a routerLink="/dashboard" class="btn btn-secondary btn-sm">← Volver</a>
       </app-topbar>
+      <app-congreso-nav [id]="conferenciaId" />
       <div class="page-body">
         <div class="page-header">
           <div class="page-title">
@@ -130,7 +131,7 @@ export class SalasComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
   private toast = inject(ToastService);
 
-  private conferenciaId = '';
+  conferenciaId = '';
 
   salas = signal<SalaDto[]>([]);
   loading = signal(true);

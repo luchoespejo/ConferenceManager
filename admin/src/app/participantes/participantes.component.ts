@@ -13,6 +13,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ParticipanteService } from './participante.service';
 import { TopbarComponent } from '../shared/topbar/topbar.component';
+import { CongresoNavComponent } from '../shared/congreso-nav/congreso-nav.component';
 import { Participante, CreateParticipanteDto, UpdateParticipanteDto } from './participante.model';
 import { ToastService } from '../core/toast.service';
 
@@ -20,12 +21,12 @@ import { ToastService } from '../core/toast.service';
   selector: 'app-participantes',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, TopbarComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, TopbarComponent, CongresoNavComponent],
   template: `
     <div class="page-shell">
       <app-topbar>
-        <a [routerLink]="['/congreso', conferenciaId]" class="btn btn-secondary btn-sm">← Volver al congreso</a>
       </app-topbar>
+      <app-congreso-nav [id]="conferenciaId" />
 
       <div class="page-body">
         <div class="page-header">
