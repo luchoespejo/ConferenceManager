@@ -358,15 +358,12 @@ export class CongresoOverviewComponent implements OnInit {
     this.http.post<{ regenerated: number }>(`${base}/regenerar-qrs`, {}, { headers })
       .subscribe({
         next: (regen) => {
-          this.toast.success(`QRs generados: ${regen?.regenerated ?? 0}`);
+          console.log('[QR] regenerated:', regen?.regenerated ?? 0);
           this.http.get<any[]>(base, { headers }).subscribe({
             next: (sesiones) => {
               this.imprimiendoQrs.set(false);
-              const first = sesiones[0];
-              const keys = first ? Object.keys(first).join('|') : 'empty';
-              const qrVal = first?.qrCodeUrl ?? first?.['QrCodeUrl'] ?? 'NULL';
-              this.toast.success(`keys: ${keys}`);
-              this.toast.success(`qr[0]: ${String(qrVal).substring(0, 30)}`);
+              console.log('[QR] sesiones raw:', JSON.stringify(sesiones[0]));
+              console.log('[QR] qrCodeUrl[0]:', sesiones[0]?.qrCodeUrl);
               const nombre = this.overview()?.nombre ?? 'Congreso';
               const html = this.buildQrHtml(nombre, sesiones);
               const win = window.open('', '_blank');
