@@ -68,6 +68,7 @@ builder.Services.AddCors(options =>
 
 // ── HTTP Client ───────────────────────────────────────────────────────────────
 builder.Services.AddHttpClient("ResendClient");
+builder.Services.AddHttpClient<IStaticSiteService, StaticSiteService>();
 
 // ── Application Services ──────────────────────────────────────────────────────
 // CQRS Handlers

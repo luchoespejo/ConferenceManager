@@ -10,7 +10,12 @@ namespace ConferenceManager.Controllers;
 [ApiController]
 [Authorize]
 [Route("api/dashboard/conferencias")]
-public class ConferenciasController(IConferenciaService conferenciaService) : ControllerBase
+public class ConferenciasController(
+    IConferenciaService conferenciaService,
+    IStaticSiteService staticSiteService,
+    IHttpClientFactory httpClientFactory,
+    IConfiguration config,
+    ILogger<ConferenciasController> logger) : ControllerBase
 {
     private Guid UsuarioId =>
         Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -110,7 +115,10 @@ public class ConferenciasController(IConferenciaService conferenciaService) : Co
         var result = await conferenciaService.PublicarAsync(id, UsuarioId);
 
         if (result.Success)
+        {
+            TriggerVercelDeploy();
             return Ok(result.Data);
+        }
 
         return result.ErrorCode switch
         {
@@ -119,6 +127,37 @@ public class ConferenciasController(IConferenciaService conferenciaService) : Co
                 StatusCode(422, new { error = result.ErrorCode, message = result.ErrorMessage }),
             _ => StatusCode(500, new { error = "INTERNAL_ERROR", message = "Error inesperado." })
         };
+    }
+
+    [HttpGet("{id:guid}/sitio-estatico")]
+    public async Task<IActionResult> DescargarSitioEstatico(Guid id)
+    {
+        var result = await staticSiteService.GenerateZipAsync(id, UsuarioId);
+
+        if (result is null)
+            return NotFound(new { error = "CONFERENCIA_NOT_FOUND" });
+
+        return File(result.Data, "application/zip", $"{result.Slug}-sitio.zip");
+    }
+
+    private void TriggerVercelDeploy()
+    {
+        var hookUrl = config["App:VercelDeployHookUrl"];
+        if (string.IsNullOrEmpty(hookUrl)) return;
+
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                var client = httpClientFactory.CreateClient();
+                await client.PostAsync(hookUrl, null);
+                logger.LogInformation("Vercel deploy hook triggered");
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(ex, "Vercel deploy hook failed");
+            }
+        });
     }
 
     [HttpPut("{id:guid}/finalizar")]
