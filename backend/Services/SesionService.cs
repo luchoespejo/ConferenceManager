@@ -109,7 +109,7 @@ public class SesionService(AppDbContext context, IQrService qrService, IConfigur
         await context.SaveChangesAsync();
 
         var siteUrl = config["App:SiteUrl"] ?? "http://localhost:3000";
-        var qrUrl = await qrService.GenerateAsync($"{siteUrl}/s/{sesion.Id}");
+        var qrUrl = await qrService.GenerateAsync($"{siteUrl}/{conferencia?.Slug}/s/{sesion.Id}");
         if (!string.IsNullOrEmpty(qrUrl))
         {
             sesion.QrCodeUrl = qrUrl;
@@ -213,6 +213,7 @@ public class SesionService(AppDbContext context, IQrService qrService, IConfigur
         var sesiones = await context.Sesiones
             .Include(s => s.Sala)
             .Include(s => s.Expositor)
+            .Include(s => s.Conferencia)
             .Where(s => s.ConferenciaId == conferenciaId)
             .ToListAsync();
 
@@ -220,7 +221,7 @@ public class SesionService(AppDbContext context, IQrService qrService, IConfigur
 
         foreach (var sesion in sesiones)
         {
-            var qr = await qrService.GenerateAsync($"{siteUrl}/s/{sesion.Id}");
+            var qr = await qrService.GenerateAsync($"{siteUrl}/{sesion.Conferencia.Slug}/s/{sesion.Id}");
             if (qr is not null)
                 sesion.QrCodeUrl = qr;
         }
