@@ -355,29 +355,18 @@ export class CongresoOverviewComponent implements OnInit {
     const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
     const base = `${environment.apiUrl}/api/dashboard/conferencias/${this.id}/sesiones`;
 
-    this.http.post<{ regenerated: number }>(`${base}/regenerar-qrs`, {}, { headers })
+    this.http.post<any[]>(`${base}/regenerar-qrs`, {}, { headers })
       .subscribe({
-        next: (regen) => {
-          console.log('[QR] regenerated:', regen?.regenerated ?? 0);
-          this.http.get<any[]>(base, { headers }).subscribe({
-            next: (sesiones) => {
-              this.imprimiendoQrs.set(false);
-              console.log('[QR] sesiones raw:', JSON.stringify(sesiones[0]));
-              console.log('[QR] qrCodeUrl[0]:', sesiones[0]?.qrCodeUrl);
-              const nombre = this.overview()?.nombre ?? 'Congreso';
-              const html = this.buildQrHtml(nombre, sesiones);
-              const win = window.open('', '_blank');
-              if (win) { win.document.write(html); win.document.close(); }
-            },
-            error: () => {
-              this.imprimiendoQrs.set(false);
-              this.apiError.set('No se pudieron cargar los QRs. Intentá de nuevo.');
-            }
-          });
+        next: (sesiones) => {
+          this.imprimiendoQrs.set(false);
+          const nombre = this.overview()?.nombre ?? 'Congreso';
+          const html = this.buildQrHtml(nombre, sesiones);
+          const win = window.open('', '_blank');
+          if (win) { win.document.write(html); win.document.close(); }
         },
         error: () => {
           this.imprimiendoQrs.set(false);
-          this.apiError.set('Error al regenerar los QRs. Intentá de nuevo.');
+          this.apiError.set('Error al generar los QRs. Intentá de nuevo.');
         }
       });
   }
