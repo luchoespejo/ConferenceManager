@@ -3,7 +3,8 @@ import {
   ChangeDetectionStrategy,
   OnInit,
   inject,
-  signal
+  signal,
+  HostListener
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -27,35 +28,39 @@ import { CongresoNavComponent } from '../../shared/congreso-nav/congreso-nav.com
       <app-topbar>
         @if (overview()) {
           <span class="badge badge-{{ overview()!.estado.toLowerCase() }}">{{ overview()!.estado }}</span>
-          <a [routerLink]="['/congreso', id, 'configuracion']" class="btn btn-secondary btn-sm">Configuración</a>
-          <a href="https://conference-manager-irl1.vercel.app" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">🌍 Sitio publicado ↗</a>
-          <a [routerLink]="['/congreso', id, 'demo']" class="btn btn-warning btn-sm">👁️ Demo</a>
-          <button class="btn btn-secondary btn-sm" (click)="imprimirQrs()" [disabled]="imprimiendoQrs()">
-            @if (imprimiendoQrs()) { <span class="spinner"></span> } 🖨️ QRs
-          </button>
           @if (overview()!.estado !== 'Borrador') {
-            <button class="btn btn-secondary btn-sm" (click)="descargarSitio()" [disabled]="descargandoSitio()">
-              @if (descargandoSitio()) { <span class="spinner"></span> } ⬇️ Sitio ZIP
-            </button>
+            <a href="https://conference-manager-irl1.vercel.app" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">🌍 Ver sitio ↗</a>
           }
-          @if (overview()!.estado === 'Borrador') {
-            <button class="btn btn-outline-success btn-sm" (click)="publicar()" [disabled]="publicando()">
-              @if (publicando()) { <span class="spinner"></span> }
-              Publicar
+          <div class="dropdown">
+            <button class="btn btn-secondary btn-sm dropdown-toggle"
+                    (click)="toggleMenu($event)"
+                    [disabled]="imprimiendoQrs() || descargandoSitio() || republicando()">
+              @if (imprimiendoQrs() || descargandoSitio() || republicando()) {
+                <span class="spinner"></span>
+              }
+              Acciones ▾
             </button>
-          }
-          @if (overview()!.estado === 'Publicado') {
-            <button class="btn btn-outline-primary btn-sm" (click)="finalizar()" [disabled]="finalizando()">
-              @if (finalizando()) { <span class="spinner"></span> }
-              Finalizar
-            </button>
-          }
-          @if (overview()!.estado === 'Borrador') {
-            <button class="btn btn-outline-danger btn-sm" (click)="eliminar()" [disabled]="eliminando()">
-              @if (eliminando()) { <span class="spinner"></span> }
-              Eliminar
-            </button>
-          }
+            @if (menuAbierto()) {
+              <div class="dropdown-menu" (click)="$event.stopPropagation()">
+                <a [routerLink]="['/congreso', id, 'demo']" class="dropdown-item" (click)="menuAbierto.set(false)">👁️ Demo</a>
+                <a [routerLink]="['/congreso', id, 'configuracion']" class="dropdown-item" (click)="menuAbierto.set(false)">⚙️ Configuración</a>
+                <hr class="dropdown-divider" />
+                <button class="dropdown-item" (click)="imprimirQrs(); menuAbierto.set(false)" [disabled]="imprimiendoQrs()">🖨️ Imprimir QRs</button>
+                @if (overview()!.estado !== 'Borrador') {
+                  <button class="dropdown-item" (click)="descargarSitio(); menuAbierto.set(false)" [disabled]="descargandoSitio()">⬇️ Descargar sitio ZIP</button>
+                  <button class="dropdown-item" (click)="republicar(); menuAbierto.set(false)" [disabled]="republicando()">🚀 Re-publicar</button>
+                }
+                <hr class="dropdown-divider" />
+                @if (overview()!.estado === 'Borrador') {
+                  <button class="dropdown-item dropdown-item--success" (click)="publicar(); menuAbierto.set(false)" [disabled]="publicando()">✅ Publicar</button>
+                  <button class="dropdown-item dropdown-item--danger" (click)="eliminar(); menuAbierto.set(false)" [disabled]="eliminando()">🗑️ Eliminar</button>
+                }
+                @if (overview()!.estado === 'Publicado') {
+                  <button class="dropdown-item dropdown-item--warning" (click)="finalizar(); menuAbierto.set(false)" [disabled]="finalizando()">🏁 Finalizar</button>
+                }
+              </div>
+            }
+          </div>
         }
       </app-topbar>
       <app-congreso-nav [id]="id" />
@@ -192,12 +197,46 @@ import { CongresoNavComponent } from '../../shared/congreso-nav/congreso-nav.com
     </div>
   `,
   styles: [`
-    .btn-outline-success { background:transparent; color:var(--success); border-color:var(--success); }
-    .btn-outline-success:hover { background:var(--success-sub); }
-    .btn-outline-primary { background:transparent; color:var(--primary); border-color:var(--primary); }
-    .btn-outline-primary:hover { background:var(--primary-sub); }
-    .btn-outline-danger { background:transparent; color:var(--danger); border-color:var(--danger); }
-    .btn-outline-danger:hover { background:var(--danger-sub); }
+    .dropdown { position: relative; }
+    .dropdown-menu {
+      position: absolute;
+      right: 0;
+      top: calc(100% + 6px);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      box-shadow: 0 8px 24px rgba(0,0,0,.15);
+      min-width: 210px;
+      z-index: 200;
+      overflow: hidden;
+      animation: fadeInDown .12s ease;
+    }
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-4px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .575rem 1rem;
+      font-size: .875rem;
+      color: var(--text);
+      cursor: pointer;
+      background: none;
+      border: none;
+      width: 100%;
+      text-align: left;
+      text-decoration: none;
+      transition: background .12s;
+      font-family: inherit;
+    }
+    .dropdown-item:hover:not(:disabled) { background: var(--hover); }
+    .dropdown-item:disabled { opacity: .45; cursor: not-allowed; }
+    .dropdown-item--success { color: var(--success); font-weight: 600; }
+    .dropdown-item--danger  { color: var(--danger);  font-weight: 600; }
+    .dropdown-item--warning { color: var(--warning); font-weight: 600; }
+    .dropdown-divider { border: none; border-top: 1px solid var(--border); margin: .25rem 0; }
     .action-card {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -264,6 +303,8 @@ export class CongresoOverviewComponent implements OnInit {
   eliminando = signal(false);
   imprimiendoQrs = signal(false);
   descargandoSitio = signal(false);
+  republicando = signal(false);
+  menuAbierto = signal(false);
   apiError = signal<string | null>(null);
 
   ngOnInit(): void {
@@ -351,6 +392,40 @@ export class CongresoOverviewComponent implements OnInit {
       error: (err) => {
         this.eliminando.set(false);
         this.apiError.set(err.error?.message ?? 'Error al eliminar el congreso.');
+      }
+    });
+  }
+
+  toggleMenu(event: Event): void {
+    event.stopPropagation();
+    this.menuAbierto.update(v => !v);
+  }
+
+  @HostListener('document:click')
+  closeMenu(): void {
+    this.menuAbierto.set(false);
+  }
+
+  republicar(): void {
+    this.republicando.set(true);
+    const token = localStorage.getItem('access_token') ?? sessionStorage.getItem('access_token') ?? '';
+    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+
+    this.http.post(
+      `${environment.apiUrl}/api/dashboard/conferencias/${this.id}/redeployar`,
+      {},
+      { headers }
+    ).subscribe({
+      next: () => {
+        this.republicando.set(false);
+        this.toast.success('Re-publicación iniciada. El sitio se actualizará en breve.');
+      },
+      error: (err) => {
+        this.republicando.set(false);
+        if (err.error?.error === 'VERCEL_HOOK_NOT_CONFIGURED')
+          this.toast.error('No hay hook de deploy configurado en el servidor.');
+        else
+          this.toast.error('No se pudo iniciar la re-publicación.');
       }
     });
   }
