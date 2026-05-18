@@ -151,8 +151,10 @@ export default async function ConferenciaHome({ params }: { params: Promise<{ sl
               </p>
             )}
             {bannerSrc && (
-              <img src={bannerSrc} alt="" aria-hidden="true"
-                style={{ width: '100%', height: 'auto', borderRadius: '10px', margin: '1.5rem 0', display: 'block' }} />
+              <div style={{ borderRadius: '10px', overflow: 'hidden', margin: '1.5rem 0', lineHeight: 0, background: sc('hero').bgColor ?? '#fff' }}>
+                <img src={bannerSrc} alt="" aria-hidden="true"
+                  style={{ width: '100%', height: 'auto', display: 'block' }} />
+              </div>
             )}
             <div style={{ background: primary, color: '#fff', borderRadius: '8px', padding: '1.25rem 2rem', margin: '0 auto 1.5rem', display: 'inline-block', minWidth: '280px' }}>
               <p style={{ margin: 0, fontWeight: 700, fontSize: '1.1rem' }}>
