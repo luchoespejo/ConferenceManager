@@ -34,4 +34,20 @@ public class UpdateConferenciaDto
     public string? VenueNombre { get; set; }
     public string? VenueDireccion { get; set; }
     public string? VenueLinkMaps { get; set; }
+
+    // US-11
+    public string? BannerModo { get; set; }
+    public string? Subtitulo { get; set; }
+    public string? Lema { get; set; }
+    public string? EmailContacto { get; set; }
+    public string? Instagram { get; set; }
+    public string? FormularioInscripcionUrl { get; set; }
+    public string? ArancelesTexto { get; set; }
+    public string? InformacionPago { get; set; }
+    public string? ContactoAdicional { get; set; }
+    public bool? MostrarFechas { get; set; }
+    public bool? MostrarDescripcion { get; set; }
+    public bool? MostrarOrganizadores { get; set; }
+    public bool? MostrarContacto { get; set; }
+    public bool? MostrarInscripciones { get; set; }
 }

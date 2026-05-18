@@ -16,6 +16,10 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Participante> Participantes => Set<Participante>();
     public DbSet<AvisoUrgente> AvisosUrgentes => Set<AvisoUrgente>();
     public DbSet<ImagenAlmacenada> ImagenesAlmacenadas => Set<ImagenAlmacenada>();
+    public DbSet<Organizador> Organizadores => Set<Organizador>();
+    public DbSet<FechaImportante> FechasImportantes => Set<FechaImportante>();
+    public DbSet<EjeTematico> EjesTematicos => Set<EjeTematico>();
+    public DbSet<SeccionConfig> SeccionConfigs => Set<SeccionConfig>();
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

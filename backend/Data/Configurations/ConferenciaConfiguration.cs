@@ -71,6 +71,49 @@ public class ConferenciaConfiguration : IEntityTypeConfiguration<Conferencia>
         builder.Property(c => c.VenueLinkMaps)
             .HasColumnType("text");
 
+        // US-11: new text fields
+        builder.Property(c => c.Lema)
+            .HasColumnType("text");
+
+        builder.Property(c => c.EmailContacto)
+            .HasColumnType("text");
+
+        builder.Property(c => c.Instagram)
+            .HasColumnType("text");
+
+        builder.Property(c => c.FormularioInscripcionUrl)
+            .HasColumnType("text");
+
+        builder.Property(c => c.ArancelesTexto)
+            .HasColumnType("text");
+
+        builder.Property(c => c.InformacionPago)
+            .HasColumnType("text");
+
+        builder.Property(c => c.ContactoAdicional)
+            .HasColumnType("text");
+
+        // US-11: section visibility flags with explicit defaults
+        builder.Property(c => c.MostrarFechas)
+            .IsRequired()
+            .HasDefaultValue(true);
+
+        builder.Property(c => c.MostrarDescripcion)
+            .IsRequired()
+            .HasDefaultValue(true);
+
+        builder.Property(c => c.MostrarOrganizadores)
+            .IsRequired()
+            .HasDefaultValue(false);
+
+        builder.Property(c => c.MostrarContacto)
+            .IsRequired()
+            .HasDefaultValue(true);
+
+        builder.Property(c => c.MostrarInscripciones)
+            .IsRequired()
+            .HasDefaultValue(false);
+
         builder.Property(c => c.CreatedAt)
             .HasColumnType("timestamptz")
             .HasDefaultValueSql("NOW()")

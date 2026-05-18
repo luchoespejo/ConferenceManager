@@ -1,5 +1,11 @@
 export type EstadoCongreso = 'Borrador' | 'Publicado' | 'Finalizado';
 
+export interface SeccionConfigDto {
+  seccionKey: string;
+  bgColor: string | null;
+  textoColor: string | null;
+}
+
 export interface CongresoListItemDto {
   id: string;
   slug: string;
@@ -9,6 +15,25 @@ export interface CongresoListItemDto {
   fechaFin: string;
   cantidadSesiones: number;
   creadoEn: string;
+}
+
+export interface OrganizadorDto {
+  id: string;
+  nombre: string;
+  logoUrl: string | null;
+  orden: number;
+}
+
+export interface FechaImportanteDto {
+  id: string;
+  descripcion: string;
+  fecha: string;
+  fechaFin?: string | null;
+}
+
+export interface EjeTematicoDto {
+  id: string;
+  nombre: string;
 }
 
 export interface CongresoDetalleDto {
@@ -29,6 +54,21 @@ export interface CongresoDetalleDto {
   venueNombre: string | null;
   venueDireccion: string | null;
   venueLinkMaps: string | null;
+  // US-11
+  bannerModo: string;
+  subtitulo: string | null;
+  lema: string | null;
+  emailContacto: string | null;
+  instagram: string | null;
+  formularioInscripcionUrl: string | null;
+  arancelesTexto: string | null;
+  informacionPago: string | null;
+  contactoAdicional: string | null;
+  mostrarFechas: boolean;
+  mostrarDescripcion: boolean;
+  mostrarOrganizadores: boolean;
+  mostrarContacto: boolean;
+  mostrarInscripciones: boolean;
   creadoEn: string;
 }
 
@@ -48,6 +88,21 @@ export interface CreateCongresoDto {
   venueNombre?: string;
   venueDireccion?: string;
   venueLinkMaps?: string;
+  // US-11
+  bannerModo?: string;
+  subtitulo?: string | null;
+  lema?: string | null;
+  emailContacto?: string | null;
+  instagram?: string | null;
+  formularioInscripcionUrl?: string | null;
+  arancelesTexto?: string | null;
+  informacionPago?: string | null;
+  contactoAdicional?: string | null;
+  mostrarFechas?: boolean;
+  mostrarDescripcion?: boolean;
+  mostrarOrganizadores?: boolean;
+  mostrarContacto?: boolean;
+  mostrarInscripciones?: boolean;
 }
 
 export type UpdateCongresoDto = Partial<CreateCongresoDto>;

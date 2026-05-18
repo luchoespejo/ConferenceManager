@@ -1,4 +1,4 @@
-export const revalidate = 300;
+export const dynamic = 'force-dynamic';
 
 interface Expositor {
   id: string;
@@ -11,7 +11,7 @@ interface Expositor {
 async function fetchExpositores(slug: string): Promise<Expositor[]> {
   const backend = process.env.BACKEND_URL ?? 'http://localhost:5000';
   try {
-    const res = await fetch(`${backend}/api/public/${slug}/expositores`, { next: { revalidate: 300 } });
+    const res = await fetch(`${backend}/api/public/${slug}/expositores`, { cache: 'no-store' });
     if (!res.ok) return [];
     return res.json();
   } catch {
