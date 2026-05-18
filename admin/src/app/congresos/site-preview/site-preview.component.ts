@@ -173,7 +173,7 @@ interface PreviewData {
     .pv-title-light { font-size:clamp(1.2rem,3vw,1.8rem);font-weight:800;margin:0 0 .5rem;line-height:1.25; }
     .pv-subtitulo { font-size:.95rem;font-weight:600;margin:0 auto .5rem;max-width:560px;line-height:1.4; }
     .pv-lema { font-size:.9rem;font-style:italic;margin:0 auto .75rem;max-width:500px;line-height:1.5; }
-    .pv-banner-decorativo { width:100%;height:auto;border-radius:8px;margin:1rem 0;display:block; }
+    .pv-banner-decorativo { width:100%;height:auto;border-radius:8px;margin:1rem 0;display:block;clip-path:inset(1% 1% 1% 1%); }
     .pv-date-badge { border-radius:8px;padding:.75rem 1.5rem;margin:0 auto 1rem;display:inline-block;min-width:200px; }
     .pv-date-text { margin:0;font-weight:700;font-size:1rem; }
     .pv-venue-text { margin:.2rem 0 0;font-size:.85rem;opacity:.85; }
