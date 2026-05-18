@@ -29,7 +29,7 @@ import { CongresoNavComponent } from '../../shared/congreso-nav/congreso-nav.com
         @if (overview()) {
           <span class="badge badge-{{ overview()!.estado.toLowerCase() }}">{{ overview()!.estado }}</span>
           @if (overview()!.estado !== 'Borrador') {
-            <a [href]="'https://conference-manager-irl1.vercel.app/' + overview()!.slug" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">🌍 Ver sitio ↗</a>
+            <a [href]="siteUrl + '/' + overview()!.slug" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">🌍 Ver sitio ↗</a>
           }
           <div class="dropdown">
             <button class="btn btn-secondary btn-sm dropdown-toggle"
@@ -287,6 +287,7 @@ import { CongresoNavComponent } from '../../shared/congreso-nav/congreso-nav.com
   `]
 })
 export class CongresoOverviewComponent implements OnInit {
+  readonly siteUrl = environment.siteUrl;
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private congresoService = inject(CongresoService);

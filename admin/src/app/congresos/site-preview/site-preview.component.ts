@@ -3,32 +3,23 @@ import {
   Input,
   ChangeDetectionStrategy,
   OnInit,
+  OnDestroy,
   signal,
-  inject
+  inject,
+  computed
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
+import { CongresoService } from '../congreso.service';
+import { CongresoDetalleDto, OrganizadorDto, FechaImportanteDto, EjeTematicoDto, SeccionConfigDto } from '../congreso.model';
 import { environment } from '../../../environments/environment';
+import { forkJoin } from 'rxjs';
 
-interface ConferenciaPreview {
-  id: string;
-  nombre: string;
-  slug: string;
-  descripcion: string;
-  logoUrl?: string;
-  bannerUrl?: string;
-  colorPrimario?: string;
-  colorSecundario?: string;
-  proximasSesiones: Array<{
-    id: string;
-    titulo: string;
-    fecha: string;
-    horaInicio: string;
-    horaFin: string;
-    salaNombre: string;
-    expositorNombre: string;
-    qrCodeUrl?: string;
-  }>;
+interface PreviewData {
+  conf: CongresoDetalleDto;
+  organizadores: OrganizadorDto[];
+  fechas: FechaImportanteDto[];
+  ejes: EjeTematicoDto[];
+  secciones: Record<string, SeccionConfigDto>;
 }
 
 @Component({
@@ -37,270 +28,260 @@ interface ConferenciaPreview {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule],
   template: `
-    <div class="preview-container">
-      @if (loading()) {
-        <div class="preview-loading">
-          <div class="spinner"></div>
-          <p style="color: var(--muted)">Cargando vista previa...</p>
-        </div>
-      } @else if (error()) {
-        <div class="preview-error">
-          <p style="color: var(--danger)">⚠️ {{ error() }}</p>
-        </div>
-      } @else if (data()) {
-        <!-- Hero Section -->
-        <div class="preview-hero" [style.backgroundColor]="data()!.colorPrimario || 'var(--primary)'">
-          @if (data()!.bannerUrl) {
-            <img
-              [src]="resolveUrl(data()!.bannerUrl!)"
-              alt="Banner"
-              class="preview-banner"
-              (error)="onImageError($event)"
-            />
-          }
-          <div class="preview-hero-content">
-            @if (data()!.logoUrl) {
-              <img
-                [src]="resolveUrl(data()!.logoUrl!)"
-                alt="Logo"
-                class="preview-logo"
-                (error)="onImageError($event)"
-              />
-            }
-            <h1 class="preview-title">{{ data()!.nombre }}</h1>
-            @if (data()!.descripcion) {
-              <p class="preview-desc">{{ data()!.descripcion }}</p>
-            }
-          </div>
-        </div>
+    @if (loading()) {
+      <div class="pv-center"><div class="spinner"></div></div>
+    } @else if (!data()) {
+      <div class="pv-center" style="color:var(--danger)">No se pudo cargar la vista previa</div>
+    } @else {
+      <div class="pv-root" [style.fontFamily]="data()!.conf.tipografia || 'Arial, sans-serif'">
 
-        <!-- Upcoming Sessions Preview -->
-        @if (data()!.proximasSesiones.length > 0) {
-          <div class="preview-sessions">
-            <h3>Próximas sesiones</h3>
-            <div class="sessions-list">
-              @for (sesion of data()!.proximasSesiones.slice(0, 3); track sesion.id) {
-                <div class="session-item">
-                  <div class="session-main">
-                    <div class="session-time">
-                      {{ sesion.horaInicio | slice:0:5 }} – {{ sesion.horaFin | slice:0:5 }}
-                    </div>
-                    <div class="session-info">
-                      <div class="session-title">{{ sesion.titulo }}</div>
-                      <div class="session-meta">
-                        {{ sesion.salaNombre }} · {{ sesion.expositorNombre }}
-                      </div>
-                    </div>
-                  </div>
-                  @if (sesion.qrCodeUrl) {
-                    <img [src]="sesion.qrCodeUrl" alt="QR" class="session-qr" />
-                  }
+        <!-- HERO -->
+        @if (esDecorativo()) {
+          <!-- Hero claro -->
+          <div class="pv-hero-light" [style.background]="sc('hero').bgColor || '#fff'">
+            @if (logoSrc()) {
+              <img [src]="logoSrc()!" alt="" class="pv-logo-light" />
+            }
+            <h1 class="pv-title-light" [style.color]="sc('hero').textoColor || '#0f172a'">{{ data()!.conf.nombre }}</h1>
+            @if (data()!.conf.subtitulo) {
+              <p class="pv-subtitulo" [style.color]="sc('hero').textoColor || '#334155'">{{ data()!.conf.subtitulo }}</p>
+            }
+            @if (data()!.conf.lema) {
+              <p class="pv-lema" [style.color]="sc('hero').textoColor || '#475569'">&ldquo;{{ data()!.conf.lema }}&rdquo;</p>
+            }
+            @if (bannerSrc()) {
+              <img [src]="bannerSrc()!" alt="" class="pv-banner-decorativo" />
+            }
+            <div class="pv-date-badge" [style.background]="primary()">
+              <p class="pv-date-text">{{ fmtDateRange(data()!.conf.fechaInicio, data()!.conf.fechaInicio !== data()!.conf.fechaFin ? data()!.conf.fechaFin : undefined) }}</p>
+              @if (data()!.conf.venueNombre) {
+                <p class="pv-venue-text">{{ data()!.conf.venueNombre }}{{ data()!.conf.venueDireccion ? ' · ' + data()!.conf.venueDireccion : '' }}</p>
+              }
+            </div>
+            <div class="pv-btns">
+              <span class="pv-btn-solid" [style.background]="primary()" [style.color]="'#fff'">Ver Programa</span>
+              @if (data()!.conf.mostrarInscripciones) {
+                <span class="pv-btn-outline" [style.color]="primary()" [style.borderColor]="primary()">Inscribirse</span>
+              }
+            </div>
+          </div>
+        } @else {
+          <!-- Hero oscuro -->
+          <div class="pv-hero-dark"
+            [style.background]="bannerSrc()
+              ? 'linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.55)),url(' + bannerSrc()! + ') center/cover'
+              : (sc(\'hero\').bgColor || primary())"
+            [style.color]="sc('hero').textoColor || '#fff'">
+            @if (logoSrc()) {
+              <img [src]="logoSrc()!" alt="" class="pv-logo-dark" />
+            }
+            <h1 class="pv-title-dark">{{ data()!.conf.nombre }}</h1>
+            @if (data()!.conf.subtitulo) {
+              <p class="pv-subtitulo-dark">{{ data()!.conf.subtitulo }}</p>
+            }
+            @if (data()!.conf.lema) {
+              <p class="pv-lema-dark">&ldquo;{{ data()!.conf.lema }}&rdquo;</p>
+            }
+            <p class="pv-dates-dark">{{ fmtDateRange(data()!.conf.fechaInicio, data()!.conf.fechaInicio !== data()!.conf.fechaFin ? data()!.conf.fechaFin : undefined) }}</p>
+            @if (data()!.conf.venueNombre) {
+              <p class="pv-venue-dark">{{ data()!.conf.venueNombre }}{{ data()!.conf.venueDireccion ? ' · ' + data()!.conf.venueDireccion : '' }}</p>
+            }
+            <div class="pv-btns">
+              <span class="pv-btn-solid" [style.background]="'#fff'" [style.color]="primary()">Ver Programa</span>
+              @if (data()!.conf.mostrarInscripciones) {
+                <span class="pv-btn-outline" style="color:#fff;border-color:rgba(255,255,255,.8)">Inscribirse</span>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- FECHAS IMPORTANTES -->
+        @if (data()!.conf.mostrarFechas && data()!.fechas.length > 0) {
+          <div class="pv-section" [style.background]="sc('fechas').bgColor || secondary()" [style.color]="sc('fechas').textoColor || '#fff'">
+            <h2 class="pv-section-title">Fechas importantes</h2>
+            <div class="pv-fechas">
+              @for (f of data()!.fechas; track f.id) {
+                <div class="pv-fecha-row" [style.justifyContent]="f.descripcion ? 'space-between' : 'center'">
+                  @if (f.descripcion) { <span style="font-weight:600">{{ f.descripcion }}</span> }
+                  <span style="opacity:.85;font-size:.95rem">{{ fmtDateRange(f.fecha, f.fechaFin) }}</span>
                 </div>
               }
             </div>
           </div>
         }
-      }
-    </div>
+
+        <!-- DESCRIPCIÓN + EJES -->
+        @if (data()!.conf.mostrarDescripcion && (data()!.conf.descripcion || data()!.ejes.length > 0)) {
+          <div class="pv-section" [style.background]="sc('descripcion').bgColor || '#f8fafc'" [style.color]="sc('descripcion').textoColor || '#334155'">
+            @if (data()!.conf.descripcion) {
+              <p class="pv-desc-text">{{ data()!.conf.descripcion }}</p>
+            }
+            @if (data()!.ejes.length > 0) {
+              <p class="pv-ejes-label">Ejes temáticos</p>
+              <div class="pv-chips">
+                @for (e of data()!.ejes; track e.id) {
+                  <span class="pv-chip" [style.background]="primary()">{{ e.nombre }}</span>
+                }
+              </div>
+            }
+          </div>
+        }
+
+        <!-- ORGANIZADORES — strip centrado -->
+        @if (data()!.conf.mostrarOrganizadores && data()!.organizadores.length > 0) {
+          <div class="pv-org-strip" [style.background]="sc('organizadores').bgColor || '#f1f5f9'">
+            <p class="pv-org-label" [style.color]="sc('organizadores').textoColor || '#64748b'">Organizado por</p>
+            <div class="pv-org-logos">
+              @for (org of data()!.organizadores; track org.id) {
+                @if (resolveUrl(org.logoUrl)) {
+                  <img [src]="resolveUrl(org.logoUrl)!" alt="{{ org.nombre }}" class="pv-org-logo" />
+                } @else {
+                  <span class="pv-org-name" [style.color]="sc('organizadores').textoColor || '#475569'">{{ org.nombre }}</span>
+                }
+              }
+            </div>
+          </div>
+        }
+
+        <!-- CONTACTO -->
+        @if (data()!.conf.mostrarContacto && (data()!.conf.emailContacto || data()!.conf.instagram || data()!.conf.contactoAdicional)) {
+          <div class="pv-section" [style.background]="sc('contacto').bgColor || primary()" [style.color]="sc('contacto').textoColor || '#fff'" style="text-align:center">
+            <h2 class="pv-section-title">Informes</h2>
+            @if (data()!.conf.emailContacto) {
+              <p style="margin:.4rem 0;font-size:1rem;font-weight:600">{{ data()!.conf.emailContacto }}</p>
+            }
+            @if (data()!.conf.instagram) {
+              <p style="margin:.4rem 0;font-size:1rem;font-weight:600">&#64;{{ data()!.conf.instagram }}</p>
+            }
+            @if (data()!.conf.contactoAdicional) {
+              <p style="margin:.75rem 0 0;font-size:.9rem;opacity:.85;white-space:pre-line">{{ data()!.conf.contactoAdicional }}</p>
+            }
+          </div>
+        }
+
+      </div>
+    }
   `,
   styles: [`
-    .preview-container {
-      display: flex;
-      flex-direction: column;
-      border: 1px solid var(--border);
-      border-radius: var(--r-md);
-      overflow: hidden;
-      background: var(--surface);
-      height: 100%;
-    }
+    :host { display:block; height:100%; overflow-y:auto; }
+    .pv-center { display:flex;align-items:center;justify-content:center;height:200px;gap:.75rem; }
+    .pv-root { font-size:14px; }
 
-    .preview-loading,
-    .preview-error {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 1rem;
-      padding: 2rem;
-      min-height: 200px;
-      color: var(--muted);
-    }
+    /* Hero claro */
+    .pv-hero-light { padding:2rem 1.5rem 0;text-align:center; }
+    .pv-logo-light { height:56px;width:auto;margin:0 auto 1rem;display:block;object-fit:contain; }
+    .pv-title-light { font-size:clamp(1.2rem,3vw,1.8rem);font-weight:800;margin:0 0 .5rem;line-height:1.25; }
+    .pv-subtitulo { font-size:.95rem;font-weight:600;margin:0 auto .5rem;max-width:560px;line-height:1.4; }
+    .pv-lema { font-size:.9rem;font-style:italic;margin:0 auto .75rem;max-width:500px;line-height:1.5; }
+    .pv-banner-decorativo { width:100%;height:auto;border-radius:8px;margin:1rem 0;display:block; }
+    .pv-date-badge { border-radius:8px;padding:.75rem 1.5rem;margin:0 auto 1rem;display:inline-block;min-width:200px; }
+    .pv-date-text { margin:0;font-weight:700;font-size:1rem; }
+    .pv-venue-text { margin:.2rem 0 0;font-size:.85rem;opacity:.85; }
 
-    .preview-hero {
-      position: relative;
-      padding: 2rem 1.5rem;
-      color: white;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 1rem;
-      min-height: 180px;
-      flex-shrink: 0;
-      overflow: hidden;
-    }
+    /* Hero oscuro */
+    .pv-hero-dark { padding:3rem 1.5rem;text-align:center; }
+    .pv-logo-dark { height:56px;width:auto;margin:0 auto 1rem;display:block;object-fit:contain; }
+    .pv-title-dark { font-size:clamp(1.2rem,3vw,1.8rem);font-weight:700;margin:0 0 .5rem;line-height:1.2; }
+    .pv-subtitulo-dark { font-size:.9rem;font-weight:600;margin:0 auto .4rem;max-width:560px;opacity:.9;line-height:1.4; }
+    .pv-lema-dark { font-size:.95rem;font-style:italic;margin:0 auto 1rem;max-width:500px;opacity:.9;line-height:1.5; }
+    .pv-dates-dark { font-size:.95rem;opacity:.85;margin:0 0 .3rem; }
+    .pv-venue-dark { font-size:.85rem;opacity:.75;margin:0 0 1.5rem; }
 
-    .preview-banner {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      opacity: 0.3;
-    }
+    /* Botones */
+    .pv-btns { display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;margin-top:1rem;padding-bottom:1.5rem; }
+    .pv-btn-solid { display:inline-block;font-weight:700;padding:8px 20px;border-radius:8px;font-size:.875rem; }
+    .pv-btn-outline { display:inline-block;font-weight:700;padding:8px 20px;border-radius:8px;font-size:.875rem;border:2px solid;background:transparent; }
 
-    .preview-hero-content {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.75rem;
-      text-align: center;
-    }
+    /* Secciones genéricas */
+    .pv-section { padding:2rem 1.5rem; }
+    .pv-section-title { font-size:1.1rem;font-weight:700;margin:0 0 1rem;text-align:center; }
 
-    .preview-logo {
-      max-width: 80px;
-      max-height: 80px;
-      object-fit: contain;
-      background: rgba(255, 255, 255, 0.1);
-      padding: 0.5rem;
-      border-radius: var(--r-sm);
-    }
+    /* Fechas */
+    .pv-fechas { display:flex;flex-direction:column;gap:.5rem;max-width:500px;margin:0 auto; }
+    .pv-fecha-row { display:flex;justify-content:space-between;align-items:center;padding:.6rem .75rem;background:rgba(255,255,255,.08);border-radius:6px;gap:.75rem; }
 
-    .preview-title {
-      margin: 0;
-      font-size: 1.5rem;
-      font-weight: 700;
-      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-    }
+    /* Descripción */
+    .pv-desc-text { font-size:.95rem;line-height:1.7;margin-bottom:1.25rem; }
+    .pv-ejes-label { font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.75rem;opacity:.7; }
+    .pv-chips { display:flex;flex-wrap:wrap;gap:.4rem; }
+    .pv-chip { color:#fff;padding:4px 12px;border-radius:999px;font-size:.8rem;font-weight:500; }
 
-    .preview-desc {
-      margin: 0;
-      font-size: 0.875rem;
-      opacity: 0.9;
-      max-width: 300px;
-      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
-    }
-
-    .preview-sessions {
-      padding: 1.5rem;
-      border-top: 1px solid var(--border);
-      flex: 1;
-      overflow-y: auto;
-    }
-
-    .preview-sessions h3 {
-      margin: 0 0 1rem 0;
-      font-size: 0.9375rem;
-      color: var(--text);
-    }
-
-    .sessions-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-
-    .session-item {
-      display: flex;
-      gap: 0.75rem;
-      padding: 0.75rem;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--r-sm);
-      font-size: 0.8125rem;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .session-main {
-      display: flex;
-      gap: 0.75rem;
-      flex: 1;
-      min-width: 0;
-    }
-
-    .session-time {
-      flex-shrink: 0;
-      font-weight: 600;
-      color: var(--primary);
-      min-width: 60px;
-    }
-
-    .session-info {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .session-title {
-      font-weight: 500;
-      color: var(--text);
-      margin-bottom: 2px;
-    }
-
-    .session-meta {
-      color: var(--muted);
-      font-size: 0.75rem;
-    }
-
-    .session-qr {
-      width: 60px;
-      height: 60px;
-      flex-shrink: 0;
-      border: 1px solid var(--border);
-      border-radius: var(--r-sm);
-      background: white;
-      padding: 2px;
-    }
+    /* Organizadores — strip centrado */
+    .pv-org-strip { text-align:center;padding:.75rem 1rem;border-top:1px solid rgba(0,0,0,.08);border-bottom:1px solid rgba(0,0,0,.08); }
+    .pv-org-label { font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;margin:0 0 .6rem; }
+    .pv-org-logos { display:flex;flex-wrap:wrap;gap:1.25rem;align-items:center;justify-content:center; }
+    .pv-org-logo { max-width:80px;max-height:36px;width:auto;height:auto;object-fit:contain;display:block; }
+    .pv-org-name { font-size:.75rem;font-weight:600; }
   `]
 })
 export class SitePreviewComponent implements OnInit {
   @Input() conferenciaId!: string;
 
-  private http = inject(HttpClient);
+  private svc = inject(CongresoService);
 
-  data = signal<ConferenciaPreview | null>(null);
   loading = signal(true);
-  error = signal<string | null>(null);
+  data = signal<PreviewData | null>(null);
 
-  ngOnInit(): void {
-    if (!this.conferenciaId) {
-      this.error.set('ID de conferencia no especificado');
-      this.loading.set(false);
-      return;
-    }
-    this.loadPreview();
+  primary = computed(() => this.data()?.conf.colorPrimario ?? '#1a1a2e');
+  secondary = computed(() => this.data()?.conf.colorSecundario ?? '#16213e');
+  esDecorativo = computed(() => this.data()?.conf.bannerModo === 'decorativo');
+
+  logoSrc = computed(() => this.resolveUrl(this.data()?.conf.logoUrl));
+  bannerSrc = computed(() => this.resolveUrl(this.data()?.conf.bannerUrl));
+
+  sc(key: string): SeccionConfigDto {
+    return this.data()?.secciones[key] ?? { seccionKey: key, bgColor: null, textoColor: null };
   }
 
-  private loadPreview(): void {
-    this.loading.set(true);
-    this.error.set(null);
+  ngOnInit(): void {
+    if (!this.conferenciaId) return;
+    this.load();
+  }
 
-    const apiUrl = environment.apiUrl;
-    this.http.get<ConferenciaPreview>(
-      `${apiUrl}/api/dashboard/preview/${this.conferenciaId}`
-    ).subscribe({
-      next: (data) => {
-        this.data.set(data);
+  load(): void {
+    this.loading.set(true);
+    forkJoin({
+      conf: this.svc.getById(this.conferenciaId),
+      organizadores: this.svc.getOrganizadores(this.conferenciaId),
+      fechas: this.svc.getFechasImportantes(this.conferenciaId),
+      ejes: this.svc.getEjesTematicos(this.conferenciaId),
+      seccionList: this.svc.getSeccionConfigs(this.conferenciaId),
+    }).subscribe({
+      next: ({ conf, organizadores, fechas, ejes, seccionList }) => {
+        const secciones: Record<string, SeccionConfigDto> = {};
+        seccionList.forEach(s => secciones[s.seccionKey] = s);
+        this.data.set({ conf, organizadores, fechas, ejes, secciones });
         this.loading.set(false);
       },
-      error: (err) => {
-        this.error.set('No se pudo cargar la vista previa');
+      error: () => {
+        this.data.set(null);
         this.loading.set(false);
       }
     });
   }
 
-  resolveUrl(url: string): string {
-    if (!url) return '';
+  resolveUrl(url?: string | null): string | null {
+    if (!url) return null;
     if (url.startsWith('http')) return url;
-    const apiUrl = environment.apiUrl;
-    return `${apiUrl}${url}`;
+    return `${environment.apiUrl}${url}`;
   }
 
-  onImageError(event: Event): void {
-    const img = event.target as HTMLImageElement;
-    img.style.opacity = '0.5';
+  fmtDate(d: string): string {
+    return new Date(d + 'T12:00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' });
+  }
+
+  fmtDateShort(d: string): string {
+    return new Date(d + 'T12:00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'long' });
+  }
+
+  fmtDateRange(fecha: string, fechaFin?: string | null): string {
+    if (!fechaFin) return this.fmtDate(fecha);
+    const d1 = new Date(fecha + 'T12:00:00');
+    const d2 = new Date(fechaFin + 'T12:00:00');
+    if (d1.getMonth() === d2.getMonth() && d1.getFullYear() === d2.getFullYear()) {
+      const mes = d1.toLocaleDateString('es-AR', { month: 'long' });
+      return `${d1.getDate()} al ${d2.getDate()} de ${mes} de ${d1.getFullYear()}`;
+    }
+    return `${this.fmtDateShort(fecha)} — ${this.fmtDate(fechaFin)}`;
   }
 }

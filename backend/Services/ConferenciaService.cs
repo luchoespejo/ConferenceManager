@@ -149,13 +149,27 @@ public class ConferenciaService(AppDbContext context) : IConferenciaService
         if (dto.ColorPrimario is not null) conferencia.ColorPrimario = dto.ColorPrimario;
         if (dto.ColorSecundario is not null) conferencia.ColorSecundario = dto.ColorSecundario;
         if (dto.Tipografia is not null) conferencia.Tipografia = dto.Tipografia;
-        if (dto.LogoUrl is not null) conferencia.LogoUrl = dto.LogoUrl;
-        if (dto.LogoSecundarioUrl is not null) conferencia.LogoSecundarioUrl = dto.LogoSecundarioUrl;
-        if (dto.BannerUrl is not null) conferencia.BannerUrl = dto.BannerUrl;
-        if (dto.FaviconUrl is not null) conferencia.FaviconUrl = dto.FaviconUrl;
+        if (dto.LogoUrl is not null) conferencia.LogoUrl = dto.LogoUrl == "" ? null : dto.LogoUrl;
+        if (dto.LogoSecundarioUrl is not null) conferencia.LogoSecundarioUrl = dto.LogoSecundarioUrl == "" ? null : dto.LogoSecundarioUrl;
+        if (dto.BannerUrl is not null) conferencia.BannerUrl = dto.BannerUrl == "" ? null : dto.BannerUrl;
+        if (dto.FaviconUrl is not null) conferencia.FaviconUrl = dto.FaviconUrl == "" ? null : dto.FaviconUrl;
         if (dto.VenueNombre is not null) conferencia.VenueNombre = dto.VenueNombre;
         if (dto.VenueDireccion is not null) conferencia.VenueDireccion = dto.VenueDireccion;
         if (dto.VenueLinkMaps is not null) conferencia.VenueLinkMaps = dto.VenueLinkMaps;
+        if (dto.BannerModo is not null) conferencia.BannerModo = dto.BannerModo;
+        if (dto.Subtitulo is not null) conferencia.Subtitulo = dto.Subtitulo;
+        if (dto.Lema is not null) conferencia.Lema = dto.Lema;
+        if (dto.EmailContacto is not null) conferencia.EmailContacto = dto.EmailContacto;
+        if (dto.Instagram is not null) conferencia.Instagram = dto.Instagram;
+        if (dto.FormularioInscripcionUrl is not null) conferencia.FormularioInscripcionUrl = dto.FormularioInscripcionUrl;
+        if (dto.ArancelesTexto is not null) conferencia.ArancelesTexto = dto.ArancelesTexto;
+        if (dto.InformacionPago is not null) conferencia.InformacionPago = dto.InformacionPago;
+        if (dto.ContactoAdicional is not null) conferencia.ContactoAdicional = dto.ContactoAdicional;
+        if (dto.MostrarFechas.HasValue) conferencia.MostrarFechas = dto.MostrarFechas.Value;
+        if (dto.MostrarDescripcion.HasValue) conferencia.MostrarDescripcion = dto.MostrarDescripcion.Value;
+        if (dto.MostrarOrganizadores.HasValue) conferencia.MostrarOrganizadores = dto.MostrarOrganizadores.Value;
+        if (dto.MostrarContacto.HasValue) conferencia.MostrarContacto = dto.MostrarContacto.Value;
+        if (dto.MostrarInscripciones.HasValue) conferencia.MostrarInscripciones = dto.MostrarInscripciones.Value;
 
         await context.SaveChangesAsync();
 
@@ -308,6 +322,20 @@ public class ConferenciaService(AppDbContext context) : IConferenciaService
         VenueNombre = c.VenueNombre,
         VenueDireccion = c.VenueDireccion,
         VenueLinkMaps = c.VenueLinkMaps,
+        Subtitulo = c.Subtitulo,
+        Lema = c.Lema,
+        EmailContacto = c.EmailContacto,
+        Instagram = c.Instagram,
+        FormularioInscripcionUrl = c.FormularioInscripcionUrl,
+        ArancelesTexto = c.ArancelesTexto,
+        InformacionPago = c.InformacionPago,
+        ContactoAdicional = c.ContactoAdicional,
+        BannerModo = c.BannerModo,
+        MostrarFechas = c.MostrarFechas,
+        MostrarDescripcion = c.MostrarDescripcion,
+        MostrarOrganizadores = c.MostrarOrganizadores,
+        MostrarContacto = c.MostrarContacto,
+        MostrarInscripciones = c.MostrarInscripciones,
         CreadoEn = c.CreatedAt
     };
 }

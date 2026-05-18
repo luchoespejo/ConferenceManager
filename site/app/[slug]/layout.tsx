@@ -2,19 +2,22 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import AvisosUrgentes from './AvisosUrgentes';
 
-export const revalidate = 300;
+export const dynamic = 'force-dynamic';
 
 interface ConferenciaBasica {
   nombre: string;
   slug: string;
   logoUrl?: string;
   colorPrimario?: string;
+  mostrarInscripciones?: boolean;
+  tieneSesiones?: boolean;
+  tieneExpositores?: boolean;
 }
 
 async function fetchConferencia(slug: string): Promise<ConferenciaBasica | null> {
   const backend = process.env.BACKEND_URL ?? 'http://localhost:5000';
   try {
-    const res = await fetch(`${backend}/api/public/${slug}`, { next: { revalidate: 300 } });
+    const res = await fetch(`${backend}/api/public/${slug}`, { cache: 'no-store' });
     if (!res.ok) return null;
     return res.json();
   } catch {
@@ -46,15 +49,25 @@ export default async function SlugLayout({
     <>
       <nav className="site-nav" style={{ background: primary }}>
         <Link href={`/${slug}`} className="site-nav-brand">
-          {logoSrc && (
-            <img src={logoSrc} alt={conf.nombre} style={{ height: '32px', width: 'auto', objectFit: 'contain' }} />
+          {logoSrc ? (
+            <img src={logoSrc} alt={conf.nombre} style={{ height: '36px', width: 'auto', objectFit: 'contain' }} />
+          ) : (
+            <span>Conferencia</span>
           )}
-          <span>{conf.nombre}</span>
         </Link>
         <div className="site-nav-spacer" />
         <div className="site-nav-links">
-          <Link href={`/${slug}/programa`} className="site-nav-link">Programa</Link>
-          <Link href={`/${slug}/expositores`} className="site-nav-link">Expositores</Link>
+          {conf.tieneSesiones && (
+            <Link href={`/${slug}/programa`} className="site-nav-link">Programa</Link>
+          )}
+          {conf.tieneExpositores && (
+            <Link href={`/${slug}/expositores`} className="site-nav-link">Expositores</Link>
+          )}
+          {conf.mostrarInscripciones && (
+            <Link href={`/${slug}/inscripciones`} className="site-nav-link" style={{ fontWeight: 700 }}>
+              Inscripciones
+            </Link>
+          )}
         </div>
       </nav>
       <AvisosUrgentes slug={slug} />

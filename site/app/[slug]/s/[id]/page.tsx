@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 
-export const revalidate = 300;
+export const dynamic = 'force-dynamic';
 
 interface Sesion {
   id: string;
@@ -20,7 +20,7 @@ interface Sesion {
 async function fetchSesion(slug: string, id: string): Promise<Sesion | null> {
   const backend = process.env.BACKEND_URL ?? 'http://localhost:5000';
   try {
-    const res = await fetch(`${backend}/api/public/${slug}/sesiones/${id}`, { next: { revalidate: 300 } });
+    const res = await fetch(`${backend}/api/public/${slug}/sesiones/${id}`, { cache: 'no-store' });
     if (!res.ok) return null;
     return res.json();
   } catch {

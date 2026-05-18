@@ -12,10 +12,19 @@ public class PublicService(AppDbContext context) : IPublicService
     {
         var conferencia = await context.Conferencias
             .AsNoTracking()
+            .Include(c => c.Organizadores.OrderBy(o => o.Orden))
+            .Include(c => c.FechasImportantes.OrderBy(f => f.Fecha))
+            .Include(c => c.EjesTematicos)
+            .Include(c => c.SeccionConfigs)
             .FirstOrDefaultAsync(c => c.Slug == slug && c.Estado == ConferenciaEstado.Publicado);
 
         if (conferencia is null)
             return null;
+
+        var tieneSesiones = await context.Sesiones.AsNoTracking()
+            .AnyAsync(s => s.ConferenciaId == conferencia.Id);
+        var tieneExpositores = await context.Expositores.AsNoTracking()
+            .AnyAsync(e => e.ConferenciaId == conferencia.Id);
 
         return new ConferenciaPublicaDto
         {
@@ -27,12 +36,54 @@ public class PublicService(AppDbContext context) : IPublicService
             FechaFin = conferencia.FechaFin,
             LogoUrl = conferencia.LogoUrl,
             LogoSecundarioUrl = conferencia.LogoSecundarioUrl,
+            BannerUrl = conferencia.BannerUrl,
             ColorPrimario = conferencia.ColorPrimario,
             ColorSecundario = conferencia.ColorSecundario,
             Tipografia = conferencia.Tipografia,
             VenueNombre = conferencia.VenueNombre,
             VenueDireccion = conferencia.VenueDireccion,
-            VenueLinkMaps = conferencia.VenueLinkMaps
+            VenueLinkMaps = conferencia.VenueLinkMaps,
+            Subtitulo = conferencia.Subtitulo,
+            Lema = conferencia.Lema,
+            EmailContacto = conferencia.EmailContacto,
+            Instagram = conferencia.Instagram,
+            FormularioInscripcionUrl = conferencia.FormularioInscripcionUrl,
+            ArancelesTexto = conferencia.ArancelesTexto,
+            InformacionPago = conferencia.InformacionPago,
+            ContactoAdicional = conferencia.ContactoAdicional,
+            BannerModo = conferencia.BannerModo,
+            SeccionConfigs = conferencia.SeccionConfigs.Select(s => new SeccionConfigPublicaDto
+            {
+                SeccionKey = s.SeccionKey,
+                BgColor = s.BgColor,
+                TextoColor = s.TextoColor,
+            }).ToList(),
+            MostrarFechas = conferencia.MostrarFechas,
+            MostrarDescripcion = conferencia.MostrarDescripcion,
+            MostrarOrganizadores = conferencia.MostrarOrganizadores,
+            MostrarContacto = conferencia.MostrarContacto,
+            MostrarInscripciones = conferencia.MostrarInscripciones,
+            TieneSesiones = tieneSesiones,
+            TieneExpositores = tieneExpositores,
+            Organizadores = conferencia.Organizadores.Select(o => new OrganizadorPublicoDto
+            {
+                Id = o.Id,
+                Nombre = o.Nombre,
+                LogoUrl = o.LogoUrl,
+                Orden = o.Orden
+            }).ToList(),
+            FechasImportantes = conferencia.FechasImportantes.Select(f => new FechaImportantePublicaDto
+            {
+                Id = f.Id,
+                Descripcion = f.Descripcion,
+                Fecha = f.Fecha,
+                FechaFin = f.FechaFin
+            }).ToList(),
+            EjesTematicos = conferencia.EjesTematicos.Select(e => new EjeTematicoPublicoDto
+            {
+                Id = e.Id,
+                Nombre = e.Nombre
+            }).ToList()
         };
     }
 

@@ -1,6 +1,6 @@
 import ProgramaFilters from './ProgramaFilters';
 
-export const revalidate = 300;
+export const dynamic = 'force-dynamic';
 
 interface Sesion {
   id: string;
@@ -17,7 +17,7 @@ interface Sesion {
 async function fetchSesiones(slug: string): Promise<Sesion[]> {
   const backend = process.env.BACKEND_URL ?? 'http://localhost:5000';
   try {
-    const res = await fetch(`${backend}/api/public/${slug}/programa`, { next: { revalidate: 300 } });
+    const res = await fetch(`${backend}/api/public/${slug}/programa`, { cache: 'no-store' });
     if (!res.ok) return [];
     return res.json();
   } catch {
