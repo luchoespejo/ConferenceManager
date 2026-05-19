@@ -9,6 +9,8 @@ interface SeccionConfig {
   textoColor?: string | null;
   fontSize?: string | null;
   logoAltura?: number | null;
+  logoColumnas?: number | null;
+  paddingV?: number | null;
 }
 
 interface Organizador {
@@ -129,7 +131,7 @@ export default async function ConferenciaHome({ params }: { params: Promise<{ sl
     <div>
       {esDecorativo ? (
         /* Hero claro: fondo blanco, texto oscuro, banner como imagen decorativa */
-        <div style={{ background: sc('hero').bgColor ?? '#fff', padding: '3.5rem 1.5rem 0', textAlign: 'center', fontSize: sc('hero').fontSize ?? undefined }}>
+        <div style={{ background: sc('hero').bgColor ?? '#fff', padding: sc('hero').paddingV != null ? `${sc('hero').paddingV}px 1.5rem 0` : '3.5rem 1.5rem 0', textAlign: 'center', fontSize: sc('hero').fontSize ?? undefined }}>
           <div style={{ maxWidth: '860px', margin: '0 auto' }}>
             {logoSrc && (
               <img src={logoSrc} alt={conf.nombre} style={{ height: '80px', width: 'auto', margin: '0 auto 1.5rem', display: 'block', objectFit: 'contain' }} />
@@ -174,7 +176,7 @@ export default async function ConferenciaHome({ params }: { params: Promise<{ sl
             ? `linear-gradient(rgba(0,0,0,.55), rgba(0,0,0,.55)), url('${bannerSrc}') center/cover`
             : sc('hero').bgColor ?? primary,
           color: sc('hero').textoColor ?? '#fff',
-          padding: '5rem 1.5rem',
+          padding: sc('hero').paddingV != null ? `${sc('hero').paddingV}px 1.5rem` : '5rem 1.5rem',
           textAlign: 'center',
           fontSize: sc('hero').fontSize ?? undefined,
         }}>
@@ -208,7 +210,7 @@ export default async function ConferenciaHome({ params }: { params: Promise<{ sl
 
       {/* Fechas importantes */}
       {conf.mostrarFechas && conf.fechasImportantes?.length > 0 && (
-        <div style={{ background: sc('fechas').bgColor ?? secondary, color: sc('fechas').textoColor ?? '#fff', padding: '3rem 1.5rem', fontSize: sc('fechas').fontSize ?? undefined }}>
+        <div style={{ background: sc('fechas').bgColor ?? secondary, color: sc('fechas').textoColor ?? '#fff', padding: sc('fechas').paddingV != null ? `${sc('fechas').paddingV}px 1.5rem` : '3rem 1.5rem', fontSize: sc('fechas').fontSize ?? undefined }}>
           <div style={{ maxWidth: '700px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
             {conf.fechasImportantes.map(f => (
               <div key={f.id} style={{
@@ -234,7 +236,7 @@ export default async function ConferenciaHome({ params }: { params: Promise<{ sl
 
       {/* Descripción + Ejes temáticos */}
       {conf.mostrarDescripcion && (conf.descripcion || conf.ejesTematicos?.length > 0) && (
-        <div style={{ padding: '2.25rem 1.5rem', background: sc('descripcion').bgColor ?? '#f8fafc', fontSize: sc('descripcion').fontSize ?? undefined }}>
+        <div style={{ padding: sc('descripcion').paddingV != null ? `${sc('descripcion').paddingV}px 1.5rem` : '2.25rem 1.5rem', background: sc('descripcion').bgColor ?? '#f8fafc', fontSize: sc('descripcion').fontSize ?? undefined }}>
           <div style={{ maxWidth: '700px', margin: '0 auto' }}>
             {conf.descripcion && (
               <p style={{ fontSize: sc('descripcion').fontSize ?? '1.05rem', lineHeight: 1.7, color: sc('descripcion').textoColor ?? '#334155', marginBottom: conf.ejesTematicos?.length > 0 ? '1.5rem' : 0, textAlign: 'justify' }}>
@@ -268,10 +270,32 @@ export default async function ConferenciaHome({ params }: { params: Promise<{ sl
 
       {/* Organizado por — strip centrado */}
       {conf.mostrarOrganizadores && conf.organizadores?.length > 0 && (
-        <div style={{ background: sc('organizadores').bgColor ?? '#f1f5f9', borderTop: '1px solid rgba(0,0,0,.08)', borderBottom: '1px solid rgba(0,0,0,.08)', padding: '1.25rem 2rem', textAlign: 'center' }}>
+        <div style={{ background: sc('organizadores').bgColor ?? '#f1f5f9', borderTop: '1px solid rgba(0,0,0,.08)', borderBottom: '1px solid rgba(0,0,0,.08)', padding: sc('organizadores').paddingV != null ? `${sc('organizadores').paddingV}px 2rem` : '1.25rem 2rem', textAlign: 'center' }}>
           <p style={{ fontSize: '.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.12em', color: sc('organizadores').textoColor ?? '#64748b', margin: '0 0 .75rem' }}>
             Organizado por
           </p>
+          {sc('organizadores').logoColumnas ? (
+            <div style={{ display: 'grid', gridTemplateColumns: `repeat(${sc('organizadores').logoColumnas}, 1fr)`, gap: '1.5rem', alignItems: 'center', maxWidth: '700px', margin: '0 auto' }}>
+              {conf.organizadores.map(org => {
+                const logoH = sc('organizadores').logoAltura ?? 44;
+                return (
+                  <div key={org.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: `${logoH}px` }}>
+                    {org.logoUrl ? (
+                      <img
+                        src={org.logoUrl.startsWith('http') ? org.logoUrl : `${backend}${org.logoUrl}`}
+                        alt={org.nombre}
+                        style={{ maxHeight: `${logoH}px`, width: 'auto', height: 'auto', objectFit: 'contain', display: 'block' }}
+                      />
+                    ) : (
+                      <span style={{ fontSize: sc('organizadores').fontSize ?? '.8rem', fontWeight: 600, color: sc('organizadores').textoColor ?? '#475569' }}>
+                        {org.nombre}
+                      </span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2rem', alignItems: 'center', justifyContent: 'center' }}>
             {conf.organizadores.map(org => {
               const logoH = sc('organizadores').logoAltura ?? 44;
@@ -292,12 +316,13 @@ export default async function ConferenciaHome({ params }: { params: Promise<{ sl
               );
             })}
           </div>
+          )}
         </div>
       )}
 
       {/* Informes / Contacto */}
       {conf.mostrarContacto && (conf.emailContacto || conf.instagram || conf.contactoAdicional || conf.formularioInscripcionUrl) && (
-        <div style={{ background: sc('contacto').bgColor ?? primary, color: sc('contacto').textoColor ?? '#fff', padding: '1.75rem 1.5rem', fontSize: sc('contacto').fontSize ?? undefined }}>
+        <div style={{ background: sc('contacto').bgColor ?? primary, color: sc('contacto').textoColor ?? '#fff', padding: sc('contacto').paddingV != null ? `${sc('contacto').paddingV}px 1.5rem` : '1.75rem 1.5rem', fontSize: sc('contacto').fontSize ?? undefined }}>
           <div style={{ maxWidth: '700px', margin: '0 auto' }}>
             <p style={{ fontSize: '.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.12em', opacity: .65, margin: '0 0 .875rem', textAlign: 'center' }}>
               Informes y contacto

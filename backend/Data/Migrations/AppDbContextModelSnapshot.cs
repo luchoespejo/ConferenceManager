@@ -503,6 +503,12 @@ namespace ConferenceManager.Data.Migrations
                     b.Property<int?>("LogoAltura")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("LogoColumnas")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("PaddingV")
+                        .HasColumnType("integer");
+
                     b.Property<string>("SeccionKey")
                         .IsRequired()
                         .HasColumnType("text");

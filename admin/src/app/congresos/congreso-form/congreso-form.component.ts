@@ -7,7 +7,6 @@ import {
   signal
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import {
   ReactiveFormsModule,
   FormBuilder,
@@ -51,7 +50,7 @@ function slugFromNombre(nombre: string): string {
   selector: 'app-congreso-form',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink, ImageUploadComponent, TopbarComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, ImageUploadComponent, TopbarComponent],
   template: `
     <div class="page-shell">
       <app-topbar>
@@ -148,14 +147,16 @@ function slugFromNombre(nombre: string): string {
                     @if (getSeccionText('hero')) { <button type="button" (click)="upsertSeccion('hero','textoColor','')" style="background:none;border:none;font-size:.7rem;color:var(--muted);cursor:pointer;padding:0;line-height:1" title="Restablecer">✕</button> }
                   </label>
                   <label style="display:flex;align-items:center;gap:.35rem;font-size:.78rem;color:var(--muted)">
-                    Tamaño
-                    <select [ngModel]="getSeccionFontSize('hero')" (ngModelChange)="upsertSeccion('hero','fontSize',$event||null)" style="font-size:.78rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px;height:22px;background:var(--bg)">
-                      <option value="">Auto</option>
-                      <option value=".85rem">Pequeño</option>
-                      <option value="1rem">Normal</option>
-                      <option value="1.15rem">Grande</option>
-                      <option value="1.3rem">Muy grande</option>
-                    </select>
+                    Texto
+                    <input type="number" min="8" max="72" [value]="getSeccionFontSizePx('hero')"
+                      (change)="upsertSeccion('hero','fontSize',$any($event.target).value ? $any($event.target).value+'px' : null)"
+                      placeholder="auto" style="width:52px;font-size:.78rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px;height:22px;background:var(--bg)" /> px
+                  </label>
+                  <label style="display:flex;align-items:center;gap:.35rem;font-size:.78rem;color:var(--muted)">
+                    Padding
+                    <input type="number" min="0" max="200" [value]="getSeccionPaddingV('hero')"
+                      (change)="upsertSeccion('hero','paddingV',+$any($event.target).value || null)"
+                      placeholder="auto" style="width:52px;font-size:.78rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px;height:22px;background:var(--bg)" /> px
                   </label>
                 </div>
               }
@@ -183,14 +184,16 @@ function slugFromNombre(nombre: string): string {
                     @if (getSeccionText('descripcion')) { <button type="button" (click)="upsertSeccion('descripcion','textoColor','')" style="background:none;border:none;font-size:.7rem;color:var(--muted);cursor:pointer;padding:0;line-height:1" title="Restablecer">✕</button> }
                   </label>
                   <label style="display:flex;align-items:center;gap:.35rem;font-size:.78rem;color:var(--muted)">
-                    Tamaño
-                    <select [ngModel]="getSeccionFontSize('descripcion')" (ngModelChange)="upsertSeccion('descripcion','fontSize',$event||null)" style="font-size:.78rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px;height:22px;background:var(--bg)">
-                      <option value="">Auto</option>
-                      <option value=".85rem">Pequeño</option>
-                      <option value="1rem">Normal</option>
-                      <option value="1.15rem">Grande</option>
-                      <option value="1.3rem">Muy grande</option>
-                    </select>
+                    Texto
+                    <input type="number" min="8" max="72" [value]="getSeccionFontSizePx('descripcion')"
+                      (change)="upsertSeccion('descripcion','fontSize',$any($event.target).value ? $any($event.target).value+'px' : null)"
+                      placeholder="auto" style="width:52px;font-size:.78rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px;height:22px;background:var(--bg)" /> px
+                  </label>
+                  <label style="display:flex;align-items:center;gap:.35rem;font-size:.78rem;color:var(--muted)">
+                    Padding
+                    <input type="number" min="0" max="200" [value]="getSeccionPaddingV('descripcion')"
+                      (change)="upsertSeccion('descripcion','paddingV',+$any($event.target).value || null)"
+                      placeholder="auto" style="width:52px;font-size:.78rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px;height:22px;background:var(--bg)" /> px
                   </label>
                 </div>
               }
@@ -335,14 +338,16 @@ function slugFromNombre(nombre: string): string {
                           @if (getSeccionText('fechas')) { <button type="button" (click)="upsertSeccion('fechas','textoColor','')" style="background:none;border:none;font-size:.7rem;color:var(--muted);cursor:pointer;padding:0;line-height:1" title="Restablecer">✕</button> }
                         </label>
                         <label style="display:flex;align-items:center;gap:.35rem;font-size:.78rem;color:var(--muted)">
-                          Tamaño
-                          <select [ngModel]="getSeccionFontSize('fechas')" (ngModelChange)="upsertSeccion('fechas','fontSize',$event||null)" style="font-size:.78rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px;height:22px;background:var(--bg)">
-                            <option value="">Auto</option>
-                            <option value=".85rem">Pequeño</option>
-                            <option value="1rem">Normal</option>
-                            <option value="1.15rem">Grande</option>
-                            <option value="1.3rem">Muy grande</option>
-                          </select>
+                          Texto
+                          <input type="number" min="8" max="72" [value]="getSeccionFontSizePx('fechas')"
+                            (change)="upsertSeccion('fechas','fontSize',$any($event.target).value ? $any($event.target).value+'px' : null)"
+                            placeholder="auto" style="width:52px;font-size:.78rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px;height:22px;background:var(--bg)" /> px
+                        </label>
+                        <label style="display:flex;align-items:center;gap:.35rem;font-size:.78rem;color:var(--muted)">
+                          Padding
+                          <input type="number" min="0" max="200" [value]="getSeccionPaddingV('fechas')"
+                            (change)="upsertSeccion('fechas','paddingV',+$any($event.target).value || null)"
+                            placeholder="auto" style="width:52px;font-size:.78rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px;height:22px;background:var(--bg)" /> px
                         </label>
                       </div>
                     </div>
@@ -396,6 +401,18 @@ function slugFromNombre(nombre: string): string {
                           <input type="number" min="24" max="160" [value]="getSeccionLogoAltura('organizadores')"
                             (change)="upsertSeccion('organizadores','logoAltura',+$any($event.target).value || null)"
                             style="width:54px;font-size:.78rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px;height:22px;background:var(--bg)" /> px
+                        </label>
+                        <label style="display:flex;align-items:center;gap:.35rem;font-size:.78rem;color:var(--muted)">
+                          Col/fila
+                          <input type="number" min="1" max="8" [value]="getSeccionLogoColumnas('organizadores')"
+                            (change)="upsertSeccion('organizadores','logoColumnas',+$any($event.target).value || null)"
+                            placeholder="auto" style="width:44px;font-size:.78rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px;height:22px;background:var(--bg)" />
+                        </label>
+                        <label style="display:flex;align-items:center;gap:.35rem;font-size:.78rem;color:var(--muted)">
+                          Padding
+                          <input type="number" min="0" max="200" [value]="getSeccionPaddingV('organizadores')"
+                            (change)="upsertSeccion('organizadores','paddingV',+$any($event.target).value || null)"
+                            placeholder="auto" style="width:52px;font-size:.78rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px;height:22px;background:var(--bg)" /> px
                         </label>
                       </div>
                     </div>
@@ -472,14 +489,16 @@ function slugFromNombre(nombre: string): string {
                           @if (getSeccionText('contacto')) { <button type="button" (click)="upsertSeccion('contacto','textoColor','')" style="background:none;border:none;font-size:.7rem;color:var(--muted);cursor:pointer;padding:0;line-height:1" title="Restablecer">✕</button> }
                         </label>
                         <label style="display:flex;align-items:center;gap:.35rem;font-size:.78rem;color:var(--muted)">
-                          Tamaño
-                          <select [ngModel]="getSeccionFontSize('contacto')" (ngModelChange)="upsertSeccion('contacto','fontSize',$event||null)" style="font-size:.78rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px;height:22px;background:var(--bg)">
-                            <option value="">Auto</option>
-                            <option value=".85rem">Pequeño</option>
-                            <option value="1rem">Normal</option>
-                            <option value="1.15rem">Grande</option>
-                            <option value="1.3rem">Muy grande</option>
-                          </select>
+                          Texto
+                          <input type="number" min="8" max="72" [value]="getSeccionFontSizePx('contacto')"
+                            (change)="upsertSeccion('contacto','fontSize',$any($event.target).value ? $any($event.target).value+'px' : null)"
+                            placeholder="auto" style="width:52px;font-size:.78rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px;height:22px;background:var(--bg)" /> px
+                        </label>
+                        <label style="display:flex;align-items:center;gap:.35rem;font-size:.78rem;color:var(--muted)">
+                          Padding
+                          <input type="number" min="0" max="200" [value]="getSeccionPaddingV('contacto')"
+                            (change)="upsertSeccion('contacto','paddingV',+$any($event.target).value || null)"
+                            placeholder="auto" style="width:52px;font-size:.78rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px;height:22px;background:var(--bg)" /> px
                         </label>
                       </div>
                     </div>
@@ -547,14 +566,16 @@ function slugFromNombre(nombre: string): string {
                           @if (getSeccionText('inscripciones')) { <button type="button" (click)="upsertSeccion('inscripciones','textoColor','')" style="background:none;border:none;font-size:.7rem;color:var(--muted);cursor:pointer;padding:0;line-height:1" title="Restablecer">✕</button> }
                         </label>
                         <label style="display:flex;align-items:center;gap:.35rem;font-size:.78rem;color:var(--muted)">
-                          Tamaño
-                          <select [ngModel]="getSeccionFontSize('inscripciones')" (ngModelChange)="upsertSeccion('inscripciones','fontSize',$event||null)" style="font-size:.78rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px;height:22px;background:var(--bg)">
-                            <option value="">Auto</option>
-                            <option value=".85rem">Pequeño</option>
-                            <option value="1rem">Normal</option>
-                            <option value="1.15rem">Grande</option>
-                            <option value="1.3rem">Muy grande</option>
-                          </select>
+                          Texto
+                          <input type="number" min="8" max="72" [value]="getSeccionFontSizePx('inscripciones')"
+                            (change)="upsertSeccion('inscripciones','fontSize',$any($event.target).value ? $any($event.target).value+'px' : null)"
+                            placeholder="auto" style="width:52px;font-size:.78rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px;height:22px;background:var(--bg)" /> px
+                        </label>
+                        <label style="display:flex;align-items:center;gap:.35rem;font-size:.78rem;color:var(--muted)">
+                          Padding
+                          <input type="number" min="0" max="200" [value]="getSeccionPaddingV('inscripciones')"
+                            (change)="upsertSeccion('inscripciones','paddingV',+$any($event.target).value || null)"
+                            placeholder="auto" style="width:52px;font-size:.78rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px;height:22px;background:var(--bg)" /> px
                         </label>
                       </div>
                     </div>
@@ -779,13 +800,20 @@ export class CongresoFormComponent implements OnInit, OnDestroy {
 
   getSeccionBg(key: string): string { return this.seccionConfigs()[key]?.bgColor ?? ''; }
   getSeccionText(key: string): string { return this.seccionConfigs()[key]?.textoColor ?? ''; }
-  getSeccionFontSize(key: string): string { return this.seccionConfigs()[key]?.fontSize ?? ''; }
+  getSeccionFontSizePx(key: string): number | null {
+    const v = this.seccionConfigs()[key]?.fontSize;
+    if (!v) return null;
+    const m = v.match(/^(\d+(?:\.\d+)?)px$/);
+    return m ? +m[1] : null;
+  }
   getSeccionLogoAltura(key: string): number { return this.seccionConfigs()[key]?.logoAltura ?? 44; }
+  getSeccionLogoColumnas(key: string): number | null { return this.seccionConfigs()[key]?.logoColumnas ?? null; }
+  getSeccionPaddingV(key: string): number | null { return this.seccionConfigs()[key]?.paddingV ?? null; }
 
-  upsertSeccion(key: string, field: 'bgColor' | 'textoColor' | 'fontSize' | 'logoAltura', value: string | number | null): void {
+  upsertSeccion(key: string, field: 'bgColor' | 'textoColor' | 'fontSize' | 'logoAltura' | 'logoColumnas' | 'paddingV', value: string | number | null): void {
     if (!this.id) return;
-    const current = this.seccionConfigs()[key] ?? { seccionKey: key, bgColor: null, textoColor: null, fontSize: null, logoAltura: null };
-    const dto = { bgColor: current.bgColor, textoColor: current.textoColor, fontSize: current.fontSize, logoAltura: current.logoAltura, [field]: value || null };
+    const current = this.seccionConfigs()[key] ?? { seccionKey: key, bgColor: null, textoColor: null, fontSize: null, logoAltura: null, logoColumnas: null, paddingV: null };
+    const dto = { bgColor: current.bgColor, textoColor: current.textoColor, fontSize: current.fontSize, logoAltura: current.logoAltura, logoColumnas: current.logoColumnas, paddingV: current.paddingV, [field]: value || null };
     this.congresoService.upsertSeccion(this.id, key, dto).subscribe(saved => {
       this.seccionConfigs.update(m => ({ ...m, [key]: saved }));
     });

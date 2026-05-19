@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 interface ArancelFila { categoria: string; monto: string; }
 interface ArancelesData { filas: ArancelFila[]; nota?: string; }
 
-interface SeccionConfig { seccionKey: string; bgColor?: string | null; textoColor?: string | null; fontSize?: string | null; }
+interface SeccionConfig { seccionKey: string; bgColor?: string | null; textoColor?: string | null; fontSize?: string | null; paddingV?: number | null; }
 
 interface Conferencia {
   slug: string;
@@ -68,7 +68,7 @@ export default async function InscripcionesPage({ params }: { params: Promise<{ 
 
   return (
     <div style={{ background: pageBg, minHeight: '100vh', fontSize: pageFontSize }}>
-    <div style={{ maxWidth: '760px', margin: '0 auto', padding: '3rem 1.5rem' }}>
+    <div style={{ maxWidth: '760px', margin: '0 auto', padding: sc('inscripciones').paddingV != null ? `${sc('inscripciones').paddingV}px 1.5rem` : '3rem 1.5rem' }}>
       <h1 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '2.5rem', color: pageColor }}>
         Inscripciones
       </h1>

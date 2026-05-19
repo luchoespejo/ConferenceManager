@@ -6,6 +6,8 @@ export interface SeccionConfigDto {
   textoColor: string | null;
   fontSize: string | null;
   logoAltura: number | null;
+  logoColumnas: number | null;
+  paddingV: number | null;
 }
 
 export interface CongresoListItemDto {

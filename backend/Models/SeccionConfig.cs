@@ -13,6 +13,10 @@ public class SeccionConfig
     public string? FontSize { get; set; }
     /// <summary>Logo height in px for the organizadores section (default 44)</summary>
     public int? LogoAltura { get; set; }
+    /// <summary>Logos per row in the organizadores section</summary>
+    public int? LogoColumnas { get; set; }
+    /// <summary>Vertical padding override in px</summary>
+    public int? PaddingV { get; set; }
 
     public Conferencia Conferencia { get; set; } = null!;
 }

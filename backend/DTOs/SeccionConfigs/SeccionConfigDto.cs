@@ -7,6 +7,8 @@ public class SeccionConfigDto
     public string? TextoColor { get; set; }
     public string? FontSize { get; set; }
     public int? LogoAltura { get; set; }
+    public int? LogoColumnas { get; set; }
+    public int? PaddingV { get; set; }
 }
 
 public class UpsertSeccionConfigDto
@@ -15,4 +17,6 @@ public class UpsertSeccionConfigDto
     public string? TextoColor { get; set; }
     public string? FontSize { get; set; }
     public int? LogoAltura { get; set; }
+    public int? LogoColumnas { get; set; }
+    public int? PaddingV { get; set; }
 }

@@ -25,7 +25,7 @@ public class SeccionConfigsController(AppDbContext db) : ControllerBase
 
         var lista = await db.SeccionConfigs.AsNoTracking()
             .Where(s => s.ConferenciaId == conferenciaId)
-            .Select(s => new SeccionConfigDto { SeccionKey = s.SeccionKey, BgColor = s.BgColor, TextoColor = s.TextoColor, FontSize = s.FontSize, LogoAltura = s.LogoAltura })
+            .Select(s => new SeccionConfigDto { SeccionKey = s.SeccionKey, BgColor = s.BgColor, TextoColor = s.TextoColor, FontSize = s.FontSize, LogoAltura = s.LogoAltura, LogoColumnas = s.LogoColumnas, PaddingV = s.PaddingV })
             .ToListAsync();
 
         return Ok(lista);
@@ -51,9 +51,11 @@ public class SeccionConfigsController(AppDbContext db) : ControllerBase
         seccion.TextoColor = string.IsNullOrEmpty(dto.TextoColor) ? null : dto.TextoColor;
         seccion.FontSize = string.IsNullOrEmpty(dto.FontSize) ? null : dto.FontSize;
         seccion.LogoAltura = dto.LogoAltura;
+        seccion.LogoColumnas = dto.LogoColumnas;
+        seccion.PaddingV = dto.PaddingV;
 
         await db.SaveChangesAsync();
 
-        return Ok(new SeccionConfigDto { SeccionKey = seccion.SeccionKey, BgColor = seccion.BgColor, TextoColor = seccion.TextoColor, FontSize = seccion.FontSize, LogoAltura = seccion.LogoAltura });
+        return Ok(new SeccionConfigDto { SeccionKey = seccion.SeccionKey, BgColor = seccion.BgColor, TextoColor = seccion.TextoColor, FontSize = seccion.FontSize, LogoAltura = seccion.LogoAltura, LogoColumnas = seccion.LogoColumnas, PaddingV = seccion.PaddingV });
     }
 }

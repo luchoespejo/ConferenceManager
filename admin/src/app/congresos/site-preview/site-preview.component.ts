@@ -230,7 +230,7 @@ export class SitePreviewComponent implements OnInit {
   bannerSrc = computed(() => this.resolveUrl(this.data()?.conf.bannerUrl));
 
   sc(key: string): SeccionConfigDto {
-    return this.data()?.secciones[key] ?? { seccionKey: key, bgColor: null, textoColor: null, fontSize: null, logoAltura: null };
+    return this.data()?.secciones[key] ?? { seccionKey: key, bgColor: null, textoColor: null, fontSize: null, logoAltura: null, logoColumnas: null, paddingV: null };
   }
 
   ngOnInit(): void {
