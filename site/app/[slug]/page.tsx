@@ -7,6 +7,8 @@ interface SeccionConfig {
   seccionKey: string;
   bgColor?: string | null;
   textoColor?: string | null;
+  fontSize?: string | null;
+  logoAltura?: number | null;
 }
 
 interface Organizador {
@@ -117,14 +119,9 @@ export default async function ConferenciaHome({ params }: { params: Promise<{ sl
   const btnSolid = { ...btnBase, background: esDecorativo ? primary : '#fff', color: esDecorativo ? '#fff' : primary, border: '2px solid transparent' };
   const btnOutline = { ...btnBase, background: 'transparent', border: `2px solid ${esDecorativo ? primary : 'rgba(255,255,255,.85)'}`, color: esDecorativo ? primary : '#fff' };
 
-  const heroBtns = (conf.tieneSesiones || conf.mostrarInscripciones) ? (
+  const heroBtns = conf.tieneSesiones ? (
     <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap', marginTop: '1.5rem' }}>
-      {conf.tieneSesiones && (
-        <Link href={`/${slug}/programa`} style={btnSolid}>Ver Programa</Link>
-      )}
-      {conf.mostrarInscripciones && (
-        <Link href={`/${slug}/inscripciones`} style={btnOutline}>Inscribirse</Link>
-      )}
+      <Link href={`/${slug}/programa`} style={btnSolid}>Ver Programa</Link>
     </div>
   ) : null;
 
@@ -210,7 +207,7 @@ export default async function ConferenciaHome({ params }: { params: Promise<{ sl
 
       {/* Fechas importantes */}
       {conf.mostrarFechas && conf.fechasImportantes?.length > 0 && (
-        <div style={{ background: sc('fechas').bgColor ?? secondary, color: sc('fechas').textoColor ?? '#fff', padding: '3rem 1.5rem' }}>
+        <div style={{ background: sc('fechas').bgColor ?? secondary, color: sc('fechas').textoColor ?? '#fff', padding: '3rem 1.5rem', fontSize: sc('fechas').fontSize ?? undefined }}>
           <div style={{ maxWidth: '700px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
             {conf.fechasImportantes.map(f => (
               <div key={f.id} style={{
@@ -236,10 +233,10 @@ export default async function ConferenciaHome({ params }: { params: Promise<{ sl
 
       {/* Descripción + Ejes temáticos */}
       {conf.mostrarDescripcion && (conf.descripcion || conf.ejesTematicos?.length > 0) && (
-        <div style={{ padding: '4rem 1.5rem', background: sc('descripcion').bgColor ?? '#f8fafc' }}>
+        <div style={{ padding: '4rem 1.5rem', background: sc('descripcion').bgColor ?? '#f8fafc', fontSize: sc('descripcion').fontSize ?? undefined }}>
           <div style={{ maxWidth: '700px', margin: '0 auto' }}>
             {conf.descripcion && (
-              <p style={{ fontSize: '1.05rem', lineHeight: 1.7, color: sc('descripcion').textoColor ?? '#334155', marginBottom: '2rem', textAlign: 'justify' }}>
+              <p style={{ fontSize: sc('descripcion').fontSize ?? '1.05rem', lineHeight: 1.7, color: sc('descripcion').textoColor ?? '#334155', marginBottom: '2rem', textAlign: 'justify' }}>
                 {conf.descripcion}
               </p>
             )}
@@ -270,76 +267,73 @@ export default async function ConferenciaHome({ params }: { params: Promise<{ sl
 
       {/* Organizado por — strip centrado */}
       {conf.mostrarOrganizadores && conf.organizadores?.length > 0 && (
-        <div style={{ background: sc('organizadores').bgColor ?? '#f1f5f9', borderTop: '1px solid rgba(0,0,0,.08)', borderBottom: '1px solid rgba(0,0,0,.08)', padding: '1rem 2rem', textAlign: 'center' }}>
+        <div style={{ background: sc('organizadores').bgColor ?? '#f1f5f9', borderTop: '1px solid rgba(0,0,0,.08)', borderBottom: '1px solid rgba(0,0,0,.08)', padding: '1.25rem 2rem', textAlign: 'center' }}>
           <p style={{ fontSize: '.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.12em', color: sc('organizadores').textoColor ?? '#64748b', margin: '0 0 .75rem' }}>
             Organizado por
           </p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2rem', alignItems: 'center', justifyContent: 'center' }}>
-              {conf.organizadores.map(org => (
-                <div key={org.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '44px' }}>
+            {conf.organizadores.map(org => {
+              const logoH = sc('organizadores').logoAltura ?? 44;
+              return (
+                <div key={org.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: `${logoH}px` }}>
                   {org.logoUrl ? (
                     <img
                       src={org.logoUrl.startsWith('http') ? org.logoUrl : `${backend}${org.logoUrl}`}
                       alt={org.nombre}
-                      style={{ maxWidth: '100px', maxHeight: '44px', width: 'auto', height: 'auto', objectFit: 'contain', display: 'block' }}
+                      style={{ maxHeight: `${logoH}px`, width: 'auto', height: 'auto', objectFit: 'contain', display: 'block' }}
                     />
                   ) : (
-                    <span style={{ fontSize: '.8rem', fontWeight: 600, color: sc('organizadores').textoColor ?? '#475569' }}>
+                    <span style={{ fontSize: sc('organizadores').fontSize ?? '.8rem', fontWeight: 600, color: sc('organizadores').textoColor ?? '#475569' }}>
                       {org.nombre}
                     </span>
                   )}
                 </div>
-              ))}
-            </div>
+              );
+            })}
+          </div>
         </div>
       )}
 
       {/* Informes / Contacto */}
-      {conf.mostrarContacto && (conf.emailContacto || conf.instagram || conf.contactoAdicional) && (
-        <div style={{ background: sc('contacto').bgColor ?? primary, color: sc('contacto').textoColor ?? '#fff', padding: '3.5rem 1.5rem', textAlign: 'center' }}>
+      {conf.mostrarContacto && (conf.emailContacto || conf.instagram || conf.contactoAdicional || conf.formularioInscripcionUrl) && (
+        <div style={{ background: sc('contacto').bgColor ?? primary, color: sc('contacto').textoColor ?? '#fff', padding: '3.5rem 1.5rem', textAlign: 'center', fontSize: sc('contacto').fontSize ?? undefined }}>
           <div style={{ maxWidth: '600px', margin: '0 auto' }}>
             <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1.5rem' }}>Informes</h2>
             {conf.emailContacto && (
-              <p style={{ marginBottom: '.75rem', fontSize: '1.05rem' }}>
-                <a href={`mailto:${conf.emailContacto}`} style={{ color: '#fff', fontWeight: 600 }}>
-                  {conf.emailContacto}
+              <p style={{ marginBottom: '.75rem', fontSize: sc('contacto').fontSize ?? '1.05rem' }}>
+                <a href={`mailto:${conf.emailContacto}`} style={{ color: sc('contacto').textoColor ?? '#fff', fontWeight: 600 }}>
+                  ✉ {conf.emailContacto}
                 </a>
               </p>
             )}
             {conf.instagram && (
-              <p style={{ marginBottom: '.75rem', fontSize: '1.05rem' }}>
+              <p style={{ marginBottom: '.75rem', fontSize: sc('contacto').fontSize ?? '1.05rem' }}>
                 <a
                   href={`https://instagram.com/${conf.instagram}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ color: '#fff', fontWeight: 600 }}
+                  style={{ color: sc('contacto').textoColor ?? '#fff', fontWeight: 600 }}
                 >
-                  @{conf.instagram}
+                  📷 @{conf.instagram}
+                </a>
+              </p>
+            )}
+            {conf.formularioInscripcionUrl && (
+              <p style={{ marginBottom: '.75rem', fontSize: sc('contacto').fontSize ?? '1.05rem' }}>
+                <a
+                  href={conf.formularioInscripcionUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: sc('contacto').textoColor ?? '#fff', fontWeight: 600 }}
+                >
+                  📝 Formulario de inscripción
                 </a>
               </p>
             )}
             {conf.contactoAdicional && (
-              <p style={{ marginTop: '1rem', fontSize: '.95rem', opacity: .85, whiteSpace: 'pre-line' }}>
+              <p style={{ marginTop: '1rem', fontSize: sc('contacto').fontSize ?? '.95rem', opacity: .85, whiteSpace: 'pre-line' }}>
                 {conf.contactoAdicional}
               </p>
-            )}
-            {conf.mostrarInscripciones && (
-              <Link
-                href={`/${slug}/inscripciones`}
-                style={{
-                  display: 'inline-block',
-                  marginTop: '1.5rem',
-                  background: '#fff',
-                  color: primary,
-                  fontWeight: 700,
-                  padding: '12px 28px',
-                  borderRadius: '8px',
-                  textDecoration: 'none',
-                  fontSize: '1rem'
-                }}
-              >
-                Ver información de inscripción
-              </Link>
             )}
           </div>
         </div>

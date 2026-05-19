@@ -141,6 +141,16 @@ function slugFromNombre(nombre: string): string {
                     @if (getSeccionText('hero')) { <button type="button" (click)="upsertSeccion('hero','textoColor','')" style="background:none;border:none;font-size:.75rem;color:var(--muted);cursor:pointer;padding:0" title="Reset">✕</button> }
                     @if (!getSeccionText('hero')) { <span style="font-size:.75rem;color:var(--muted)">(auto)</span> }
                   </label>
+                  <label style="display:flex;align-items:center;gap:.4rem;font-size:.8rem">
+                    Tamaño texto
+                    <select [value]="getSeccionFontSize('hero')" (change)="upsertSeccion('hero','fontSize',$any($event.target).value)" style="font-size:.8rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px">
+                      <option value="">Auto</option>
+                      <option value=".85rem">Pequeño</option>
+                      <option value="1rem">Normal</option>
+                      <option value="1.15rem">Grande</option>
+                      <option value="1.3rem">Muy grande</option>
+                    </select>
+                  </label>
                 </div>
               }
             </div>
@@ -164,6 +174,16 @@ function slugFromNombre(nombre: string): string {
                     Texto <input type="color" [value]="getSeccionText('descripcion') || '#334155'" (change)="upsertSeccion('descripcion','textoColor',$any($event.target).value)" style="width:30px;height:22px;border:1px solid var(--border);border-radius:4px;cursor:pointer;padding:1px" />
                     @if (getSeccionText('descripcion')) { <button type="button" (click)="upsertSeccion('descripcion','textoColor','')" style="background:none;border:none;font-size:.75rem;color:var(--muted);cursor:pointer;padding:0" title="Reset">✕</button> }
                     @if (!getSeccionText('descripcion')) { <span style="font-size:.75rem;color:var(--muted)">(auto)</span> }
+                  </label>
+                  <label style="display:flex;align-items:center;gap:.4rem;font-size:.8rem">
+                    Tamaño texto
+                    <select [value]="getSeccionFontSize('descripcion')" (change)="upsertSeccion('descripcion','fontSize',$any($event.target).value)" style="font-size:.8rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px">
+                      <option value="">Auto</option>
+                      <option value=".85rem">Pequeño</option>
+                      <option value="1rem">Normal</option>
+                      <option value="1.15rem">Grande</option>
+                      <option value="1.3rem">Muy grande</option>
+                    </select>
                   </label>
                 </div>
               }
@@ -339,6 +359,16 @@ function slugFromNombre(nombre: string): string {
                           Texto <input type="color" [value]="getSeccionText('fechas') || '#ffffff'" (change)="upsertSeccion('fechas','textoColor',$any($event.target).value)" style="width:30px;height:22px;border:1px solid var(--border);border-radius:4px;cursor:pointer;padding:1px" />
                           @if (getSeccionText('fechas')) { <button type="button" (click)="upsertSeccion('fechas','textoColor','')" style="background:none;border:none;font-size:.75rem;color:var(--muted);cursor:pointer;padding:0" title="Reset">✕</button> }
                         </label>
+                        <label style="display:flex;align-items:center;gap:.4rem;font-size:.8rem">
+                          Tamaño texto
+                          <select [value]="getSeccionFontSize('fechas')" (change)="upsertSeccion('fechas','fontSize',$any($event.target).value)" style="font-size:.8rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px">
+                            <option value="">Auto</option>
+                            <option value=".85rem">Pequeño</option>
+                            <option value="1rem">Normal</option>
+                            <option value="1.15rem">Grande</option>
+                            <option value="1.3rem">Muy grande</option>
+                          </select>
+                        </label>
                       </div>
                     </div>
                   }
@@ -384,6 +414,12 @@ function slugFromNombre(nombre: string): string {
                         <label style="display:flex;align-items:center;gap:.4rem;font-size:.8rem">
                           Texto <input type="color" [value]="getSeccionText('organizadores') || '#1e293b'" (change)="upsertSeccion('organizadores','textoColor',$any($event.target).value)" style="width:30px;height:22px;border:1px solid var(--border);border-radius:4px;cursor:pointer;padding:1px" />
                           @if (getSeccionText('organizadores')) { <button type="button" (click)="upsertSeccion('organizadores','textoColor','')" style="background:none;border:none;font-size:.75rem;color:var(--muted);cursor:pointer;padding:0" title="Reset">✕</button> }
+                        </label>
+                        <label style="display:flex;align-items:center;gap:.4rem;font-size:.8rem">
+                          Altura logos
+                          <input type="number" min="24" max="160" [value]="getSeccionLogoAltura('organizadores')"
+                            (change)="upsertSeccion('organizadores','logoAltura',+$any($event.target).value || null)"
+                            style="width:60px;font-size:.8rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px" /> px
                         </label>
                       </div>
                     </div>
@@ -448,6 +484,16 @@ function slugFromNombre(nombre: string): string {
                           Texto <input type="color" [value]="getSeccionText('contacto') || '#ffffff'" (change)="upsertSeccion('contacto','textoColor',$any($event.target).value)" style="width:30px;height:22px;border:1px solid var(--border);border-radius:4px;cursor:pointer;padding:1px" />
                           @if (getSeccionText('contacto')) { <button type="button" (click)="upsertSeccion('contacto','textoColor','')" style="background:none;border:none;font-size:.75rem;color:var(--muted);cursor:pointer;padding:0" title="Reset">✕</button> }
                         </label>
+                        <label style="display:flex;align-items:center;gap:.4rem;font-size:.8rem">
+                          Tamaño texto
+                          <select [value]="getSeccionFontSize('contacto')" (change)="upsertSeccion('contacto','fontSize',$any($event.target).value)" style="font-size:.8rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px">
+                            <option value="">Auto</option>
+                            <option value=".85rem">Pequeño</option>
+                            <option value="1rem">Normal</option>
+                            <option value="1.15rem">Grande</option>
+                            <option value="1.3rem">Muy grande</option>
+                          </select>
+                        </label>
                       </div>
                     </div>
                   }
@@ -507,6 +553,16 @@ function slugFromNombre(nombre: string): string {
                         <label style="display:flex;align-items:center;gap:.4rem;font-size:.8rem">
                           Texto <input type="color" [value]="getSeccionText('inscripciones') || '#1e293b'" (change)="upsertSeccion('inscripciones','textoColor',$any($event.target).value)" style="width:30px;height:22px;border:1px solid var(--border);border-radius:4px;cursor:pointer;padding:1px" />
                           @if (getSeccionText('inscripciones')) { <button type="button" (click)="upsertSeccion('inscripciones','textoColor','')" style="background:none;border:none;font-size:.75rem;color:var(--muted);cursor:pointer;padding:0" title="Reset">✕</button> }
+                        </label>
+                        <label style="display:flex;align-items:center;gap:.4rem;font-size:.8rem">
+                          Tamaño texto
+                          <select [value]="getSeccionFontSize('inscripciones')" (change)="upsertSeccion('inscripciones','fontSize',$any($event.target).value)" style="font-size:.8rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px">
+                            <option value="">Auto</option>
+                            <option value=".85rem">Pequeño</option>
+                            <option value="1rem">Normal</option>
+                            <option value="1.15rem">Grande</option>
+                            <option value="1.3rem">Muy grande</option>
+                          </select>
                         </label>
                       </div>
                     </div>
@@ -731,11 +787,13 @@ export class CongresoFormComponent implements OnInit, OnDestroy {
 
   getSeccionBg(key: string): string { return this.seccionConfigs()[key]?.bgColor ?? ''; }
   getSeccionText(key: string): string { return this.seccionConfigs()[key]?.textoColor ?? ''; }
+  getSeccionFontSize(key: string): string { return this.seccionConfigs()[key]?.fontSize ?? ''; }
+  getSeccionLogoAltura(key: string): number { return this.seccionConfigs()[key]?.logoAltura ?? 44; }
 
-  upsertSeccion(key: string, field: 'bgColor' | 'textoColor', value: string): void {
+  upsertSeccion(key: string, field: 'bgColor' | 'textoColor' | 'fontSize' | 'logoAltura', value: string | number | null): void {
     if (!this.id) return;
-    const current = this.seccionConfigs()[key] ?? { seccionKey: key, bgColor: null, textoColor: null };
-    const dto = { bgColor: current.bgColor, textoColor: current.textoColor, [field]: value || null };
+    const current = this.seccionConfigs()[key] ?? { seccionKey: key, bgColor: null, textoColor: null, fontSize: null, logoAltura: null };
+    const dto = { bgColor: current.bgColor, textoColor: current.textoColor, fontSize: current.fontSize, logoAltura: current.logoAltura, [field]: value || null };
     this.congresoService.upsertSeccion(this.id, key, dto).subscribe(saved => {
       this.seccionConfigs.update(m => ({ ...m, [key]: saved }));
     });

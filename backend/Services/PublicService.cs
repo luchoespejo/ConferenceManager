@@ -57,6 +57,8 @@ public class PublicService(AppDbContext context) : IPublicService
                 SeccionKey = s.SeccionKey,
                 BgColor = s.BgColor,
                 TextoColor = s.TextoColor,
+                FontSize = s.FontSize,
+                LogoAltura = s.LogoAltura,
             }).ToList(),
             MostrarFechas = conferencia.MostrarFechas,
             MostrarDescripcion = conferencia.MostrarDescripcion,

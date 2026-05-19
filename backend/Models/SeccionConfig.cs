@@ -10,6 +10,9 @@ public class SeccionConfig
 
     public string? BgColor { get; set; }
     public string? TextoColor { get; set; }
+    public string? FontSize { get; set; }
+    /// <summary>Logo height in px for the organizadores section (default 44)</summary>
+    public int? LogoAltura { get; set; }
 
     public Conferencia Conferencia { get; set; } = null!;
 }

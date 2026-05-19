@@ -4,6 +4,8 @@ export interface SeccionConfigDto {
   seccionKey: string;
   bgColor: string | null;
   textoColor: string | null;
+  fontSize: string | null;
+  logoAltura: number | null;
 }
 
 export interface CongresoListItemDto {

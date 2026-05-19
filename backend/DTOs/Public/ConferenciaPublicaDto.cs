@@ -5,6 +5,8 @@ public class SeccionConfigPublicaDto
     public string SeccionKey { get; set; } = null!;
     public string? BgColor { get; set; }
     public string? TextoColor { get; set; }
+    public string? FontSize { get; set; }
+    public int? LogoAltura { get; set; }
 }
 
 public class OrganizadorPublicoDto
