@@ -133,38 +133,41 @@ function slugFromNombre(nombre: string): string {
                 <div class="error-msg" style="margin-bottom:.75rem">{{ fechasError() }}</div>
               }
               @if (id) {
-                <div style="margin-top:.875rem;display:flex;align-items:center;gap:.875rem;flex-wrap:wrap;padding:.625rem 1rem;background:rgba(0,0,0,.22);border-radius:6px;border:1px solid var(--border)">
-                  <span style="font-size:.58rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;opacity:.55;white-space:nowrap">Hero</span>
-                  <div style="width:1px;height:12px;background:var(--border);opacity:.4;flex-shrink:0"></div>
-                  <label style="display:flex;align-items:center;gap:.3rem;font-size:.72rem;color:var(--muted);cursor:pointer">
-                    Fondo
-                    <input type="color" [value]="getSeccionBg('hero') || '#1a1a2e'" (change)="upsertSeccion('hero','bgColor',$any($event.target).value)" style="width:24px;height:20px;padding:1px;border:1px solid var(--border);border-radius:4px;cursor:pointer;vertical-align:middle" />
-                    @if (getSeccionBg('hero')) { <button type="button" (click)="upsertSeccion('hero','bgColor','')" style="background:none;border:none;font-size:.62rem;color:var(--muted);cursor:pointer;padding:0;line-height:1;opacity:.55" title="Restablecer">✕</button> }
-                  </label>
-                  <label style="display:flex;align-items:center;gap:.3rem;font-size:.72rem;color:var(--muted);cursor:pointer">
-                    Texto
-                    <input type="color" [value]="getSeccionText('hero') || '#ffffff'" (change)="upsertSeccion('hero','textoColor',$any($event.target).value)" style="width:24px;height:20px;padding:1px;border:1px solid var(--border);border-radius:4px;cursor:pointer;vertical-align:middle" />
-                    @if (getSeccionText('hero')) { <button type="button" (click)="upsertSeccion('hero','textoColor','')" style="background:none;border:none;font-size:.62rem;color:var(--muted);cursor:pointer;padding:0;line-height:1;opacity:.55" title="Restablecer">✕</button> }
-                  </label>
-                  <div style="width:1px;height:12px;background:var(--border);opacity:.4;flex-shrink:0"></div>
-                  <label style="display:flex;align-items:center;gap:.3rem;font-size:.72rem;color:var(--muted)" title="Tamaño de fuente">
-                    T
-                    <div style="position:relative;display:inline-flex;align-items:center">
-                      <input type="number" min="0.5" max="5" step="0.05" [value]="getSeccionFontSizeRem('hero')"
-                        (input)="upsertSeccionFontRem('hero', $any($event.target).value)"
-                        placeholder="–" style="width:58px;font-size:.72rem;padding:2px 26px 2px 5px;border:1px solid var(--border);border-radius:4px;height:21px;background:var(--surface2);color:var(--text)" />
-                      <span style="position:absolute;right:4px;font-size:.56rem;color:var(--muted);pointer-events:none;font-weight:700;opacity:.6">rem</span>
-                    </div>
-                  </label>
-                  <label style="display:flex;align-items:center;gap:.3rem;font-size:.72rem;color:var(--muted)" title="Padding vertical">
-                    ↕
-                    <div style="position:relative;display:inline-flex;align-items:center">
-                      <input type="number" min="0" max="12" step="0.25" [value]="getSeccionPaddingVRem('hero')"
-                        (input)="upsertSeccionPaddingRem('hero', $any($event.target).value)"
-                        placeholder="–" style="width:58px;font-size:.72rem;padding:2px 26px 2px 5px;border:1px solid var(--border);border-radius:4px;height:21px;background:var(--surface2);color:var(--text)" />
-                      <span style="position:absolute;right:4px;font-size:.56rem;color:var(--muted);pointer-events:none;font-weight:700;opacity:.6">rem</span>
-                    </div>
-                  </label>
+                <div style="margin-top:.875rem;background:rgba(0,0,0,.22);border-radius:6px;border:1px solid var(--border);padding:.875rem 1rem;display:flex;flex-direction:column;gap:.75rem">
+                  <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
+                    <span style="font-size:.65rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;opacity:.7;white-space:nowrap">Hero</span>
+                    <div style="width:1px;height:16px;background:var(--border);opacity:.4;flex-shrink:0"></div>
+                    <label style="display:flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--muted);cursor:pointer">
+                      Fondo
+                      <input type="color" [value]="getSeccionBg('hero') || '#1a1a2e'" (change)="upsertSeccion('hero','bgColor',$any($event.target).value)" style="width:34px;height:30px;padding:2px;border:1px solid var(--border);border-radius:5px;cursor:pointer;vertical-align:middle" />
+                      @if (getSeccionBg('hero')) { <button type="button" (click)="upsertSeccion('hero','bgColor','')" style="background:none;border:none;font-size:.75rem;color:var(--muted);cursor:pointer;padding:0;line-height:1;opacity:.6" title="Restablecer">✕</button> }
+                    </label>
+                    <label style="display:flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--muted);cursor:pointer">
+                      Texto
+                      <input type="color" [value]="getSeccionText('hero') || '#ffffff'" (change)="upsertSeccion('hero','textoColor',$any($event.target).value)" style="width:34px;height:30px;padding:2px;border:1px solid var(--border);border-radius:5px;cursor:pointer;vertical-align:middle" />
+                      @if (getSeccionText('hero')) { <button type="button" (click)="upsertSeccion('hero','textoColor','')" style="background:none;border:none;font-size:.75rem;color:var(--muted);cursor:pointer;padding:0;line-height:1;opacity:.6" title="Restablecer">✕</button> }
+                    </label>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:1.25rem;flex-wrap:wrap">
+                    <label style="display:flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--muted)">
+                      Tamaño texto
+                      <div style="position:relative;display:inline-flex;align-items:center">
+                        <input type="number" min="0.5" max="5" step="0.05" [value]="getSeccionFontSizeRem('hero')"
+                          (input)="upsertSeccionFontRem('hero', $any($event.target).value)"
+                          placeholder="–" style="width:84px;font-size:.875rem;padding:6px 36px 6px 10px;border:1px solid var(--border);border-radius:6px;height:36px;background:var(--surface2);color:var(--text)" />
+                        <span style="position:absolute;right:8px;font-size:.7rem;color:var(--muted);pointer-events:none;font-weight:700;opacity:.7">rem</span>
+                      </div>
+                    </label>
+                    <label style="display:flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--muted)">
+                      Espaciado vertical
+                      <div style="position:relative;display:inline-flex;align-items:center">
+                        <input type="number" min="0" max="12" step="0.25" [value]="getSeccionPaddingVRem('hero')"
+                          (input)="upsertSeccionPaddingRem('hero', $any($event.target).value)"
+                          placeholder="–" style="width:84px;font-size:.875rem;padding:6px 36px 6px 10px;border:1px solid var(--border);border-radius:6px;height:36px;background:var(--surface2);color:var(--text)" />
+                        <span style="position:absolute;right:8px;font-size:.7rem;color:var(--muted);pointer-events:none;font-weight:700;opacity:.7">rem</span>
+                      </div>
+                    </label>
+                  </div>
                 </div>
               }
             </div>
@@ -177,38 +180,41 @@ function slugFromNombre(nombre: string): string {
                 <textarea id="descripcion" formControlName="descripcion" class="form-control" rows="4" placeholder="Descripción del congreso (opcional)"></textarea>
               </div>
               @if (id) {
-                <div style="margin-top:.875rem;display:flex;align-items:center;gap:.875rem;flex-wrap:wrap;padding:.625rem 1rem;background:rgba(0,0,0,.22);border-radius:6px;border:1px solid var(--border)">
-                  <span style="font-size:.58rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;opacity:.55;white-space:nowrap">Desc.</span>
-                  <div style="width:1px;height:12px;background:var(--border);opacity:.4;flex-shrink:0"></div>
-                  <label style="display:flex;align-items:center;gap:.3rem;font-size:.72rem;color:var(--muted);cursor:pointer">
-                    Fondo
-                    <input type="color" [value]="getSeccionBg('descripcion') || '#f8fafc'" (change)="upsertSeccion('descripcion','bgColor',$any($event.target).value)" style="width:24px;height:20px;padding:1px;border:1px solid var(--border);border-radius:4px;cursor:pointer;vertical-align:middle" />
-                    @if (getSeccionBg('descripcion')) { <button type="button" (click)="upsertSeccion('descripcion','bgColor','')" style="background:none;border:none;font-size:.62rem;color:var(--muted);cursor:pointer;padding:0;line-height:1;opacity:.55" title="Restablecer">✕</button> }
-                  </label>
-                  <label style="display:flex;align-items:center;gap:.3rem;font-size:.72rem;color:var(--muted);cursor:pointer">
-                    Texto
-                    <input type="color" [value]="getSeccionText('descripcion') || '#334155'" (change)="upsertSeccion('descripcion','textoColor',$any($event.target).value)" style="width:24px;height:20px;padding:1px;border:1px solid var(--border);border-radius:4px;cursor:pointer;vertical-align:middle" />
-                    @if (getSeccionText('descripcion')) { <button type="button" (click)="upsertSeccion('descripcion','textoColor','')" style="background:none;border:none;font-size:.62rem;color:var(--muted);cursor:pointer;padding:0;line-height:1;opacity:.55" title="Restablecer">✕</button> }
-                  </label>
-                  <div style="width:1px;height:12px;background:var(--border);opacity:.4;flex-shrink:0"></div>
-                  <label style="display:flex;align-items:center;gap:.3rem;font-size:.72rem;color:var(--muted)" title="Tamaño de fuente">
-                    T
-                    <div style="position:relative;display:inline-flex;align-items:center">
-                      <input type="number" min="0.5" max="5" step="0.05" [value]="getSeccionFontSizeRem('descripcion')"
-                        (input)="upsertSeccionFontRem('descripcion', $any($event.target).value)"
-                        placeholder="–" style="width:58px;font-size:.72rem;padding:2px 26px 2px 5px;border:1px solid var(--border);border-radius:4px;height:21px;background:var(--surface2);color:var(--text)" />
-                      <span style="position:absolute;right:4px;font-size:.56rem;color:var(--muted);pointer-events:none;font-weight:700;opacity:.6">rem</span>
-                    </div>
-                  </label>
-                  <label style="display:flex;align-items:center;gap:.3rem;font-size:.72rem;color:var(--muted)" title="Padding vertical">
-                    ↕
-                    <div style="position:relative;display:inline-flex;align-items:center">
-                      <input type="number" min="0" max="12" step="0.25" [value]="getSeccionPaddingVRem('descripcion')"
-                        (input)="upsertSeccionPaddingRem('descripcion', $any($event.target).value)"
-                        placeholder="–" style="width:58px;font-size:.72rem;padding:2px 26px 2px 5px;border:1px solid var(--border);border-radius:4px;height:21px;background:var(--surface2);color:var(--text)" />
-                      <span style="position:absolute;right:4px;font-size:.56rem;color:var(--muted);pointer-events:none;font-weight:700;opacity:.6">rem</span>
-                    </div>
-                  </label>
+                <div style="margin-top:.875rem;background:rgba(0,0,0,.22);border-radius:6px;border:1px solid var(--border);padding:.875rem 1rem;display:flex;flex-direction:column;gap:.75rem">
+                  <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
+                    <span style="font-size:.65rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;opacity:.7;white-space:nowrap">Desc.</span>
+                    <div style="width:1px;height:16px;background:var(--border);opacity:.4;flex-shrink:0"></div>
+                    <label style="display:flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--muted);cursor:pointer">
+                      Fondo
+                      <input type="color" [value]="getSeccionBg('descripcion') || '#f8fafc'" (change)="upsertSeccion('descripcion','bgColor',$any($event.target).value)" style="width:34px;height:30px;padding:2px;border:1px solid var(--border);border-radius:5px;cursor:pointer;vertical-align:middle" />
+                      @if (getSeccionBg('descripcion')) { <button type="button" (click)="upsertSeccion('descripcion','bgColor','')" style="background:none;border:none;font-size:.75rem;color:var(--muted);cursor:pointer;padding:0;line-height:1;opacity:.6" title="Restablecer">✕</button> }
+                    </label>
+                    <label style="display:flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--muted);cursor:pointer">
+                      Texto
+                      <input type="color" [value]="getSeccionText('descripcion') || '#334155'" (change)="upsertSeccion('descripcion','textoColor',$any($event.target).value)" style="width:34px;height:30px;padding:2px;border:1px solid var(--border);border-radius:5px;cursor:pointer;vertical-align:middle" />
+                      @if (getSeccionText('descripcion')) { <button type="button" (click)="upsertSeccion('descripcion','textoColor','')" style="background:none;border:none;font-size:.75rem;color:var(--muted);cursor:pointer;padding:0;line-height:1;opacity:.6" title="Restablecer">✕</button> }
+                    </label>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:1.25rem;flex-wrap:wrap">
+                    <label style="display:flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--muted)">
+                      Tamaño texto
+                      <div style="position:relative;display:inline-flex;align-items:center">
+                        <input type="number" min="0.5" max="5" step="0.05" [value]="getSeccionFontSizeRem('descripcion')"
+                          (input)="upsertSeccionFontRem('descripcion', $any($event.target).value)"
+                          placeholder="–" style="width:84px;font-size:.875rem;padding:6px 36px 6px 10px;border:1px solid var(--border);border-radius:6px;height:36px;background:var(--surface2);color:var(--text)" />
+                        <span style="position:absolute;right:8px;font-size:.7rem;color:var(--muted);pointer-events:none;font-weight:700;opacity:.7">rem</span>
+                      </div>
+                    </label>
+                    <label style="display:flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--muted)">
+                      Espaciado vertical
+                      <div style="position:relative;display:inline-flex;align-items:center">
+                        <input type="number" min="0" max="12" step="0.25" [value]="getSeccionPaddingVRem('descripcion')"
+                          (input)="upsertSeccionPaddingRem('descripcion', $any($event.target).value)"
+                          placeholder="–" style="width:84px;font-size:.875rem;padding:6px 36px 6px 10px;border:1px solid var(--border);border-radius:6px;height:36px;background:var(--surface2);color:var(--text)" />
+                        <span style="position:absolute;right:8px;font-size:.7rem;color:var(--muted);pointer-events:none;font-weight:700;opacity:.7">rem</span>
+                      </div>
+                    </label>
+                  </div>
                 </div>
               }
             </div>
@@ -338,38 +344,41 @@ function slugFromNombre(nombre: string): string {
                         <p style="color:var(--muted);font-size:.875rem;margin-bottom:.75rem">Sin fechas aún.</p>
                       }
                       <button type="button" class="btn btn-secondary btn-sm" (click)="addFecha()">+ Agregar fecha</button>
-                      <div style="margin-top:.875rem;display:flex;align-items:center;gap:.875rem;flex-wrap:wrap;padding:.625rem 1rem;background:rgba(0,0,0,.22);border-radius:6px;border:1px solid var(--border)">
-                        <span style="font-size:.58rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;opacity:.55;white-space:nowrap">Fechas</span>
-                        <div style="width:1px;height:12px;background:var(--border);opacity:.4;flex-shrink:0"></div>
-                        <label style="display:flex;align-items:center;gap:.3rem;font-size:.72rem;color:var(--muted);cursor:pointer">
-                          Fondo
-                          <input type="color" [value]="getSeccionBg('fechas') || '#16213e'" (change)="upsertSeccion('fechas','bgColor',$any($event.target).value)" style="width:24px;height:20px;padding:1px;border:1px solid var(--border);border-radius:4px;cursor:pointer;vertical-align:middle" />
-                          @if (getSeccionBg('fechas')) { <button type="button" (click)="upsertSeccion('fechas','bgColor','')" style="background:none;border:none;font-size:.62rem;color:var(--muted);cursor:pointer;padding:0;line-height:1;opacity:.55" title="Restablecer">✕</button> }
-                        </label>
-                        <label style="display:flex;align-items:center;gap:.3rem;font-size:.72rem;color:var(--muted);cursor:pointer">
-                          Texto
-                          <input type="color" [value]="getSeccionText('fechas') || '#ffffff'" (change)="upsertSeccion('fechas','textoColor',$any($event.target).value)" style="width:24px;height:20px;padding:1px;border:1px solid var(--border);border-radius:4px;cursor:pointer;vertical-align:middle" />
-                          @if (getSeccionText('fechas')) { <button type="button" (click)="upsertSeccion('fechas','textoColor','')" style="background:none;border:none;font-size:.62rem;color:var(--muted);cursor:pointer;padding:0;line-height:1;opacity:.55" title="Restablecer">✕</button> }
-                        </label>
-                        <div style="width:1px;height:12px;background:var(--border);opacity:.4;flex-shrink:0"></div>
-                        <label style="display:flex;align-items:center;gap:.3rem;font-size:.72rem;color:var(--muted)" title="Tamaño de fuente">
-                          T
-                          <div style="position:relative;display:inline-flex;align-items:center">
-                            <input type="number" min="0.5" max="5" step="0.05" [value]="getSeccionFontSizeRem('fechas')"
-                              (input)="upsertSeccionFontRem('fechas', $any($event.target).value)"
-                              placeholder="–" style="width:58px;font-size:.72rem;padding:2px 26px 2px 5px;border:1px solid var(--border);border-radius:4px;height:21px;background:var(--surface2);color:var(--text)" />
-                            <span style="position:absolute;right:4px;font-size:.56rem;color:var(--muted);pointer-events:none;font-weight:700;opacity:.6">rem</span>
-                          </div>
-                        </label>
-                        <label style="display:flex;align-items:center;gap:.3rem;font-size:.72rem;color:var(--muted)" title="Padding vertical">
-                          ↕
-                          <div style="position:relative;display:inline-flex;align-items:center">
-                            <input type="number" min="0" max="12" step="0.25" [value]="getSeccionPaddingVRem('fechas')"
-                              (input)="upsertSeccionPaddingRem('fechas', $any($event.target).value)"
-                              placeholder="–" style="width:58px;font-size:.72rem;padding:2px 26px 2px 5px;border:1px solid var(--border);border-radius:4px;height:21px;background:var(--surface2);color:var(--text)" />
-                            <span style="position:absolute;right:4px;font-size:.56rem;color:var(--muted);pointer-events:none;font-weight:700;opacity:.6">rem</span>
-                          </div>
-                        </label>
+                      <div style="margin-top:.875rem;background:rgba(0,0,0,.22);border-radius:6px;border:1px solid var(--border);padding:.875rem 1rem;display:flex;flex-direction:column;gap:.75rem">
+                        <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
+                          <span style="font-size:.65rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;opacity:.7;white-space:nowrap">Fechas</span>
+                          <div style="width:1px;height:16px;background:var(--border);opacity:.4;flex-shrink:0"></div>
+                          <label style="display:flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--muted);cursor:pointer">
+                            Fondo
+                            <input type="color" [value]="getSeccionBg('fechas') || '#16213e'" (change)="upsertSeccion('fechas','bgColor',$any($event.target).value)" style="width:34px;height:30px;padding:2px;border:1px solid var(--border);border-radius:5px;cursor:pointer;vertical-align:middle" />
+                            @if (getSeccionBg('fechas')) { <button type="button" (click)="upsertSeccion('fechas','bgColor','')" style="background:none;border:none;font-size:.75rem;color:var(--muted);cursor:pointer;padding:0;line-height:1;opacity:.6" title="Restablecer">✕</button> }
+                          </label>
+                          <label style="display:flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--muted);cursor:pointer">
+                            Texto
+                            <input type="color" [value]="getSeccionText('fechas') || '#ffffff'" (change)="upsertSeccion('fechas','textoColor',$any($event.target).value)" style="width:34px;height:30px;padding:2px;border:1px solid var(--border);border-radius:5px;cursor:pointer;vertical-align:middle" />
+                            @if (getSeccionText('fechas')) { <button type="button" (click)="upsertSeccion('fechas','textoColor','')" style="background:none;border:none;font-size:.75rem;color:var(--muted);cursor:pointer;padding:0;line-height:1;opacity:.6" title="Restablecer">✕</button> }
+                          </label>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:1.25rem;flex-wrap:wrap">
+                          <label style="display:flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--muted)">
+                            Tamaño texto
+                            <div style="position:relative;display:inline-flex;align-items:center">
+                              <input type="number" min="0.5" max="5" step="0.05" [value]="getSeccionFontSizeRem('fechas')"
+                                (input)="upsertSeccionFontRem('fechas', $any($event.target).value)"
+                                placeholder="–" style="width:84px;font-size:.875rem;padding:6px 36px 6px 10px;border:1px solid var(--border);border-radius:6px;height:36px;background:var(--surface2);color:var(--text)" />
+                              <span style="position:absolute;right:8px;font-size:.7rem;color:var(--muted);pointer-events:none;font-weight:700;opacity:.7">rem</span>
+                            </div>
+                          </label>
+                          <label style="display:flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--muted)">
+                            Espaciado vertical
+                            <div style="position:relative;display:inline-flex;align-items:center">
+                              <input type="number" min="0" max="12" step="0.25" [value]="getSeccionPaddingVRem('fechas')"
+                                (input)="upsertSeccionPaddingRem('fechas', $any($event.target).value)"
+                                placeholder="–" style="width:84px;font-size:.875rem;padding:6px 36px 6px 10px;border:1px solid var(--border);border-radius:6px;height:36px;background:var(--surface2);color:var(--text)" />
+                              <span style="position:absolute;right:8px;font-size:.7rem;color:var(--muted);pointer-events:none;font-weight:700;opacity:.7">rem</span>
+                            </div>
+                          </label>
+                        </div>
                       </div>
                     </div>
                   }
@@ -404,42 +413,47 @@ function slugFromNombre(nombre: string): string {
                         <p style="color:var(--muted);font-size:.875rem;margin-bottom:.75rem">Sin organizadores aún.</p>
                       }
                       <button type="button" class="btn btn-secondary btn-sm" (click)="addOrg()">+ Agregar organizador</button>
-                      <div style="margin-top:.875rem;display:flex;align-items:center;gap:.875rem;flex-wrap:wrap;padding:.625rem 1rem;background:rgba(0,0,0,.22);border-radius:6px;border:1px solid var(--border)">
-                        <span style="font-size:.58rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;opacity:.55;white-space:nowrap">Orgs.</span>
-                        <div style="width:1px;height:12px;background:var(--border);opacity:.4;flex-shrink:0"></div>
-                        <label style="display:flex;align-items:center;gap:.3rem;font-size:.72rem;color:var(--muted);cursor:pointer">
-                          Fondo
-                          <input type="color" [value]="getSeccionBg('organizadores') || '#ffffff'" (change)="upsertSeccion('organizadores','bgColor',$any($event.target).value)" style="width:24px;height:20px;padding:1px;border:1px solid var(--border);border-radius:4px;cursor:pointer;vertical-align:middle" />
-                          @if (getSeccionBg('organizadores')) { <button type="button" (click)="upsertSeccion('organizadores','bgColor','')" style="background:none;border:none;font-size:.62rem;color:var(--muted);cursor:pointer;padding:0;line-height:1;opacity:.55" title="Restablecer">✕</button> }
-                        </label>
-                        <label style="display:flex;align-items:center;gap:.3rem;font-size:.72rem;color:var(--muted);cursor:pointer">
-                          Texto
-                          <input type="color" [value]="getSeccionText('organizadores') || '#1e293b'" (change)="upsertSeccion('organizadores','textoColor',$any($event.target).value)" style="width:24px;height:20px;padding:1px;border:1px solid var(--border);border-radius:4px;cursor:pointer;vertical-align:middle" />
-                          @if (getSeccionText('organizadores')) { <button type="button" (click)="upsertSeccion('organizadores','textoColor','')" style="background:none;border:none;font-size:.62rem;color:var(--muted);cursor:pointer;padding:0;line-height:1;opacity:.55" title="Restablecer">✕</button> }
-                        </label>
-                        <div style="width:1px;height:12px;background:var(--border);opacity:.4;flex-shrink:0"></div>
-                        <label style="display:flex;align-items:center;gap:.3rem;font-size:.72rem;color:var(--muted)" title="Altura de logos en px">
-                          ↨
-                          <input type="number" min="24" max="160" [value]="getSeccionLogoAltura('organizadores')"
-                            (input)="upsertSeccion('organizadores','logoAltura',+$any($event.target).value || null)"
-                            style="width:46px;font-size:.72rem;padding:2px 5px;border:1px solid var(--border);border-radius:4px;height:21px;background:var(--surface2);color:var(--text)" />
-                          <span style="font-size:.56rem;color:var(--muted);opacity:.6;font-weight:700">px</span>
-                        </label>
-                        <label style="display:flex;align-items:center;gap:.3rem;font-size:.72rem;color:var(--muted)" title="Columnas por fila">
-                          ⊞
-                          <input type="number" min="1" max="8" [value]="getSeccionLogoColumnas('organizadores')"
-                            (input)="upsertSeccion('organizadores','logoColumnas',+$any($event.target).value || null)"
-                            placeholder="–" style="width:40px;font-size:.72rem;padding:2px 5px;border:1px solid var(--border);border-radius:4px;height:21px;background:var(--surface2);color:var(--text)" />
-                        </label>
-                        <label style="display:flex;align-items:center;gap:.3rem;font-size:.72rem;color:var(--muted)" title="Padding vertical">
-                          ↕
-                          <div style="position:relative;display:inline-flex;align-items:center">
-                            <input type="number" min="0" max="12" step="0.25" [value]="getSeccionPaddingVRem('organizadores')"
-                              (input)="upsertSeccionPaddingRem('organizadores', $any($event.target).value)"
-                              placeholder="–" style="width:58px;font-size:.72rem;padding:2px 26px 2px 5px;border:1px solid var(--border);border-radius:4px;height:21px;background:var(--surface2);color:var(--text)" />
-                            <span style="position:absolute;right:4px;font-size:.56rem;color:var(--muted);pointer-events:none;font-weight:700;opacity:.6">rem</span>
-                          </div>
-                        </label>
+                      <div style="margin-top:.875rem;background:rgba(0,0,0,.22);border-radius:6px;border:1px solid var(--border);padding:.875rem 1rem;display:flex;flex-direction:column;gap:.75rem">
+                        <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
+                          <span style="font-size:.65rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;opacity:.7;white-space:nowrap">Orgs.</span>
+                          <div style="width:1px;height:16px;background:var(--border);opacity:.4;flex-shrink:0"></div>
+                          <label style="display:flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--muted);cursor:pointer">
+                            Fondo
+                            <input type="color" [value]="getSeccionBg('organizadores') || '#ffffff'" (change)="upsertSeccion('organizadores','bgColor',$any($event.target).value)" style="width:34px;height:30px;padding:2px;border:1px solid var(--border);border-radius:5px;cursor:pointer;vertical-align:middle" />
+                            @if (getSeccionBg('organizadores')) { <button type="button" (click)="upsertSeccion('organizadores','bgColor','')" style="background:none;border:none;font-size:.75rem;color:var(--muted);cursor:pointer;padding:0;line-height:1;opacity:.6" title="Restablecer">✕</button> }
+                          </label>
+                          <label style="display:flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--muted);cursor:pointer">
+                            Texto
+                            <input type="color" [value]="getSeccionText('organizadores') || '#1e293b'" (change)="upsertSeccion('organizadores','textoColor',$any($event.target).value)" style="width:34px;height:30px;padding:2px;border:1px solid var(--border);border-radius:5px;cursor:pointer;vertical-align:middle" />
+                            @if (getSeccionText('organizadores')) { <button type="button" (click)="upsertSeccion('organizadores','textoColor','')" style="background:none;border:none;font-size:.75rem;color:var(--muted);cursor:pointer;padding:0;line-height:1;opacity:.6" title="Restablecer">✕</button> }
+                          </label>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:1.25rem;flex-wrap:wrap">
+                          <label style="display:flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--muted)">
+                            Alto logo
+                            <div style="position:relative;display:inline-flex;align-items:center">
+                              <input type="number" min="24" max="160" [value]="getSeccionLogoAltura('organizadores')"
+                                (input)="upsertSeccion('organizadores','logoAltura',+$any($event.target).value || null)"
+                                style="width:84px;font-size:.875rem;padding:6px 36px 6px 10px;border:1px solid var(--border);border-radius:6px;height:36px;background:var(--surface2);color:var(--text)" />
+                              <span style="position:absolute;right:8px;font-size:.7rem;color:var(--muted);pointer-events:none;font-weight:700;opacity:.7">px</span>
+                            </div>
+                          </label>
+                          <label style="display:flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--muted)">
+                            Columnas
+                            <input type="number" min="1" max="8" [value]="getSeccionLogoColumnas('organizadores')"
+                              (input)="upsertSeccion('organizadores','logoColumnas',+$any($event.target).value || null)"
+                              placeholder="–" style="width:72px;font-size:.875rem;padding:6px 10px;border:1px solid var(--border);border-radius:6px;height:36px;background:var(--surface2);color:var(--text)" />
+                          </label>
+                          <label style="display:flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--muted)">
+                            Espaciado vertical
+                            <div style="position:relative;display:inline-flex;align-items:center">
+                              <input type="number" min="0" max="12" step="0.25" [value]="getSeccionPaddingVRem('organizadores')"
+                                (input)="upsertSeccionPaddingRem('organizadores', $any($event.target).value)"
+                                placeholder="–" style="width:84px;font-size:.875rem;padding:6px 36px 6px 10px;border:1px solid var(--border);border-radius:6px;height:36px;background:var(--surface2);color:var(--text)" />
+                              <span style="position:absolute;right:8px;font-size:.7rem;color:var(--muted);pointer-events:none;font-weight:700;opacity:.7">rem</span>
+                            </div>
+                          </label>
+                        </div>
                       </div>
                     </div>
                   }
@@ -501,38 +515,41 @@ function slugFromNombre(nombre: string): string {
                         <textarea id="contactoAdicional" formControlName="contactoAdicional" class="form-control" rows="3"
                           placeholder="Ej. También podés consultar en Tesorería, Oficina 12, lunes a viernes 9-17hs"></textarea>
                       </div>
-                      <div style="margin-top:.875rem;display:flex;align-items:center;gap:.875rem;flex-wrap:wrap;padding:.625rem 1rem;background:rgba(0,0,0,.22);border-radius:6px;border:1px solid var(--border)">
-                        <span style="font-size:.58rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;opacity:.55;white-space:nowrap">Contacto</span>
-                        <div style="width:1px;height:12px;background:var(--border);opacity:.4;flex-shrink:0"></div>
-                        <label style="display:flex;align-items:center;gap:.3rem;font-size:.72rem;color:var(--muted);cursor:pointer">
-                          Fondo
-                          <input type="color" [value]="getSeccionBg('contacto') || '#1a1a2e'" (change)="upsertSeccion('contacto','bgColor',$any($event.target).value)" style="width:24px;height:20px;padding:1px;border:1px solid var(--border);border-radius:4px;cursor:pointer;vertical-align:middle" />
-                          @if (getSeccionBg('contacto')) { <button type="button" (click)="upsertSeccion('contacto','bgColor','')" style="background:none;border:none;font-size:.62rem;color:var(--muted);cursor:pointer;padding:0;line-height:1;opacity:.55" title="Restablecer">✕</button> }
-                        </label>
-                        <label style="display:flex;align-items:center;gap:.3rem;font-size:.72rem;color:var(--muted);cursor:pointer">
-                          Texto
-                          <input type="color" [value]="getSeccionText('contacto') || '#ffffff'" (change)="upsertSeccion('contacto','textoColor',$any($event.target).value)" style="width:24px;height:20px;padding:1px;border:1px solid var(--border);border-radius:4px;cursor:pointer;vertical-align:middle" />
-                          @if (getSeccionText('contacto')) { <button type="button" (click)="upsertSeccion('contacto','textoColor','')" style="background:none;border:none;font-size:.62rem;color:var(--muted);cursor:pointer;padding:0;line-height:1;opacity:.55" title="Restablecer">✕</button> }
-                        </label>
-                        <div style="width:1px;height:12px;background:var(--border);opacity:.4;flex-shrink:0"></div>
-                        <label style="display:flex;align-items:center;gap:.3rem;font-size:.72rem;color:var(--muted)" title="Tamaño de fuente">
-                          T
-                          <div style="position:relative;display:inline-flex;align-items:center">
-                            <input type="number" min="0.5" max="5" step="0.05" [value]="getSeccionFontSizeRem('contacto')"
-                              (input)="upsertSeccionFontRem('contacto', $any($event.target).value)"
-                              placeholder="–" style="width:58px;font-size:.72rem;padding:2px 26px 2px 5px;border:1px solid var(--border);border-radius:4px;height:21px;background:var(--surface2);color:var(--text)" />
-                            <span style="position:absolute;right:4px;font-size:.56rem;color:var(--muted);pointer-events:none;font-weight:700;opacity:.6">rem</span>
-                          </div>
-                        </label>
-                        <label style="display:flex;align-items:center;gap:.3rem;font-size:.72rem;color:var(--muted)" title="Padding vertical">
-                          ↕
-                          <div style="position:relative;display:inline-flex;align-items:center">
-                            <input type="number" min="0" max="12" step="0.25" [value]="getSeccionPaddingVRem('contacto')"
-                              (input)="upsertSeccionPaddingRem('contacto', $any($event.target).value)"
-                              placeholder="–" style="width:58px;font-size:.72rem;padding:2px 26px 2px 5px;border:1px solid var(--border);border-radius:4px;height:21px;background:var(--surface2);color:var(--text)" />
-                            <span style="position:absolute;right:4px;font-size:.56rem;color:var(--muted);pointer-events:none;font-weight:700;opacity:.6">rem</span>
-                          </div>
-                        </label>
+                      <div style="margin-top:.875rem;background:rgba(0,0,0,.22);border-radius:6px;border:1px solid var(--border);padding:.875rem 1rem;display:flex;flex-direction:column;gap:.75rem">
+                        <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
+                          <span style="font-size:.65rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;opacity:.7;white-space:nowrap">Contacto</span>
+                          <div style="width:1px;height:16px;background:var(--border);opacity:.4;flex-shrink:0"></div>
+                          <label style="display:flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--muted);cursor:pointer">
+                            Fondo
+                            <input type="color" [value]="getSeccionBg('contacto') || '#1a1a2e'" (change)="upsertSeccion('contacto','bgColor',$any($event.target).value)" style="width:34px;height:30px;padding:2px;border:1px solid var(--border);border-radius:5px;cursor:pointer;vertical-align:middle" />
+                            @if (getSeccionBg('contacto')) { <button type="button" (click)="upsertSeccion('contacto','bgColor','')" style="background:none;border:none;font-size:.75rem;color:var(--muted);cursor:pointer;padding:0;line-height:1;opacity:.6" title="Restablecer">✕</button> }
+                          </label>
+                          <label style="display:flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--muted);cursor:pointer">
+                            Texto
+                            <input type="color" [value]="getSeccionText('contacto') || '#ffffff'" (change)="upsertSeccion('contacto','textoColor',$any($event.target).value)" style="width:34px;height:30px;padding:2px;border:1px solid var(--border);border-radius:5px;cursor:pointer;vertical-align:middle" />
+                            @if (getSeccionText('contacto')) { <button type="button" (click)="upsertSeccion('contacto','textoColor','')" style="background:none;border:none;font-size:.75rem;color:var(--muted);cursor:pointer;padding:0;line-height:1;opacity:.6" title="Restablecer">✕</button> }
+                          </label>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:1.25rem;flex-wrap:wrap">
+                          <label style="display:flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--muted)">
+                            Tamaño texto
+                            <div style="position:relative;display:inline-flex;align-items:center">
+                              <input type="number" min="0.5" max="5" step="0.05" [value]="getSeccionFontSizeRem('contacto')"
+                                (input)="upsertSeccionFontRem('contacto', $any($event.target).value)"
+                                placeholder="–" style="width:84px;font-size:.875rem;padding:6px 36px 6px 10px;border:1px solid var(--border);border-radius:6px;height:36px;background:var(--surface2);color:var(--text)" />
+                              <span style="position:absolute;right:8px;font-size:.7rem;color:var(--muted);pointer-events:none;font-weight:700;opacity:.7">rem</span>
+                            </div>
+                          </label>
+                          <label style="display:flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--muted)">
+                            Espaciado vertical
+                            <div style="position:relative;display:inline-flex;align-items:center">
+                              <input type="number" min="0" max="12" step="0.25" [value]="getSeccionPaddingVRem('contacto')"
+                                (input)="upsertSeccionPaddingRem('contacto', $any($event.target).value)"
+                                placeholder="–" style="width:84px;font-size:.875rem;padding:6px 36px 6px 10px;border:1px solid var(--border);border-radius:6px;height:36px;background:var(--surface2);color:var(--text)" />
+                              <span style="position:absolute;right:8px;font-size:.7rem;color:var(--muted);pointer-events:none;font-weight:700;opacity:.7">rem</span>
+                            </div>
+                          </label>
+                        </div>
                       </div>
                     </div>
                   }
@@ -585,38 +602,41 @@ function slugFromNombre(nombre: string): string {
                       </div>
 
                       <!-- Apariencia sección inscripciones -->
-                      <div style="display:flex;align-items:center;gap:.875rem;flex-wrap:wrap;padding:.625rem 1rem;background:rgba(0,0,0,.22);border-radius:6px;border:1px solid var(--border)">
-                        <span style="font-size:.58rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;opacity:.55;white-space:nowrap">Inscr.</span>
-                        <div style="width:1px;height:12px;background:var(--border);opacity:.4;flex-shrink:0"></div>
-                        <label style="display:flex;align-items:center;gap:.3rem;font-size:.72rem;color:var(--muted);cursor:pointer">
-                          Fondo
-                          <input type="color" [value]="getSeccionBg('inscripciones') || '#ffffff'" (change)="upsertSeccion('inscripciones','bgColor',$any($event.target).value)" style="width:24px;height:20px;padding:1px;border:1px solid var(--border);border-radius:4px;cursor:pointer;vertical-align:middle" />
-                          @if (getSeccionBg('inscripciones')) { <button type="button" (click)="upsertSeccion('inscripciones','bgColor','')" style="background:none;border:none;font-size:.62rem;color:var(--muted);cursor:pointer;padding:0;line-height:1;opacity:.55" title="Restablecer">✕</button> }
-                        </label>
-                        <label style="display:flex;align-items:center;gap:.3rem;font-size:.72rem;color:var(--muted);cursor:pointer">
-                          Texto
-                          <input type="color" [value]="getSeccionText('inscripciones') || '#1e293b'" (change)="upsertSeccion('inscripciones','textoColor',$any($event.target).value)" style="width:24px;height:20px;padding:1px;border:1px solid var(--border);border-radius:4px;cursor:pointer;vertical-align:middle" />
-                          @if (getSeccionText('inscripciones')) { <button type="button" (click)="upsertSeccion('inscripciones','textoColor','')" style="background:none;border:none;font-size:.62rem;color:var(--muted);cursor:pointer;padding:0;line-height:1;opacity:.55" title="Restablecer">✕</button> }
-                        </label>
-                        <div style="width:1px;height:12px;background:var(--border);opacity:.4;flex-shrink:0"></div>
-                        <label style="display:flex;align-items:center;gap:.3rem;font-size:.72rem;color:var(--muted)" title="Tamaño de fuente">
-                          T
-                          <div style="position:relative;display:inline-flex;align-items:center">
-                            <input type="number" min="0.5" max="5" step="0.05" [value]="getSeccionFontSizeRem('inscripciones')"
-                              (input)="upsertSeccionFontRem('inscripciones', $any($event.target).value)"
-                              placeholder="–" style="width:58px;font-size:.72rem;padding:2px 26px 2px 5px;border:1px solid var(--border);border-radius:4px;height:21px;background:var(--surface2);color:var(--text)" />
-                            <span style="position:absolute;right:4px;font-size:.56rem;color:var(--muted);pointer-events:none;font-weight:700;opacity:.6">rem</span>
-                          </div>
-                        </label>
-                        <label style="display:flex;align-items:center;gap:.3rem;font-size:.72rem;color:var(--muted)" title="Padding vertical">
-                          ↕
-                          <div style="position:relative;display:inline-flex;align-items:center">
-                            <input type="number" min="0" max="12" step="0.25" [value]="getSeccionPaddingVRem('inscripciones')"
-                              (input)="upsertSeccionPaddingRem('inscripciones', $any($event.target).value)"
-                              placeholder="–" style="width:58px;font-size:.72rem;padding:2px 26px 2px 5px;border:1px solid var(--border);border-radius:4px;height:21px;background:var(--surface2);color:var(--text)" />
-                            <span style="position:absolute;right:4px;font-size:.56rem;color:var(--muted);pointer-events:none;font-weight:700;opacity:.6">rem</span>
-                          </div>
-                        </label>
+                      <div style="background:rgba(0,0,0,.22);border-radius:6px;border:1px solid var(--border);padding:.875rem 1rem;display:flex;flex-direction:column;gap:.75rem">
+                        <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
+                          <span style="font-size:.65rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;opacity:.7;white-space:nowrap">Inscr.</span>
+                          <div style="width:1px;height:16px;background:var(--border);opacity:.4;flex-shrink:0"></div>
+                          <label style="display:flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--muted);cursor:pointer">
+                            Fondo
+                            <input type="color" [value]="getSeccionBg('inscripciones') || '#ffffff'" (change)="upsertSeccion('inscripciones','bgColor',$any($event.target).value)" style="width:34px;height:30px;padding:2px;border:1px solid var(--border);border-radius:5px;cursor:pointer;vertical-align:middle" />
+                            @if (getSeccionBg('inscripciones')) { <button type="button" (click)="upsertSeccion('inscripciones','bgColor','')" style="background:none;border:none;font-size:.75rem;color:var(--muted);cursor:pointer;padding:0;line-height:1;opacity:.6" title="Restablecer">✕</button> }
+                          </label>
+                          <label style="display:flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--muted);cursor:pointer">
+                            Texto
+                            <input type="color" [value]="getSeccionText('inscripciones') || '#1e293b'" (change)="upsertSeccion('inscripciones','textoColor',$any($event.target).value)" style="width:34px;height:30px;padding:2px;border:1px solid var(--border);border-radius:5px;cursor:pointer;vertical-align:middle" />
+                            @if (getSeccionText('inscripciones')) { <button type="button" (click)="upsertSeccion('inscripciones','textoColor','')" style="background:none;border:none;font-size:.75rem;color:var(--muted);cursor:pointer;padding:0;line-height:1;opacity:.6" title="Restablecer">✕</button> }
+                          </label>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:1.25rem;flex-wrap:wrap">
+                          <label style="display:flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--muted)">
+                            Tamaño texto
+                            <div style="position:relative;display:inline-flex;align-items:center">
+                              <input type="number" min="0.5" max="5" step="0.05" [value]="getSeccionFontSizeRem('inscripciones')"
+                                (input)="upsertSeccionFontRem('inscripciones', $any($event.target).value)"
+                                placeholder="–" style="width:84px;font-size:.875rem;padding:6px 36px 6px 10px;border:1px solid var(--border);border-radius:6px;height:36px;background:var(--surface2);color:var(--text)" />
+                              <span style="position:absolute;right:8px;font-size:.7rem;color:var(--muted);pointer-events:none;font-weight:700;opacity:.7">rem</span>
+                            </div>
+                          </label>
+                          <label style="display:flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--muted)">
+                            Espaciado vertical
+                            <div style="position:relative;display:inline-flex;align-items:center">
+                              <input type="number" min="0" max="12" step="0.25" [value]="getSeccionPaddingVRem('inscripciones')"
+                                (input)="upsertSeccionPaddingRem('inscripciones', $any($event.target).value)"
+                                placeholder="–" style="width:84px;font-size:.875rem;padding:6px 36px 6px 10px;border:1px solid var(--border);border-radius:6px;height:36px;background:var(--surface2);color:var(--text)" />
+                              <span style="position:absolute;right:8px;font-size:.7rem;color:var(--muted);pointer-events:none;font-weight:700;opacity:.7">rem</span>
+                            </div>
+                          </label>
+                        </div>
                       </div>
                     </div>
                   }
