@@ -150,13 +150,13 @@ function slugFromNombre(nombre: string): string {
                     Texto
                     <input type="number" min="8" max="72" [value]="getSeccionFontSizePx('hero')"
                       (change)="upsertSeccion('hero','fontSize',$any($event.target).value ? $any($event.target).value+'px' : null)"
-                      placeholder="auto" style="width:52px;font-size:.78rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px;height:22px;background:var(--bg)" /> px
+                      placeholder="auto" style="width:52px;font-size:.78rem;padding:2px 5px;border:1px solid var(--border);border-radius:4px;height:22px;background:var(--surface2);color:var(--text)" /> px
                   </label>
                   <label style="display:flex;align-items:center;gap:.35rem;font-size:.78rem;color:var(--muted)">
                     Padding
                     <input type="number" min="0" max="200" [value]="getSeccionPaddingV('hero')"
                       (change)="upsertSeccion('hero','paddingV',+$any($event.target).value || null)"
-                      placeholder="auto" style="width:52px;font-size:.78rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px;height:22px;background:var(--bg)" /> px
+                      placeholder="auto" style="width:52px;font-size:.78rem;padding:2px 5px;border:1px solid var(--border);border-radius:4px;height:22px;background:var(--surface2);color:var(--text)" /> px
                   </label>
                 </div>
               }
@@ -187,13 +187,13 @@ function slugFromNombre(nombre: string): string {
                     Texto
                     <input type="number" min="8" max="72" [value]="getSeccionFontSizePx('descripcion')"
                       (change)="upsertSeccion('descripcion','fontSize',$any($event.target).value ? $any($event.target).value+'px' : null)"
-                      placeholder="auto" style="width:52px;font-size:.78rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px;height:22px;background:var(--bg)" /> px
+                      placeholder="auto" style="width:52px;font-size:.78rem;padding:2px 5px;border:1px solid var(--border);border-radius:4px;height:22px;background:var(--surface2);color:var(--text)" /> px
                   </label>
                   <label style="display:flex;align-items:center;gap:.35rem;font-size:.78rem;color:var(--muted)">
                     Padding
                     <input type="number" min="0" max="200" [value]="getSeccionPaddingV('descripcion')"
                       (change)="upsertSeccion('descripcion','paddingV',+$any($event.target).value || null)"
-                      placeholder="auto" style="width:52px;font-size:.78rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px;height:22px;background:var(--bg)" /> px
+                      placeholder="auto" style="width:52px;font-size:.78rem;padding:2px 5px;border:1px solid var(--border);border-radius:4px;height:22px;background:var(--surface2);color:var(--text)" /> px
                   </label>
                 </div>
               }
@@ -341,13 +341,13 @@ function slugFromNombre(nombre: string): string {
                           Texto
                           <input type="number" min="8" max="72" [value]="getSeccionFontSizePx('fechas')"
                             (change)="upsertSeccion('fechas','fontSize',$any($event.target).value ? $any($event.target).value+'px' : null)"
-                            placeholder="auto" style="width:52px;font-size:.78rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px;height:22px;background:var(--bg)" /> px
+                            placeholder="auto" style="width:52px;font-size:.78rem;padding:2px 5px;border:1px solid var(--border);border-radius:4px;height:22px;background:var(--surface2);color:var(--text)" /> px
                         </label>
                         <label style="display:flex;align-items:center;gap:.35rem;font-size:.78rem;color:var(--muted)">
                           Padding
                           <input type="number" min="0" max="200" [value]="getSeccionPaddingV('fechas')"
                             (change)="upsertSeccion('fechas','paddingV',+$any($event.target).value || null)"
-                            placeholder="auto" style="width:52px;font-size:.78rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px;height:22px;background:var(--bg)" /> px
+                            placeholder="auto" style="width:52px;font-size:.78rem;padding:2px 5px;border:1px solid var(--border);border-radius:4px;height:22px;background:var(--surface2);color:var(--text)" /> px
                         </label>
                       </div>
                     </div>
@@ -400,19 +400,19 @@ function slugFromNombre(nombre: string): string {
                           Altura logos
                           <input type="number" min="24" max="160" [value]="getSeccionLogoAltura('organizadores')"
                             (change)="upsertSeccion('organizadores','logoAltura',+$any($event.target).value || null)"
-                            style="width:54px;font-size:.78rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px;height:22px;background:var(--bg)" /> px
+                            style="width:54px;font-size:.78rem;padding:2px 5px;border:1px solid var(--border);border-radius:4px;height:22px;background:var(--surface2);color:var(--text)" /> px
                         </label>
                         <label style="display:flex;align-items:center;gap:.35rem;font-size:.78rem;color:var(--muted)">
                           Col/fila
                           <input type="number" min="1" max="8" [value]="getSeccionLogoColumnas('organizadores')"
                             (change)="upsertSeccion('organizadores','logoColumnas',+$any($event.target).value || null)"
-                            placeholder="auto" style="width:44px;font-size:.78rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px;height:22px;background:var(--bg)" />
+                            placeholder="auto" style="width:44px;font-size:.78rem;padding:2px 5px;border:1px solid var(--border);border-radius:4px;height:22px;background:var(--surface2);color:var(--text)" />
                         </label>
                         <label style="display:flex;align-items:center;gap:.35rem;font-size:.78rem;color:var(--muted)">
                           Padding
                           <input type="number" min="0" max="200" [value]="getSeccionPaddingV('organizadores')"
                             (change)="upsertSeccion('organizadores','paddingV',+$any($event.target).value || null)"
-                            placeholder="auto" style="width:52px;font-size:.78rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px;height:22px;background:var(--bg)" /> px
+                            placeholder="auto" style="width:52px;font-size:.78rem;padding:2px 5px;border:1px solid var(--border);border-radius:4px;height:22px;background:var(--surface2);color:var(--text)" /> px
                         </label>
                       </div>
                     </div>
@@ -492,13 +492,13 @@ function slugFromNombre(nombre: string): string {
                           Texto
                           <input type="number" min="8" max="72" [value]="getSeccionFontSizePx('contacto')"
                             (change)="upsertSeccion('contacto','fontSize',$any($event.target).value ? $any($event.target).value+'px' : null)"
-                            placeholder="auto" style="width:52px;font-size:.78rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px;height:22px;background:var(--bg)" /> px
+                            placeholder="auto" style="width:52px;font-size:.78rem;padding:2px 5px;border:1px solid var(--border);border-radius:4px;height:22px;background:var(--surface2);color:var(--text)" /> px
                         </label>
                         <label style="display:flex;align-items:center;gap:.35rem;font-size:.78rem;color:var(--muted)">
                           Padding
                           <input type="number" min="0" max="200" [value]="getSeccionPaddingV('contacto')"
                             (change)="upsertSeccion('contacto','paddingV',+$any($event.target).value || null)"
-                            placeholder="auto" style="width:52px;font-size:.78rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px;height:22px;background:var(--bg)" /> px
+                            placeholder="auto" style="width:52px;font-size:.78rem;padding:2px 5px;border:1px solid var(--border);border-radius:4px;height:22px;background:var(--surface2);color:var(--text)" /> px
                         </label>
                       </div>
                     </div>
@@ -569,13 +569,13 @@ function slugFromNombre(nombre: string): string {
                           Texto
                           <input type="number" min="8" max="72" [value]="getSeccionFontSizePx('inscripciones')"
                             (change)="upsertSeccion('inscripciones','fontSize',$any($event.target).value ? $any($event.target).value+'px' : null)"
-                            placeholder="auto" style="width:52px;font-size:.78rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px;height:22px;background:var(--bg)" /> px
+                            placeholder="auto" style="width:52px;font-size:.78rem;padding:2px 5px;border:1px solid var(--border);border-radius:4px;height:22px;background:var(--surface2);color:var(--text)" /> px
                         </label>
                         <label style="display:flex;align-items:center;gap:.35rem;font-size:.78rem;color:var(--muted)">
                           Padding
                           <input type="number" min="0" max="200" [value]="getSeccionPaddingV('inscripciones')"
                             (change)="upsertSeccion('inscripciones','paddingV',+$any($event.target).value || null)"
-                            placeholder="auto" style="width:52px;font-size:.78rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px;height:22px;background:var(--bg)" /> px
+                            placeholder="auto" style="width:52px;font-size:.78rem;padding:2px 5px;border:1px solid var(--border);border-radius:4px;height:22px;background:var(--surface2);color:var(--text)" /> px
                         </label>
                       </div>
                     </div>
