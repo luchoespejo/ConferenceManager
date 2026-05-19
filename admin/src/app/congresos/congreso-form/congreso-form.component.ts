@@ -133,7 +133,7 @@ function slugFromNombre(nombre: string): string {
                 <div class="error-msg" style="margin-bottom:.75rem">{{ fechasError() }}</div>
               }
               @if (id) {
-                <div style="margin-top:.875rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;padding:.4rem .7rem;background:rgba(0,0,0,.22);border-radius:6px;border:1px solid var(--border)">
+                <div style="margin-top:.875rem;display:flex;align-items:center;gap:.875rem;flex-wrap:wrap;padding:.625rem 1rem;background:rgba(0,0,0,.22);border-radius:6px;border:1px solid var(--border)">
                   <span style="font-size:.58rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;opacity:.55;white-space:nowrap">Hero</span>
                   <div style="width:1px;height:12px;background:var(--border);opacity:.4;flex-shrink:0"></div>
                   <label style="display:flex;align-items:center;gap:.3rem;font-size:.72rem;color:var(--muted);cursor:pointer">
@@ -177,7 +177,7 @@ function slugFromNombre(nombre: string): string {
                 <textarea id="descripcion" formControlName="descripcion" class="form-control" rows="4" placeholder="Descripción del congreso (opcional)"></textarea>
               </div>
               @if (id) {
-                <div style="margin-top:.875rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;padding:.4rem .7rem;background:rgba(0,0,0,.22);border-radius:6px;border:1px solid var(--border)">
+                <div style="margin-top:.875rem;display:flex;align-items:center;gap:.875rem;flex-wrap:wrap;padding:.625rem 1rem;background:rgba(0,0,0,.22);border-radius:6px;border:1px solid var(--border)">
                   <span style="font-size:.58rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;opacity:.55;white-space:nowrap">Desc.</span>
                   <div style="width:1px;height:12px;background:var(--border);opacity:.4;flex-shrink:0"></div>
                   <label style="display:flex;align-items:center;gap:.3rem;font-size:.72rem;color:var(--muted);cursor:pointer">
@@ -338,7 +338,7 @@ function slugFromNombre(nombre: string): string {
                         <p style="color:var(--muted);font-size:.875rem;margin-bottom:.75rem">Sin fechas aún.</p>
                       }
                       <button type="button" class="btn btn-secondary btn-sm" (click)="addFecha()">+ Agregar fecha</button>
-                      <div style="margin-top:.875rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;padding:.4rem .7rem;background:rgba(0,0,0,.22);border-radius:6px;border:1px solid var(--border)">
+                      <div style="margin-top:.875rem;display:flex;align-items:center;gap:.875rem;flex-wrap:wrap;padding:.625rem 1rem;background:rgba(0,0,0,.22);border-radius:6px;border:1px solid var(--border)">
                         <span style="font-size:.58rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;opacity:.55;white-space:nowrap">Fechas</span>
                         <div style="width:1px;height:12px;background:var(--border);opacity:.4;flex-shrink:0"></div>
                         <label style="display:flex;align-items:center;gap:.3rem;font-size:.72rem;color:var(--muted);cursor:pointer">
@@ -404,7 +404,7 @@ function slugFromNombre(nombre: string): string {
                         <p style="color:var(--muted);font-size:.875rem;margin-bottom:.75rem">Sin organizadores aún.</p>
                       }
                       <button type="button" class="btn btn-secondary btn-sm" (click)="addOrg()">+ Agregar organizador</button>
-                      <div style="margin-top:.875rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;padding:.4rem .7rem;background:rgba(0,0,0,.22);border-radius:6px;border:1px solid var(--border)">
+                      <div style="margin-top:.875rem;display:flex;align-items:center;gap:.875rem;flex-wrap:wrap;padding:.625rem 1rem;background:rgba(0,0,0,.22);border-radius:6px;border:1px solid var(--border)">
                         <span style="font-size:.58rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;opacity:.55;white-space:nowrap">Orgs.</span>
                         <div style="width:1px;height:12px;background:var(--border);opacity:.4;flex-shrink:0"></div>
                         <label style="display:flex;align-items:center;gap:.3rem;font-size:.72rem;color:var(--muted);cursor:pointer">
@@ -501,7 +501,7 @@ function slugFromNombre(nombre: string): string {
                         <textarea id="contactoAdicional" formControlName="contactoAdicional" class="form-control" rows="3"
                           placeholder="Ej. También podés consultar en Tesorería, Oficina 12, lunes a viernes 9-17hs"></textarea>
                       </div>
-                      <div style="margin-top:.875rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;padding:.4rem .7rem;background:rgba(0,0,0,.22);border-radius:6px;border:1px solid var(--border)">
+                      <div style="margin-top:.875rem;display:flex;align-items:center;gap:.875rem;flex-wrap:wrap;padding:.625rem 1rem;background:rgba(0,0,0,.22);border-radius:6px;border:1px solid var(--border)">
                         <span style="font-size:.58rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;opacity:.55;white-space:nowrap">Contacto</span>
                         <div style="width:1px;height:12px;background:var(--border);opacity:.4;flex-shrink:0"></div>
                         <label style="display:flex;align-items:center;gap:.3rem;font-size:.72rem;color:var(--muted);cursor:pointer">
@@ -585,7 +585,7 @@ function slugFromNombre(nombre: string): string {
                       </div>
 
                       <!-- Apariencia sección inscripciones -->
-                      <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;padding:.4rem .7rem;background:rgba(0,0,0,.22);border-radius:6px;border:1px solid var(--border)">
+                      <div style="display:flex;align-items:center;gap:.875rem;flex-wrap:wrap;padding:.625rem 1rem;background:rgba(0,0,0,.22);border-radius:6px;border:1px solid var(--border)">
                         <span style="font-size:.58rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;opacity:.55;white-space:nowrap">Inscr.</span>
                         <div style="width:1px;height:12px;background:var(--border);opacity:.4;flex-shrink:0"></div>
                         <label style="display:flex;align-items:center;gap:.3rem;font-size:.72rem;color:var(--muted);cursor:pointer">
