@@ -92,6 +92,10 @@ function slugFromNombre(nombre: string): string {
                 <input id="subtitulo" type="text" formControlName="subtitulo" class="form-control" placeholder="Subtítulo que aparece bajo el nombre principal (opcional)" />
               </div>
               <div class="form-group" style="margin-bottom:1rem">
+                <label for="lema">Lema <span style="font-size:.78rem;color:var(--muted);font-weight:400">(frase en cursiva bajo el subtítulo en el sitio)</span></label>
+                <input id="lema" type="text" formControlName="lema" class="form-control" placeholder='"Composición de alimentos: clave para la seguridad alimentaria..."' />
+              </div>
+              <div class="form-group" style="margin-bottom:1rem">
                 <label for="slug">Slug (subdominio) <span class="required">*</span></label>
                 <input id="slug" type="text" formControlName="slug" class="form-control" placeholder="mi-congreso" (input)="onSlugInput()" />
                 @if (f['slug'].touched && f['slug'].errors?.['required']) {
@@ -296,43 +300,10 @@ function slugFromNombre(nombre: string): string {
               <div class="card" style="margin-bottom:1.25rem">
                 <h3 style="margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:1px solid var(--border)">Sitio público</h3>
 
-                <!-- Acordeón: Información general -->
-                <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:.625rem">
-                  <div style="display:flex;align-items:center;padding:.75rem 1rem;background:var(--bg-alt);cursor:pointer;user-select:none" (click)="toggleSection('info_general')">
-                    <span style="flex:1;font-weight:600">Información general del sitio</span>
-                    <span style="color:var(--muted);font-size:1rem;pointer-events:none;line-height:1">{{ isSectionExpanded('info_general') ? '▴' : '▾' }}</span>
-                  </div>
-                  @if (isSectionExpanded('info_general')) {
-                    <div style="padding:1rem">
-                      <div class="form-group" style="margin-bottom:1rem">
-                        <label for="lema">Lema <span style="font-size:.78rem;color:var(--muted);font-weight:400">(cita en cursiva bajo el subtítulo)</span></label>
-                        <input id="lema" type="text" formControlName="lema" class="form-control" placeholder='"Composición de alimentos: clave para la seguridad alimentaria..."' />
-                      </div>
-                      <div class="form-row" style="margin-bottom:1rem">
-                        <div class="form-group">
-                          <label for="emailContacto">Email de contacto</label>
-                          <input id="emailContacto" type="email" formControlName="emailContacto" class="form-control" placeholder="info@congreso.com" />
-                        </div>
-                        <div class="form-group">
-                          <label for="instagram">Instagram</label>
-                          <div style="display:flex;align-items:center;border:1px solid var(--border);border-radius:8px;overflow:hidden">
-                            <span style="padding:0 .75rem;background:var(--bg-alt);color:var(--muted);font-size:.9rem;border-right:1px solid var(--border);height:100%;display:flex;align-items:center">&#64;</span>
-                            <input id="instagram" type="text" formControlName="instagram" class="form-control" placeholder="congreso_oficial" style="border:none;border-radius:0" />
-                          </div>
-                        </div>
-                      </div>
-                      <div class="form-group">
-                        <label for="formularioInscripcionUrl">Link de inscripción (formulario externo)</label>
-                        <input id="formularioInscripcionUrl" type="url" formControlName="formularioInscripcionUrl" class="form-control" placeholder="https://forms.gle/..." />
-                      </div>
-                    </div>
-                  }
-                </div>
-
                 <!-- Acordeón: Fechas importantes -->
                 <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:.625rem">
                   <div style="display:flex;align-items:center;gap:.75rem;padding:.75rem 1rem;background:var(--bg-alt);cursor:pointer;user-select:none" (click)="toggleSection('fechas')">
-                    <input type="checkbox" formControlName="mostrarFechas" (click)="$event.stopPropagation()" style="width:16px;height:16px;cursor:pointer;accent-color:var(--primary);flex-shrink:0" />
+                    <input type="checkbox" formControlName="mostrarFechas" style="width:16px;height:16px;cursor:pointer;accent-color:var(--primary);flex-shrink:0" />
                     <span style="flex:1;font-weight:600">Fechas importantes</span>
                     <span style="color:var(--muted);font-size:1rem;pointer-events:none;line-height:1">{{ isSectionExpanded('fechas') ? '▴' : '▾' }}</span>
                   </div>
@@ -381,7 +352,7 @@ function slugFromNombre(nombre: string): string {
                 <!-- Acordeón: Organizado por -->
                 <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:.625rem">
                   <div style="display:flex;align-items:center;gap:.75rem;padding:.75rem 1rem;background:var(--bg-alt);cursor:pointer;user-select:none" (click)="toggleSection('organizadores')">
-                    <input type="checkbox" formControlName="mostrarOrganizadores" (click)="$event.stopPropagation()" style="width:16px;height:16px;cursor:pointer;accent-color:var(--primary);flex-shrink:0" />
+                    <input type="checkbox" formControlName="mostrarOrganizadores" style="width:16px;height:16px;cursor:pointer;accent-color:var(--primary);flex-shrink:0" />
                     <span style="flex:1;font-weight:600">Organizado por</span>
                     <span style="color:var(--muted);font-size:1rem;pointer-events:none;line-height:1">{{ isSectionExpanded('organizadores') ? '▴' : '▾' }}</span>
                   </div>
@@ -434,7 +405,7 @@ function slugFromNombre(nombre: string): string {
                 <!-- Acordeón: Descripción y ejes -->
                 <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:.625rem">
                   <div style="display:flex;align-items:center;gap:.75rem;padding:.75rem 1rem;background:var(--bg-alt);cursor:pointer;user-select:none" (click)="toggleSection('descripcion')">
-                    <input type="checkbox" formControlName="mostrarDescripcion" (click)="$event.stopPropagation()" style="width:16px;height:16px;cursor:pointer;accent-color:var(--primary);flex-shrink:0" />
+                    <input type="checkbox" formControlName="mostrarDescripcion" style="width:16px;height:16px;cursor:pointer;accent-color:var(--primary);flex-shrink:0" />
                     <span style="flex:1;font-weight:600">Descripción y ejes temáticos</span>
                     <span style="color:var(--muted);font-size:1rem;pointer-events:none;line-height:1">{{ isSectionExpanded('descripcion') ? '▴' : '▾' }}</span>
                   </div>
@@ -463,14 +434,26 @@ function slugFromNombre(nombre: string): string {
                 <!-- Acordeón: Contacto -->
                 <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:.625rem">
                   <div style="display:flex;align-items:center;gap:.75rem;padding:.75rem 1rem;background:var(--bg-alt);cursor:pointer;user-select:none" (click)="toggleSection('contacto')">
-                    <input type="checkbox" formControlName="mostrarContacto" (click)="$event.stopPropagation()" style="width:16px;height:16px;cursor:pointer;accent-color:var(--primary);flex-shrink:0" />
+                    <input type="checkbox" formControlName="mostrarContacto" style="width:16px;height:16px;cursor:pointer;accent-color:var(--primary);flex-shrink:0" />
                     <span style="flex:1;font-weight:600">Contacto / Informes</span>
                     <span style="color:var(--muted);font-size:1rem;pointer-events:none;line-height:1">{{ isSectionExpanded('contacto') ? '▴' : '▾' }}</span>
                   </div>
                   @if (isSectionExpanded('contacto')) {
                     <div style="padding:1rem">
-                      <p style="font-size:.8rem;color:var(--muted);margin-bottom:.75rem">Email e Instagram se muestran automáticamente. Podés agregar texto libre:</p>
-                      <div class="form-group">
+                      <div class="form-row" style="margin-bottom:1rem">
+                        <div class="form-group">
+                          <label for="emailContacto">Email de contacto</label>
+                          <input id="emailContacto" type="email" formControlName="emailContacto" class="form-control" placeholder="info@congreso.com" />
+                        </div>
+                        <div class="form-group">
+                          <label for="instagram">Instagram</label>
+                          <div style="display:flex;align-items:center;border:1px solid var(--border);border-radius:8px;overflow:hidden">
+                            <span style="padding:0 .75rem;background:var(--bg-alt);color:var(--muted);font-size:.9rem;border-right:1px solid var(--border);height:100%;display:flex;align-items:center">&#64;</span>
+                            <input id="instagram" type="text" formControlName="instagram" class="form-control" placeholder="congreso_oficial" style="border:none;border-radius:0" />
+                          </div>
+                        </div>
+                      </div>
+                      <div class="form-group" style="margin-bottom:1rem">
                         <label for="contactoAdicional">Información adicional</label>
                         <textarea id="contactoAdicional" formControlName="contactoAdicional" class="form-control" rows="3"
                           placeholder="Ej. También podés consultar en Tesorería, Oficina 12, lunes a viernes 9-17hs"></textarea>
@@ -506,12 +489,16 @@ function slugFromNombre(nombre: string): string {
                 <!-- Acordeón: Inscripciones -->
                 <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:.625rem">
                   <div style="display:flex;align-items:center;gap:.75rem;padding:.75rem 1rem;background:var(--bg-alt);cursor:pointer;user-select:none" (click)="toggleSection('inscripciones')">
-                    <input type="checkbox" formControlName="mostrarInscripciones" (click)="$event.stopPropagation()" style="width:16px;height:16px;cursor:pointer;accent-color:var(--primary);flex-shrink:0" />
+                    <input type="checkbox" formControlName="mostrarInscripciones" style="width:16px;height:16px;cursor:pointer;accent-color:var(--primary);flex-shrink:0" />
                     <span style="flex:1;font-weight:600">Inscripciones <small style="font-weight:400;color:var(--muted);margin-left:.35rem">(tab en el sitio)</small></span>
                     <span style="color:var(--muted);font-size:1rem;pointer-events:none;line-height:1">{{ isSectionExpanded('inscripciones') ? '▴' : '▾' }}</span>
                   </div>
                   @if (isSectionExpanded('inscripciones')) {
                     <div style="padding:1rem">
+                      <div class="form-group" style="margin-bottom:1.25rem">
+                        <label for="formularioInscripcionUrl">Link de inscripción (formulario externo)</label>
+                        <input id="formularioInscripcionUrl" type="url" formControlName="formularioInscripcionUrl" class="form-control" placeholder="https://forms.gle/..." />
+                      </div>
                       <!-- Tabla de aranceles -->
                       <label style="font-size:.875rem;font-weight:600;display:block;margin-bottom:.5rem">Aranceles</label>
                       <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:.75rem">
