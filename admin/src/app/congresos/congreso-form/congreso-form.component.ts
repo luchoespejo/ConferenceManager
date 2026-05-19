@@ -154,7 +154,7 @@ function slugFromNombre(nombre: string): string {
                       <div style="position:relative;display:inline-flex;align-items:center">
                         <input type="number" min="0.5" max="5" step="0.05" [value]="getSeccionFontSizeRem('hero')"
                           (input)="upsertSeccionFontRem('hero', $any($event.target).value)"
-                          placeholder="–" style="width:84px;font-size:.875rem;padding:6px 36px 6px 10px;border:1px solid var(--border);border-radius:6px;height:36px;background:var(--surface2);color:var(--text)" />
+                          placeholder="–" style="width:110px;font-size:.875rem;padding:6px 40px 6px 12px;border:1px solid var(--border);border-radius:6px;height:36px;background:var(--surface2);color:var(--text)" />
                         <span style="position:absolute;right:8px;font-size:.7rem;color:var(--muted);pointer-events:none;font-weight:700;opacity:.7">rem</span>
                       </div>
                     </label>
@@ -163,7 +163,7 @@ function slugFromNombre(nombre: string): string {
                       <div style="position:relative;display:inline-flex;align-items:center">
                         <input type="number" min="0" max="12" step="0.25" [value]="getSeccionPaddingVRem('hero')"
                           (input)="upsertSeccionPaddingRem('hero', $any($event.target).value)"
-                          placeholder="–" style="width:84px;font-size:.875rem;padding:6px 36px 6px 10px;border:1px solid var(--border);border-radius:6px;height:36px;background:var(--surface2);color:var(--text)" />
+                          placeholder="–" style="width:110px;font-size:.875rem;padding:6px 40px 6px 12px;border:1px solid var(--border);border-radius:6px;height:36px;background:var(--surface2);color:var(--text)" />
                         <span style="position:absolute;right:8px;font-size:.7rem;color:var(--muted);pointer-events:none;font-weight:700;opacity:.7">rem</span>
                       </div>
                     </label>
@@ -201,7 +201,7 @@ function slugFromNombre(nombre: string): string {
                       <div style="position:relative;display:inline-flex;align-items:center">
                         <input type="number" min="0.5" max="5" step="0.05" [value]="getSeccionFontSizeRem('descripcion')"
                           (input)="upsertSeccionFontRem('descripcion', $any($event.target).value)"
-                          placeholder="–" style="width:84px;font-size:.875rem;padding:6px 36px 6px 10px;border:1px solid var(--border);border-radius:6px;height:36px;background:var(--surface2);color:var(--text)" />
+                          placeholder="–" style="width:110px;font-size:.875rem;padding:6px 40px 6px 12px;border:1px solid var(--border);border-radius:6px;height:36px;background:var(--surface2);color:var(--text)" />
                         <span style="position:absolute;right:8px;font-size:.7rem;color:var(--muted);pointer-events:none;font-weight:700;opacity:.7">rem</span>
                       </div>
                     </label>
@@ -210,7 +210,7 @@ function slugFromNombre(nombre: string): string {
                       <div style="position:relative;display:inline-flex;align-items:center">
                         <input type="number" min="0" max="12" step="0.25" [value]="getSeccionPaddingVRem('descripcion')"
                           (input)="upsertSeccionPaddingRem('descripcion', $any($event.target).value)"
-                          placeholder="–" style="width:84px;font-size:.875rem;padding:6px 36px 6px 10px;border:1px solid var(--border);border-radius:6px;height:36px;background:var(--surface2);color:var(--text)" />
+                          placeholder="–" style="width:110px;font-size:.875rem;padding:6px 40px 6px 12px;border:1px solid var(--border);border-radius:6px;height:36px;background:var(--surface2);color:var(--text)" />
                         <span style="position:absolute;right:8px;font-size:.7rem;color:var(--muted);pointer-events:none;font-weight:700;opacity:.7">rem</span>
                       </div>
                     </label>
@@ -365,7 +365,7 @@ function slugFromNombre(nombre: string): string {
                             <div style="position:relative;display:inline-flex;align-items:center">
                               <input type="number" min="0.5" max="5" step="0.05" [value]="getSeccionFontSizeRem('fechas')"
                                 (input)="upsertSeccionFontRem('fechas', $any($event.target).value)"
-                                placeholder="–" style="width:84px;font-size:.875rem;padding:6px 36px 6px 10px;border:1px solid var(--border);border-radius:6px;height:36px;background:var(--surface2);color:var(--text)" />
+                                placeholder="–" style="width:110px;font-size:.875rem;padding:6px 40px 6px 12px;border:1px solid var(--border);border-radius:6px;height:36px;background:var(--surface2);color:var(--text)" />
                               <span style="position:absolute;right:8px;font-size:.7rem;color:var(--muted);pointer-events:none;font-weight:700;opacity:.7">rem</span>
                             </div>
                           </label>
@@ -374,7 +374,7 @@ function slugFromNombre(nombre: string): string {
                             <div style="position:relative;display:inline-flex;align-items:center">
                               <input type="number" min="0" max="12" step="0.25" [value]="getSeccionPaddingVRem('fechas')"
                                 (input)="upsertSeccionPaddingRem('fechas', $any($event.target).value)"
-                                placeholder="–" style="width:84px;font-size:.875rem;padding:6px 36px 6px 10px;border:1px solid var(--border);border-radius:6px;height:36px;background:var(--surface2);color:var(--text)" />
+                                placeholder="–" style="width:110px;font-size:.875rem;padding:6px 40px 6px 12px;border:1px solid var(--border);border-radius:6px;height:36px;background:var(--surface2);color:var(--text)" />
                               <span style="position:absolute;right:8px;font-size:.7rem;color:var(--muted);pointer-events:none;font-weight:700;opacity:.7">rem</span>
                             </div>
                           </label>
@@ -434,7 +434,7 @@ function slugFromNombre(nombre: string): string {
                             <div style="position:relative;display:inline-flex;align-items:center">
                               <input type="number" min="24" max="160" [value]="getSeccionLogoAltura('organizadores')"
                                 (input)="upsertSeccion('organizadores','logoAltura',+$any($event.target).value || null)"
-                                style="width:84px;font-size:.875rem;padding:6px 36px 6px 10px;border:1px solid var(--border);border-radius:6px;height:36px;background:var(--surface2);color:var(--text)" />
+                                style="width:110px;font-size:.875rem;padding:6px 40px 6px 12px;border:1px solid var(--border);border-radius:6px;height:36px;background:var(--surface2);color:var(--text)" />
                               <span style="position:absolute;right:8px;font-size:.7rem;color:var(--muted);pointer-events:none;font-weight:700;opacity:.7">px</span>
                             </div>
                           </label>
@@ -449,7 +449,7 @@ function slugFromNombre(nombre: string): string {
                             <div style="position:relative;display:inline-flex;align-items:center">
                               <input type="number" min="0" max="12" step="0.25" [value]="getSeccionPaddingVRem('organizadores')"
                                 (input)="upsertSeccionPaddingRem('organizadores', $any($event.target).value)"
-                                placeholder="–" style="width:84px;font-size:.875rem;padding:6px 36px 6px 10px;border:1px solid var(--border);border-radius:6px;height:36px;background:var(--surface2);color:var(--text)" />
+                                placeholder="–" style="width:110px;font-size:.875rem;padding:6px 40px 6px 12px;border:1px solid var(--border);border-radius:6px;height:36px;background:var(--surface2);color:var(--text)" />
                               <span style="position:absolute;right:8px;font-size:.7rem;color:var(--muted);pointer-events:none;font-weight:700;opacity:.7">rem</span>
                             </div>
                           </label>
@@ -536,7 +536,7 @@ function slugFromNombre(nombre: string): string {
                             <div style="position:relative;display:inline-flex;align-items:center">
                               <input type="number" min="0.5" max="5" step="0.05" [value]="getSeccionFontSizeRem('contacto')"
                                 (input)="upsertSeccionFontRem('contacto', $any($event.target).value)"
-                                placeholder="–" style="width:84px;font-size:.875rem;padding:6px 36px 6px 10px;border:1px solid var(--border);border-radius:6px;height:36px;background:var(--surface2);color:var(--text)" />
+                                placeholder="–" style="width:110px;font-size:.875rem;padding:6px 40px 6px 12px;border:1px solid var(--border);border-radius:6px;height:36px;background:var(--surface2);color:var(--text)" />
                               <span style="position:absolute;right:8px;font-size:.7rem;color:var(--muted);pointer-events:none;font-weight:700;opacity:.7">rem</span>
                             </div>
                           </label>
@@ -545,7 +545,7 @@ function slugFromNombre(nombre: string): string {
                             <div style="position:relative;display:inline-flex;align-items:center">
                               <input type="number" min="0" max="12" step="0.25" [value]="getSeccionPaddingVRem('contacto')"
                                 (input)="upsertSeccionPaddingRem('contacto', $any($event.target).value)"
-                                placeholder="–" style="width:84px;font-size:.875rem;padding:6px 36px 6px 10px;border:1px solid var(--border);border-radius:6px;height:36px;background:var(--surface2);color:var(--text)" />
+                                placeholder="–" style="width:110px;font-size:.875rem;padding:6px 40px 6px 12px;border:1px solid var(--border);border-radius:6px;height:36px;background:var(--surface2);color:var(--text)" />
                               <span style="position:absolute;right:8px;font-size:.7rem;color:var(--muted);pointer-events:none;font-weight:700;opacity:.7">rem</span>
                             </div>
                           </label>
@@ -623,7 +623,7 @@ function slugFromNombre(nombre: string): string {
                             <div style="position:relative;display:inline-flex;align-items:center">
                               <input type="number" min="0.5" max="5" step="0.05" [value]="getSeccionFontSizeRem('inscripciones')"
                                 (input)="upsertSeccionFontRem('inscripciones', $any($event.target).value)"
-                                placeholder="–" style="width:84px;font-size:.875rem;padding:6px 36px 6px 10px;border:1px solid var(--border);border-radius:6px;height:36px;background:var(--surface2);color:var(--text)" />
+                                placeholder="–" style="width:110px;font-size:.875rem;padding:6px 40px 6px 12px;border:1px solid var(--border);border-radius:6px;height:36px;background:var(--surface2);color:var(--text)" />
                               <span style="position:absolute;right:8px;font-size:.7rem;color:var(--muted);pointer-events:none;font-weight:700;opacity:.7">rem</span>
                             </div>
                           </label>
@@ -632,7 +632,7 @@ function slugFromNombre(nombre: string): string {
                             <div style="position:relative;display:inline-flex;align-items:center">
                               <input type="number" min="0" max="12" step="0.25" [value]="getSeccionPaddingVRem('inscripciones')"
                                 (input)="upsertSeccionPaddingRem('inscripciones', $any($event.target).value)"
-                                placeholder="–" style="width:84px;font-size:.875rem;padding:6px 36px 6px 10px;border:1px solid var(--border);border-radius:6px;height:36px;background:var(--surface2);color:var(--text)" />
+                                placeholder="–" style="width:110px;font-size:.875rem;padding:6px 40px 6px 12px;border:1px solid var(--border);border-radius:6px;height:36px;background:var(--surface2);color:var(--text)" />
                               <span style="position:absolute;right:8px;font-size:.7rem;color:var(--muted);pointer-events:none;font-weight:700;opacity:.7">rem</span>
                             </div>
                           </label>
