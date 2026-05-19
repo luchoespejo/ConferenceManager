@@ -234,10 +234,10 @@ export default async function ConferenciaHome({ params }: { params: Promise<{ sl
 
       {/* Descripción + Ejes temáticos */}
       {conf.mostrarDescripcion && (conf.descripcion || conf.ejesTematicos?.length > 0) && (
-        <div style={{ padding: '4rem 1.5rem', background: sc('descripcion').bgColor ?? '#f8fafc', fontSize: sc('descripcion').fontSize ?? undefined }}>
+        <div style={{ padding: '2.25rem 1.5rem', background: sc('descripcion').bgColor ?? '#f8fafc', fontSize: sc('descripcion').fontSize ?? undefined }}>
           <div style={{ maxWidth: '700px', margin: '0 auto' }}>
             {conf.descripcion && (
-              <p style={{ fontSize: sc('descripcion').fontSize ?? '1.05rem', lineHeight: 1.7, color: sc('descripcion').textoColor ?? '#334155', marginBottom: '2rem', textAlign: 'justify' }}>
+              <p style={{ fontSize: sc('descripcion').fontSize ?? '1.05rem', lineHeight: 1.7, color: sc('descripcion').textoColor ?? '#334155', marginBottom: conf.ejesTematicos?.length > 0 ? '1.5rem' : 0, textAlign: 'justify' }}>
                 {conf.descripcion}
               </p>
             )}
@@ -297,42 +297,42 @@ export default async function ConferenciaHome({ params }: { params: Promise<{ sl
 
       {/* Informes / Contacto */}
       {conf.mostrarContacto && (conf.emailContacto || conf.instagram || conf.contactoAdicional || conf.formularioInscripcionUrl) && (
-        <div style={{ background: sc('contacto').bgColor ?? primary, color: sc('contacto').textoColor ?? '#fff', padding: '3.5rem 1.5rem', textAlign: 'center', fontSize: sc('contacto').fontSize ?? undefined }}>
-          <div style={{ maxWidth: '600px', margin: '0 auto' }}>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1.5rem' }}>Informes</h2>
-            {conf.emailContacto && (
-              <p style={{ marginBottom: '.75rem', fontSize: sc('contacto').fontSize ?? '1.05rem' }}>
-                <a href={`mailto:${conf.emailContacto}`} style={{ color: sc('contacto').textoColor ?? '#fff', fontWeight: 600 }}>
-                  ✉ {conf.emailContacto}
+        <div style={{ background: sc('contacto').bgColor ?? primary, color: sc('contacto').textoColor ?? '#fff', padding: '1.75rem 1.5rem', fontSize: sc('contacto').fontSize ?? undefined }}>
+          <div style={{ maxWidth: '700px', margin: '0 auto' }}>
+            <p style={{ fontSize: '.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.12em', opacity: .65, margin: '0 0 .875rem', textAlign: 'center' }}>
+              Informes y contacto
+            </p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.625rem 2rem', justifyContent: 'center', alignItems: 'center' }}>
+              {conf.emailContacto && (
+                <a href={`mailto:${conf.emailContacto}`}
+                  style={{ color: sc('contacto').textoColor ?? '#fff', fontWeight: 700, fontSize: sc('contacto').fontSize ?? '1rem', textDecoration: 'none' }}>
+                  {conf.emailContacto}
                 </a>
-              </p>
-            )}
-            {conf.instagram && (
-              <p style={{ marginBottom: '.75rem', fontSize: sc('contacto').fontSize ?? '1.05rem' }}>
+              )}
+              {conf.instagram && (
                 <a
                   href={`https://instagram.com/${conf.instagram}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ color: sc('contacto').textoColor ?? '#fff', fontWeight: 600 }}
+                  style={{ color: sc('contacto').textoColor ?? '#fff', fontWeight: 700, fontSize: sc('contacto').fontSize ?? '1rem', textDecoration: 'none' }}
                 >
-                  📷 @{conf.instagram}
+                  @{conf.instagram}
                 </a>
-              </p>
-            )}
-            {conf.formularioInscripcionUrl && (
-              <p style={{ marginBottom: '.75rem', fontSize: sc('contacto').fontSize ?? '1.05rem' }}>
+              )}
+              {conf.formularioInscripcionUrl && (
                 <a
                   href={conf.formularioInscripcionUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ color: sc('contacto').textoColor ?? '#fff', fontWeight: 600 }}
+                  style={{ color: sc('contacto').textoColor ?? '#fff', fontWeight: 700, fontSize: sc('contacto').fontSize ?? '1rem', textDecoration: 'none',
+                    background: 'rgba(255,255,255,.18)', padding: '6px 18px', borderRadius: '999px' }}
                 >
-                  📝 Formulario de inscripción
+                  Inscribirse →
                 </a>
-              </p>
-            )}
+              )}
+            </div>
             {conf.contactoAdicional && (
-              <p style={{ marginTop: '1rem', fontSize: sc('contacto').fontSize ?? '.95rem', opacity: .85, whiteSpace: 'pre-line' }}>
+              <p style={{ marginTop: '.875rem', fontSize: sc('contacto').fontSize ?? '.9rem', opacity: .8, whiteSpace: 'pre-line', textAlign: 'center' }}>
                 {conf.contactoAdicional}
               </p>
             )}
