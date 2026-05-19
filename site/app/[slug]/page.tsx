@@ -129,7 +129,7 @@ export default async function ConferenciaHome({ params }: { params: Promise<{ sl
     <div>
       {esDecorativo ? (
         /* Hero claro: fondo blanco, texto oscuro, banner como imagen decorativa */
-        <div style={{ background: sc('hero').bgColor ?? '#fff', padding: '3.5rem 1.5rem 0', textAlign: 'center' }}>
+        <div style={{ background: sc('hero').bgColor ?? '#fff', padding: '3.5rem 1.5rem 0', textAlign: 'center', fontSize: sc('hero').fontSize ?? undefined }}>
           <div style={{ maxWidth: '860px', margin: '0 auto' }}>
             {logoSrc && (
               <img src={logoSrc} alt={conf.nombre} style={{ height: '80px', width: 'auto', margin: '0 auto 1.5rem', display: 'block', objectFit: 'contain' }} />
@@ -176,6 +176,7 @@ export default async function ConferenciaHome({ params }: { params: Promise<{ sl
           color: sc('hero').textoColor ?? '#fff',
           padding: '5rem 1.5rem',
           textAlign: 'center',
+          fontSize: sc('hero').fontSize ?? undefined,
         }}>
           {logoSrc && (
             <img src={logoSrc} alt={conf.nombre} style={{ height: '72px', width: 'auto', margin: '0 auto 1.5rem', display: 'block', objectFit: 'contain' }} />
