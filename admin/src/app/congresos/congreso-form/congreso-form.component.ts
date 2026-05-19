@@ -143,12 +143,12 @@ function slugFromNombre(nombre: string): string {
                   </label>
                   <label style="display:flex;align-items:center;gap:.4rem;font-size:.8rem">
                     Tamaño texto
-                    <select [value]="getSeccionFontSize('hero')" (change)="upsertSeccion('hero','fontSize',$any($event.target).value)" style="font-size:.8rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px">
-                      <option value="">Auto</option>
-                      <option value=".85rem">Pequeño</option>
-                      <option value="1rem">Normal</option>
-                      <option value="1.15rem">Grande</option>
-                      <option value="1.3rem">Muy grande</option>
+                    <select (change)="upsertSeccion('hero','fontSize',$any($event.target).value)" style="font-size:.8rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px">
+                      <option value="" [selected]="!getSeccionFontSize('hero')">Auto</option>
+                      <option value=".85rem" [selected]="getSeccionFontSize('hero')==='.85rem'">Pequeño</option>
+                      <option value="1rem" [selected]="getSeccionFontSize('hero')==='1rem'">Normal</option>
+                      <option value="1.15rem" [selected]="getSeccionFontSize('hero')==='1.15rem'">Grande</option>
+                      <option value="1.3rem" [selected]="getSeccionFontSize('hero')==='1.3rem'">Muy grande</option>
                     </select>
                   </label>
                 </div>
@@ -177,12 +177,12 @@ function slugFromNombre(nombre: string): string {
                   </label>
                   <label style="display:flex;align-items:center;gap:.4rem;font-size:.8rem">
                     Tamaño texto
-                    <select [value]="getSeccionFontSize('descripcion')" (change)="upsertSeccion('descripcion','fontSize',$any($event.target).value)" style="font-size:.8rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px">
-                      <option value="">Auto</option>
-                      <option value=".85rem">Pequeño</option>
-                      <option value="1rem">Normal</option>
-                      <option value="1.15rem">Grande</option>
-                      <option value="1.3rem">Muy grande</option>
+                    <select (change)="upsertSeccion('descripcion','fontSize',$any($event.target).value)" style="font-size:.8rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px">
+                      <option value="" [selected]="!getSeccionFontSize('descripcion')">Auto</option>
+                      <option value=".85rem" [selected]="getSeccionFontSize('descripcion')==='.85rem'">Pequeño</option>
+                      <option value="1rem" [selected]="getSeccionFontSize('descripcion')==='1rem'">Normal</option>
+                      <option value="1.15rem" [selected]="getSeccionFontSize('descripcion')==='1.15rem'">Grande</option>
+                      <option value="1.3rem" [selected]="getSeccionFontSize('descripcion')==='1.3rem'">Muy grande</option>
                     </select>
                   </label>
                 </div>
@@ -361,12 +361,12 @@ function slugFromNombre(nombre: string): string {
                         </label>
                         <label style="display:flex;align-items:center;gap:.4rem;font-size:.8rem">
                           Tamaño texto
-                          <select [value]="getSeccionFontSize('fechas')" (change)="upsertSeccion('fechas','fontSize',$any($event.target).value)" style="font-size:.8rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px">
-                            <option value="">Auto</option>
-                            <option value=".85rem">Pequeño</option>
-                            <option value="1rem">Normal</option>
-                            <option value="1.15rem">Grande</option>
-                            <option value="1.3rem">Muy grande</option>
+                          <select (change)="upsertSeccion('fechas','fontSize',$any($event.target).value)" style="font-size:.8rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px">
+                            <option value="" [selected]="!getSeccionFontSize('fechas')">Auto</option>
+                            <option value=".85rem" [selected]="getSeccionFontSize('fechas')==='.85rem'">Pequeño</option>
+                            <option value="1rem" [selected]="getSeccionFontSize('fechas')==='1rem'">Normal</option>
+                            <option value="1.15rem" [selected]="getSeccionFontSize('fechas')==='1.15rem'">Grande</option>
+                            <option value="1.3rem" [selected]="getSeccionFontSize('fechas')==='1.3rem'">Muy grande</option>
                           </select>
                         </label>
                       </div>
@@ -486,12 +486,12 @@ function slugFromNombre(nombre: string): string {
                         </label>
                         <label style="display:flex;align-items:center;gap:.4rem;font-size:.8rem">
                           Tamaño texto
-                          <select [value]="getSeccionFontSize('contacto')" (change)="upsertSeccion('contacto','fontSize',$any($event.target).value)" style="font-size:.8rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px">
-                            <option value="">Auto</option>
-                            <option value=".85rem">Pequeño</option>
-                            <option value="1rem">Normal</option>
-                            <option value="1.15rem">Grande</option>
-                            <option value="1.3rem">Muy grande</option>
+                          <select (change)="upsertSeccion('contacto','fontSize',$any($event.target).value)" style="font-size:.8rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px">
+                            <option value="" [selected]="!getSeccionFontSize('contacto')">Auto</option>
+                            <option value=".85rem" [selected]="getSeccionFontSize('contacto')==='.85rem'">Pequeño</option>
+                            <option value="1rem" [selected]="getSeccionFontSize('contacto')==='1rem'">Normal</option>
+                            <option value="1.15rem" [selected]="getSeccionFontSize('contacto')==='1.15rem'">Grande</option>
+                            <option value="1.3rem" [selected]="getSeccionFontSize('contacto')==='1.3rem'">Muy grande</option>
                           </select>
                         </label>
                       </div>
@@ -556,12 +556,12 @@ function slugFromNombre(nombre: string): string {
                         </label>
                         <label style="display:flex;align-items:center;gap:.4rem;font-size:.8rem">
                           Tamaño texto
-                          <select [value]="getSeccionFontSize('inscripciones')" (change)="upsertSeccion('inscripciones','fontSize',$any($event.target).value)" style="font-size:.8rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px">
-                            <option value="">Auto</option>
-                            <option value=".85rem">Pequeño</option>
-                            <option value="1rem">Normal</option>
-                            <option value="1.15rem">Grande</option>
-                            <option value="1.3rem">Muy grande</option>
+                          <select (change)="upsertSeccion('inscripciones','fontSize',$any($event.target).value)" style="font-size:.8rem;padding:2px 4px;border:1px solid var(--border);border-radius:4px">
+                            <option value="" [selected]="!getSeccionFontSize('inscripciones')">Auto</option>
+                            <option value=".85rem" [selected]="getSeccionFontSize('inscripciones')==='.85rem'">Pequeño</option>
+                            <option value="1rem" [selected]="getSeccionFontSize('inscripciones')==='1rem'">Normal</option>
+                            <option value="1.15rem" [selected]="getSeccionFontSize('inscripciones')==='1.15rem'">Grande</option>
+                            <option value="1.3rem" [selected]="getSeccionFontSize('inscripciones')==='1.3rem'">Muy grande</option>
                           </select>
                         </label>
                       </div>
