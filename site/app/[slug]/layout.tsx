@@ -57,7 +57,7 @@ export default async function SlugLayout({
           {logoSrc ? (
             <img src={logoSrc} alt={conf.nombre} style={{ height: '36px', width: 'auto', objectFit: 'contain' }} />
           ) : (
-            <span>Conferencia</span>
+            <span>Inicio</span>
           )}
         </Link>
         <div className="site-nav-spacer" />

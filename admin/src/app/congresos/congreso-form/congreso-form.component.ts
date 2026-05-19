@@ -331,11 +331,9 @@ function slugFromNombre(nombre: string): string {
 
                 <!-- Acordeón: Fechas importantes -->
                 <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:.625rem">
-                  <div style="display:flex;align-items:center;padding:.75rem 1rem;background:var(--bg-alt);cursor:pointer;user-select:none" (click)="toggleSection('fechas')">
-                    <label style="display:flex;align-items:center;gap:.75rem;cursor:pointer;flex:1;font-weight:600" (click)="$event.stopPropagation()">
-                      <input type="checkbox" formControlName="mostrarFechas" style="width:16px;height:16px;cursor:pointer;accent-color:var(--primary)" />
-                      Fechas importantes
-                    </label>
+                  <div style="display:flex;align-items:center;gap:.75rem;padding:.75rem 1rem;background:var(--bg-alt);cursor:pointer;user-select:none" (click)="toggleSection('fechas')">
+                    <input type="checkbox" formControlName="mostrarFechas" (click)="$event.stopPropagation()" style="width:16px;height:16px;cursor:pointer;accent-color:var(--primary);flex-shrink:0" />
+                    <span style="flex:1;font-weight:600">Fechas importantes</span>
                     <span style="color:var(--muted);font-size:1rem;pointer-events:none;line-height:1">{{ isSectionExpanded('fechas') ? '▴' : '▾' }}</span>
                   </div>
                   @if (isSectionExpanded('fechas')) {
@@ -382,11 +380,9 @@ function slugFromNombre(nombre: string): string {
 
                 <!-- Acordeón: Organizado por -->
                 <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:.625rem">
-                  <div style="display:flex;align-items:center;padding:.75rem 1rem;background:var(--bg-alt);cursor:pointer;user-select:none" (click)="toggleSection('organizadores')">
-                    <label style="display:flex;align-items:center;gap:.75rem;cursor:pointer;flex:1;font-weight:600" (click)="$event.stopPropagation()">
-                      <input type="checkbox" formControlName="mostrarOrganizadores" style="width:16px;height:16px;cursor:pointer;accent-color:var(--primary)" />
-                      Organizado por
-                    </label>
+                  <div style="display:flex;align-items:center;gap:.75rem;padding:.75rem 1rem;background:var(--bg-alt);cursor:pointer;user-select:none" (click)="toggleSection('organizadores')">
+                    <input type="checkbox" formControlName="mostrarOrganizadores" (click)="$event.stopPropagation()" style="width:16px;height:16px;cursor:pointer;accent-color:var(--primary);flex-shrink:0" />
+                    <span style="flex:1;font-weight:600">Organizado por</span>
                     <span style="color:var(--muted);font-size:1rem;pointer-events:none;line-height:1">{{ isSectionExpanded('organizadores') ? '▴' : '▾' }}</span>
                   </div>
                   @if (isSectionExpanded('organizadores')) {
@@ -437,11 +433,9 @@ function slugFromNombre(nombre: string): string {
 
                 <!-- Acordeón: Descripción y ejes -->
                 <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:.625rem">
-                  <div style="display:flex;align-items:center;padding:.75rem 1rem;background:var(--bg-alt);cursor:pointer;user-select:none" (click)="toggleSection('descripcion')">
-                    <label style="display:flex;align-items:center;gap:.75rem;cursor:pointer;flex:1;font-weight:600" (click)="$event.stopPropagation()">
-                      <input type="checkbox" formControlName="mostrarDescripcion" style="width:16px;height:16px;cursor:pointer;accent-color:var(--primary)" />
-                      Descripción y ejes temáticos
-                    </label>
+                  <div style="display:flex;align-items:center;gap:.75rem;padding:.75rem 1rem;background:var(--bg-alt);cursor:pointer;user-select:none" (click)="toggleSection('descripcion')">
+                    <input type="checkbox" formControlName="mostrarDescripcion" (click)="$event.stopPropagation()" style="width:16px;height:16px;cursor:pointer;accent-color:var(--primary);flex-shrink:0" />
+                    <span style="flex:1;font-weight:600">Descripción y ejes temáticos</span>
                     <span style="color:var(--muted);font-size:1rem;pointer-events:none;line-height:1">{{ isSectionExpanded('descripcion') ? '▴' : '▾' }}</span>
                   </div>
                   @if (isSectionExpanded('descripcion')) {
@@ -468,11 +462,9 @@ function slugFromNombre(nombre: string): string {
 
                 <!-- Acordeón: Contacto -->
                 <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:.625rem">
-                  <div style="display:flex;align-items:center;padding:.75rem 1rem;background:var(--bg-alt);cursor:pointer;user-select:none" (click)="toggleSection('contacto')">
-                    <label style="display:flex;align-items:center;gap:.75rem;cursor:pointer;flex:1;font-weight:600" (click)="$event.stopPropagation()">
-                      <input type="checkbox" formControlName="mostrarContacto" style="width:16px;height:16px;cursor:pointer;accent-color:var(--primary)" />
-                      Contacto / Informes
-                    </label>
+                  <div style="display:flex;align-items:center;gap:.75rem;padding:.75rem 1rem;background:var(--bg-alt);cursor:pointer;user-select:none" (click)="toggleSection('contacto')">
+                    <input type="checkbox" formControlName="mostrarContacto" (click)="$event.stopPropagation()" style="width:16px;height:16px;cursor:pointer;accent-color:var(--primary);flex-shrink:0" />
+                    <span style="flex:1;font-weight:600">Contacto / Informes</span>
                     <span style="color:var(--muted);font-size:1rem;pointer-events:none;line-height:1">{{ isSectionExpanded('contacto') ? '▴' : '▾' }}</span>
                   </div>
                   @if (isSectionExpanded('contacto')) {
@@ -513,11 +505,9 @@ function slugFromNombre(nombre: string): string {
 
                 <!-- Acordeón: Inscripciones -->
                 <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:.625rem">
-                  <div style="display:flex;align-items:center;padding:.75rem 1rem;background:var(--bg-alt);cursor:pointer;user-select:none" (click)="toggleSection('inscripciones')">
-                    <label style="display:flex;align-items:center;gap:.75rem;cursor:pointer;flex:1;font-weight:600" (click)="$event.stopPropagation()">
-                      <input type="checkbox" formControlName="mostrarInscripciones" style="width:16px;height:16px;cursor:pointer;accent-color:var(--primary)" />
-                      Inscripciones <small style="font-weight:400;color:var(--muted);margin-left:.35rem">(tab en el sitio)</small>
-                    </label>
+                  <div style="display:flex;align-items:center;gap:.75rem;padding:.75rem 1rem;background:var(--bg-alt);cursor:pointer;user-select:none" (click)="toggleSection('inscripciones')">
+                    <input type="checkbox" formControlName="mostrarInscripciones" (click)="$event.stopPropagation()" style="width:16px;height:16px;cursor:pointer;accent-color:var(--primary);flex-shrink:0" />
+                    <span style="flex:1;font-weight:600">Inscripciones <small style="font-weight:400;color:var(--muted);margin-left:.35rem">(tab en el sitio)</small></span>
                     <span style="color:var(--muted);font-size:1rem;pointer-events:none;line-height:1">{{ isSectionExpanded('inscripciones') ? '▴' : '▾' }}</span>
                   </div>
                   @if (isSectionExpanded('inscripciones')) {
