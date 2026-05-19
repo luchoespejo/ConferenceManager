@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 interface ArancelFila { categoria: string; monto: string; }
 interface ArancelesData { filas: ArancelFila[]; nota?: string; }
 
-interface SeccionConfig { seccionKey: string; bgColor?: string | null; textoColor?: string | null; }
+interface SeccionConfig { seccionKey: string; bgColor?: string | null; textoColor?: string | null; fontSize?: string | null; }
 
 interface Conferencia {
   slug: string;
@@ -27,6 +27,17 @@ async function fetchConferencia(slug: string): Promise<Conferencia | null> {
   } catch {
     return null;
   }
+}
+
+const URL_RE = /(https?:\/\/[^\s]+)/g;
+
+function renderConLinks(text: string, color: string) {
+  const parts = text.split(URL_RE);
+  return parts.map((part, i) =>
+    URL_RE.test(part)
+      ? <a key={i} href={part} target="_blank" rel="noopener noreferrer" style={{ color, fontWeight: 600, wordBreak: 'break-all' }}>{part}</a>
+      : <span key={i}>{part}</span>
+  );
 }
 
 function parseAranceles(raw?: string): ArancelesData | null {
@@ -53,9 +64,10 @@ export default async function InscripcionesPage({ params }: { params: Promise<{ 
 
   const pageBg = sc('inscripciones').bgColor ?? '#ffffff';
   const pageColor = sc('inscripciones').textoColor ?? '#1e293b';
+  const pageFontSize = sc('inscripciones').fontSize ?? undefined;
 
   return (
-    <div style={{ background: pageBg, minHeight: '100vh' }}>
+    <div style={{ background: pageBg, minHeight: '100vh', fontSize: pageFontSize }}>
     <div style={{ maxWidth: '760px', margin: '0 auto', padding: '3rem 1.5rem' }}>
       <h1 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '2.5rem', color: pageColor }}>
         Inscripciones
@@ -87,7 +99,9 @@ export default async function InscripcionesPage({ params }: { params: Promise<{ 
             </tbody>
           </table>
           {aranceles.nota && (
-            <p style={{ marginTop: '1rem', color: pageColor, opacity: .75, fontSize: '.9rem', whiteSpace: 'pre-line', lineHeight: 1.6 }}>{aranceles.nota}</p>
+            <p style={{ marginTop: '1rem', color: pageColor, opacity: .75, fontSize: '.9rem', whiteSpace: 'pre-line', lineHeight: 1.6 }}>
+              {renderConLinks(aranceles.nota, primary)}
+            </p>
           )}
         </section>
       )}
