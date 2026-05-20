@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import PuckRenderer from './PuckRenderer';
 
 export const dynamic = 'force-dynamic';
 
@@ -60,9 +61,20 @@ interface Conferencia {
   mostrarInscripciones: boolean;
   tieneSesiones: boolean;
   tieneExpositores: boolean;
+  layoutJson?: string | null;
   organizadores: Organizador[];
   fechasImportantes: FechaImportante[];
   ejesTematicos: EjeTematico[];
+}
+
+function parsePuckData(layoutJson?: string | null) {
+  if (!layoutJson) return null;
+  try {
+    const parsed = JSON.parse(layoutJson);
+    if (parsed.puckData?.content) return parsed.puckData;
+    if (parsed.content) return parsed;
+    return null;
+  } catch { return null; }
 }
 
 async function fetchConferencia(slug: string): Promise<Conferencia | null> {
@@ -81,6 +93,35 @@ export default async function ConferenciaHome({ params }: { params: Promise<{ sl
   const conf = await fetchConferencia(slug);
 
   if (!conf) notFound();
+
+  // Layout-driven rendering: si hay un layoutJson guardado en el maquetador, usarlo
+  const puckData = parsePuckData(conf.layoutJson);
+  if (puckData) {
+    return (
+      <PuckRenderer
+        puckData={puckData}
+        conf={{
+          slug: conf.slug,
+          nombre: conf.nombre,
+          colorPrimario: conf.colorPrimario,
+          colorSecundario: conf.colorSecundario,
+          emailContacto: conf.emailContacto,
+          instagram: conf.instagram,
+          formularioInscripcionUrl: conf.formularioInscripcionUrl,
+          contactoAdicional: conf.contactoAdicional,
+          tieneSesiones: conf.tieneSesiones,
+          tieneExpositores: conf.tieneExpositores,
+          organizadores: conf.organizadores,
+          fechasImportantes: conf.fechasImportantes.map(f => ({
+            id: f.id,
+            descripcion: f.descripcion,
+            fecha: String(f.fecha),
+            fechaFin: f.fechaFin ? String(f.fechaFin) : undefined,
+          })),
+        }}
+      />
+    );
+  }
 
   const primary = conf.colorPrimario ?? '#1a1a2e';
   const secondary = conf.colorSecundario ?? '#16213e';

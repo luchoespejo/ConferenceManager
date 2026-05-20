@@ -62,6 +62,7 @@ public class PublicService(AppDbContext context) : IPublicService
                 LogoColumnas = s.LogoColumnas,
                 PaddingV = s.PaddingV,
             }).ToList(),
+            LayoutJson = conferencia.LayoutJson,
             MostrarFechas = conferencia.MostrarFechas,
             MostrarDescripcion = conferencia.MostrarDescripcion,
             MostrarOrganizadores = conferencia.MostrarOrganizadores,

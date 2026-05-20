@@ -1,9 +1,12 @@
+using ConferenceManager.Data;
 using ConferenceManager.DTOs.Conferencias;
 using ConferenceManager.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.JsonWebTokens;
 using System.Security.Claims;
+using System.Text.Json;
 
 namespace ConferenceManager.Controllers;
 
@@ -15,7 +18,8 @@ public class ConferenciasController(
     IStaticSiteService staticSiteService,
     IHttpClientFactory httpClientFactory,
     IConfiguration config,
-    ILogger<ConferenciasController> logger) : ControllerBase
+    ILogger<ConferenciasController> logger,
+    AppDbContext dbContext) : ControllerBase
 {
     private Guid UsuarioId =>
         Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -172,6 +176,47 @@ public class ConferenciasController(
                 logger.LogWarning(ex, "Vercel deploy hook failed");
             }
         });
+    }
+
+    [HttpGet("{id:guid}/layout")]
+    public async Task<IActionResult> GetLayout(Guid id)
+    {
+        var exists = await dbContext.Conferencias
+            .AsNoTracking()
+            .AnyAsync(c => c.Id == id && c.UsuarioId == UsuarioId);
+
+        if (!exists) return NotFound();
+
+        var layoutJson = await dbContext.Conferencias
+            .AsNoTracking()
+            .Where(c => c.Id == id && c.UsuarioId == UsuarioId)
+            .Select(c => c.LayoutJson)
+            .FirstOrDefaultAsync();
+
+        return Ok(new LayoutResponse { LayoutJson = layoutJson });
+    }
+
+    [HttpPut("{id:guid}/layout")]
+    public async Task<IActionResult> SaveLayout(Guid id, [FromBody] SaveLayoutRequest request)
+    {
+        try
+        {
+            var doc = JsonDocument.Parse(request.LayoutJson);
+            if (!doc.RootElement.TryGetProperty("version", out _))
+                return BadRequest(new { error = "INVALID_LAYOUT", message = "El layout debe incluir el campo 'version'." });
+        }
+        catch (JsonException)
+        {
+            return BadRequest(new { error = "INVALID_JSON", message = "El layout no es JSON válido." });
+        }
+
+        var rows = await dbContext.Conferencias
+            .Where(c => c.Id == id && c.UsuarioId == UsuarioId)
+            .ExecuteUpdateAsync(s => s.SetProperty(c => c.LayoutJson, request.LayoutJson));
+
+        if (rows == 0) return NotFound();
+
+        return Ok(new LayoutResponse { LayoutJson = request.LayoutJson });
     }
 
     [HttpPut("{id:guid}/finalizar")]

@@ -114,6 +114,9 @@ public class ConferenciaConfiguration : IEntityTypeConfiguration<Conferencia>
             .IsRequired()
             .HasDefaultValue(false);
 
+        builder.Property(c => c.LayoutJson)
+            .HasColumnType("text");
+
         builder.Property(c => c.CreatedAt)
             .HasColumnType("timestamptz")
             .HasDefaultValueSql("NOW()")

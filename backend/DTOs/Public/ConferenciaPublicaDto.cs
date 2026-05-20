@@ -71,6 +71,7 @@ public class ConferenciaPublicaDto
     public bool MostrarInscripciones { get; set; }
     public bool TieneSesiones { get; set; }
     public bool TieneExpositores { get; set; }
+    public string? LayoutJson { get; set; }
 
     public List<OrganizadorPublicoDto> Organizadores { get; set; } = [];
     public List<FechaImportantePublicaDto> FechasImportantes { get; set; } = [];
