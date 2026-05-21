@@ -21,12 +21,14 @@ export function proxy(req: NextRequest) {
   // ── Subdomain → slug routing ─────────────────────────────────────────────
   const host = req.headers.get('host') ?? '';
   const slug = host.split('.')[0];
-  if (['www', 'tuplataforma', 'localhost'].includes(slug)) {
+  if (['www', 'tuplataforma', 'localhost', 'conference-manager-irl1'].includes(slug)) {
     return NextResponse.next();
   }
-  const res = NextResponse.next();
-  res.headers.set('x-conference-slug', slug);
-  return res;
+
+  // Rewrite: congreso.tuplataforma.com/programa → /congreso/programa
+  const url = req.nextUrl.clone();
+  url.pathname = `/${slug}${pathname === '/' ? '' : pathname}`;
+  return NextResponse.rewrite(url);
 }
 
 export const config = {
