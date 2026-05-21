@@ -5,13 +5,14 @@ import { useRouter } from 'next/navigation';
 import { Puck, usePuck } from '@puckeditor/core';
 import '@puckeditor/core/dist/index.css';
 import { puckConfig, DEFAULT_PUCK_DATA } from '@/lib/puck-config';
-import { createTemplateAction, updateTemplateAction } from './actions';
+import { createTemplateAction, updateTemplateAction, previewLayoutAction } from './actions';
 
 interface Props {
   congresoId: string;
   layoutId: string | null;
   templateNombre: string | null;
   initialLayoutJson: string | null;
+  slug: string | null;
 }
 
 const EMPTY_PUCK_DATA = { content: [], root: { props: { fontFamily: 'system-ui, sans-serif' } } };
@@ -26,7 +27,7 @@ function parsePuckData(layoutJson: string | null) {
   } catch { return null; }
 }
 
-export default function MaquetadorClient({ congresoId, layoutId, templateNombre, initialLayoutJson }: Props) {
+export default function MaquetadorClient({ congresoId, layoutId, templateNombre, initialLayoutJson, slug }: Props) {
   const router = useRouter();
   const existingData = parsePuckData(initialLayoutJson);
 
@@ -35,12 +36,40 @@ export default function MaquetadorClient({ congresoId, layoutId, templateNombre,
   const [startEmpty, setStartEmpty] = useState(false);
   const [saving, setSaving] = useState(false);
   const [savedOk, setSavedOk] = useState(false);
+  const [previewing, setPreviewing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showNameModal, setShowNameModal] = useState(false);
   const [pendingData, setPendingData] = useState<unknown>(null);
   const [pendingNombre, setPendingNombre] = useState('');
 
+  const MAX_PAYLOAD_MB = 8; // margen bajo el límite de 10MB del server action
+
+  function checkPayloadSize(data: unknown): boolean {
+    const json = JSON.stringify({ version: 1, puckData: data });
+    const sizeMB = new Blob([json]).size / 1024 / 1024;
+    if (sizeMB > MAX_PAYLOAD_MB) {
+      setError(`El layout pesa ${sizeMB.toFixed(1)} MB y supera el límite de ${MAX_PAYLOAD_MB} MB. Reducí el tamaño de las imágenes.`);
+      return false;
+    }
+    return true;
+  }
+
+  async function handlePreview(data: unknown) {
+    if (!checkPayloadSize(data)) return;
+    setPreviewing(true);
+    setError(null);
+    try {
+      const resolvedSlug = await previewLayoutAction(congresoId, data);
+      window.open(`/${resolvedSlug}`, '_blank');
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Error al generar vista previa');
+    } finally {
+      setPreviewing(false);
+    }
+  }
+
   function handleSaveRequest(data: unknown) {
+    if (!checkPayloadSize(data)) return;
     if (currentLayoutId) {
       // Actualizar template existente
       doSave(data, currentLayoutId, null);
@@ -100,6 +129,24 @@ export default function MaquetadorClient({ congresoId, layoutId, templateNombre,
           }}
         >
           ← Maquetas
+        </button>
+        <button
+          onClick={() => handlePreview(appState.data)}
+          disabled={previewing || saving}
+          title="Copia el estado actual al sitio público y abre una vista previa en nueva pestaña"
+          style={{
+            padding: '5px 12px',
+            background: 'transparent',
+            color: '#0369a1',
+            border: '1px solid #bae6fd',
+            borderRadius: 6,
+            fontSize: 12,
+            fontWeight: 500,
+            cursor: (previewing || saving) ? 'not-allowed' : 'pointer',
+            opacity: (previewing || saving) ? 0.6 : 1,
+          }}
+        >
+          {previewing ? '⏳ Abriendo...' : '👁 Vista previa'}
         </button>
         <button
           onClick={() => handleSaveRequest(appState.data)}

@@ -7,6 +7,10 @@ interface LayoutTemplateDto {
   layoutJson: string;
 }
 
+interface ConferenciaBasicDto {
+  slug: string;
+}
+
 export default async function MaquetadorPage({
   params,
   searchParams,
@@ -19,6 +23,15 @@ export default async function MaquetadorPage({
 
   let initialLayoutJson: string | null = null;
   let templateNombre: string | null = null;
+  let slug: string | null = null;
+
+  // Fetch slug
+  try {
+    const conf = await apiFetch<ConferenciaBasicDto>(`/api/dashboard/conferencias/${id}`);
+    slug = conf.slug;
+  } catch {
+    // slug not critical — preview button just won't open
+  }
 
   if (layoutId) {
     // Cargar template específico
@@ -39,6 +52,7 @@ export default async function MaquetadorPage({
       layoutId={layoutId ?? null}
       templateNombre={templateNombre}
       initialLayoutJson={initialLayoutJson}
+      slug={slug}
     />
   );
 }

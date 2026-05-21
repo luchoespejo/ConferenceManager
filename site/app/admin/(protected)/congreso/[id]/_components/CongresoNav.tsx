@@ -12,13 +12,14 @@ interface Props {
 }
 
 const TABS = [
-  { key: 'maquetas',      label: '🧱 Maquetas' },
-  { key: 'salas',         label: '🚪 Salas' },
-  { key: 'expositores',   label: '🎤 Expositores' },
-  { key: 'sesiones',      label: '📅 Sesiones' },
-  { key: 'participantes', label: '👥 Participantes' },
-  { key: 'avisos',        label: '🔔 Avisos' },
-  { key: 'acciones',      label: '⚡ Acciones' },
+  { key: 'maquetas',       label: '🧱 Maquetas' },
+  { key: 'configuracion',  label: '⚙️ Configuración' },
+  { key: 'salas',          label: '🚪 Salas' },
+  { key: 'expositores',    label: '🎤 Expositores' },
+  { key: 'sesiones',       label: '📅 Sesiones' },
+  { key: 'participantes',  label: '👥 Participantes' },
+  { key: 'avisos',         label: '🔔 Avisos' },
+  { key: 'acciones',       label: '⚡ Acciones' },
 ];
 
 const ESTADO_BADGE: Record<string, string> = {

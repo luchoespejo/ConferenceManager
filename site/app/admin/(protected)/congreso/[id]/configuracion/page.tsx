@@ -8,7 +8,7 @@ interface Congreso {
   descripcion?: string | null; subtitulo?: string | null; lema?: string | null;
   venueNombre?: string | null; venueDireccion?: string | null; venueLinkMaps?: string | null;
   emailContacto?: string | null; instagram?: string | null;
-  formularioInscripcionUrl?: string | null; informacionPago?: string | null; contactoAdicional?: string | null;
+  formularioInscripcionUrl?: string | null; arancelesTexto?: string | null; informacionPago?: string | null; contactoAdicional?: string | null;
   mostrarFechas: boolean; mostrarDescripcion: boolean; mostrarOrganizadores: boolean;
   mostrarContacto: boolean; mostrarInscripciones: boolean;
   logoUrl?: string | null; bannerUrl?: string | null;

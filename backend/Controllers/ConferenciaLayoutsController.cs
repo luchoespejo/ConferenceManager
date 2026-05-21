@@ -202,6 +202,11 @@ public class ConferenciaLayoutsController(
         if (activeLayout is null)
             return BadRequest(new { error = "NO_ACTIVE_LAYOUT", message = "No hay una maqueta activa. Activá una antes de desplegar." });
 
+        // Copiar el layoutJson del layout activo a Conferencia.LayoutJson para que la API pública lo sirva
+        await db.Conferencias
+            .Where(c => c.Id == conferenciaId)
+            .ExecuteUpdateAsync(s => s.SetProperty(c => c.LayoutJson, activeLayout.LayoutJson));
+
         // Disparar GitHub publish en background
         _ = Task.Run(() => githubPublishService.PublishConferenceAsync(conferenciaId, UsuarioId));
 

@@ -1,4 +1,5 @@
 import { DropZone, type Config, type CustomField } from '@puckeditor/core';
+import CountdownDisplay from './puck-components/CountdownDisplay';
 
 // ── Campo color: swatch + hex input ─────────────────────────────────────────
 function ColorPicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
@@ -92,22 +93,6 @@ const imageField = (label: string): CustomField<string> => ({
 });
 
 // ── Placeholder bloques dinámicos ────────────────────────────────────────────
-function DynamicPlaceholder({ icon, label, desc }: { icon: string; label: string; desc: string }) {
-  return (
-    <div style={{
-      border: '2px dashed #9c88ff', padding: '2rem 1.5rem', textAlign: 'center',
-      background: '#f5f3ff', fontFamily: 'system-ui, sans-serif',
-    }}>
-      <div style={{ fontSize: '2rem', marginBottom: '.5rem' }}>{icon}</div>
-      <div style={{ fontWeight: 700, fontSize: '1rem', color: '#4c1d95', marginBottom: '.25rem' }}>{label}</div>
-      <div style={{ color: '#7c3aed', fontSize: '.875rem', marginBottom: '.75rem' }}>{desc}</div>
-      <div style={{ fontSize: '.75rem', color: '#6b7280', background: '#ede9fe', display: 'inline-block', padding: '2px 10px', borderRadius: '100px' }}>
-        📦 Datos reales se inyectan en build
-      </div>
-    </div>
-  );
-}
-
 // ── Google Fonts ─────────────────────────────────────────────────────────────
 const GOOGLE_FONTS = [
   'Inter', 'Roboto', 'Open Sans', 'Lato', 'Montserrat',
@@ -150,10 +135,9 @@ export const puckConfig: Config = {
   },
 
   categories: {
-    layout:      { title: '📐 Layout',           components: ['SeccionFondo', 'DosColumnas', 'TresColumnas'] },
-    basicos:     { title: '✏️ Básicos',           components: ['Heading', 'Parrafo', 'Imagen', 'Video', 'Boton', 'BandaColor', 'Separador'] },
-    conferencia: { title: '🎪 Conferencia',       components: ['Hero', 'Stats'] },
-    dinamicos:   { title: '📦 Dinámicos (build)', components: ['Agenda', 'Expositores', 'FechasImportantes', 'Organizadores', 'Contacto', 'Inscripciones'] },
+    layout:      { title: '📐 Layout',      components: ['SeccionFondo', 'DosColumnas', 'TresColumnas'] },
+    basicos:     { title: '✏️ Básicos',      components: ['Heading', 'Parrafo', 'GaleriaLogos', 'Imagen', 'Video', 'Boton', 'BandaColor', 'Separador'] },
+    conferencia: { title: '🎪 Conferencia', components: ['Hero', 'Stats', 'CuentaRegresiva'] },
   },
 
   components: {
@@ -185,6 +169,8 @@ export const puckConfig: Config = {
       label: '⬛⬛ Dos columnas',
       fields: {
         gap:  { type: 'number', label: 'Espacio entre columnas (px)' },
+        paddingV: { type: 'number', label: 'Padding vertical (px)' },
+        paddingH: { type: 'number', label: 'Padding horizontal (px)' },
         ratio: {
           type: 'radio', label: 'Proporción',
           options: [
@@ -203,9 +189,9 @@ export const puckConfig: Config = {
           ],
         },
       },
-      defaultProps: { gap: 32, ratio: '1fr 1fr', alignItems: 'flex-start' },
-      render: ({ gap, ratio, alignItems }) => (
-        <div style={{ display: 'grid', gridTemplateColumns: ratio, gap, alignItems, padding: '2rem' }}>
+      defaultProps: { gap: 32, paddingV: 32, paddingH: 32, ratio: '1fr 1fr', alignItems: 'flex-start' },
+      render: ({ gap, paddingV, paddingH, ratio, alignItems }) => (
+        <div style={{ display: 'grid', gridTemplateColumns: ratio, gap, alignItems, padding: `${paddingV}px ${paddingH}px` }}>
           <DropZone zone="left" />
           <DropZone zone="right" />
         </div>
@@ -214,10 +200,14 @@ export const puckConfig: Config = {
 
     TresColumnas: {
       label: '⬛⬛⬛ Tres columnas',
-      fields: { gap: { type: 'number', label: 'Espacio entre columnas (px)' } },
-      defaultProps: { gap: 24 },
-      render: ({ gap }) => (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap, padding: '2rem' }}>
+      fields: {
+        gap: { type: 'number', label: 'Espacio entre columnas (px)' },
+        paddingV: { type: 'number', label: 'Padding vertical (px)' },
+        paddingH: { type: 'number', label: 'Padding horizontal (px)' },
+      },
+      defaultProps: { gap: 24, paddingV: 32, paddingH: 32 },
+      render: ({ gap, paddingV, paddingH }) => (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap, padding: `${paddingV}px ${paddingH}px` }}>
           <DropZone zone="col1" />
           <DropZone zone="col2" />
           <DropZone zone="col3" />
@@ -244,22 +234,55 @@ export const puckConfig: Config = {
             { label: 'Izq', value: 'left' }, { label: 'Centro', value: 'center' }, { label: 'Der', value: 'right' },
           ],
         },
+        negrita: {
+          type: 'radio', label: 'Negrita',
+          options: [{ label: 'Sí', value: 'si' }, { label: 'No', value: 'no' }],
+        },
+        cursiva: {
+          type: 'radio', label: 'Cursiva',
+          options: [{ label: 'Sí', value: 'si' }, { label: 'No', value: 'no' }],
+        },
+        subrayado: {
+          type: 'radio', label: 'Subrayado',
+          options: [{ label: 'Sí', value: 'si' }, { label: 'No', value: 'no' }],
+        },
+        fontFamily: {
+          type: 'select', label: 'Tipografía',
+          options: [
+            { label: 'Heredar del sitio', value: '' },
+            { label: 'System UI', value: 'system-ui, sans-serif' },
+            ...GOOGLE_FONTS.map(f => ({ label: f, value: `'${f}', sans-serif` })),
+            { label: 'Georgia (serif)', value: 'Georgia, serif' },
+            { label: 'Times New Roman', value: "'Times New Roman', serif" },
+          ],
+        },
         color:    colorField('Color texto'),
         bgColor:  colorField('Color de fondo'),
         fontSize: { type: 'number', label: 'Tamaño fuente (px, 0=auto)' },
         paddingV: { type: 'number', label: 'Padding vertical (px)' },
         paddingH: { type: 'number', label: 'Padding horizontal (px)' },
       },
-      defaultProps: { texto: 'Título de sección', nivel: 'h2', alignment: 'left', color: '#111827', bgColor: 'transparent', fontSize: 0, paddingV: 16, paddingH: 32 },
-      render: ({ texto, nivel, alignment, color, bgColor, fontSize, paddingV, paddingH }) => {
+      defaultProps: { texto: 'Título de sección', nivel: 'h2', alignment: 'left', negrita: 'si', cursiva: 'no', subrayado: 'no', fontFamily: '', color: '#111827', bgColor: 'transparent', fontSize: 0, paddingV: 16, paddingH: 32 },
+      render: ({ texto, nivel, alignment, negrita, cursiva, subrayado, fontFamily, color, bgColor, fontSize, paddingV, paddingH }) => {
         const Tag = nivel as 'h1' | 'h2' | 'h3' | 'h4';
         const sizes: Record<string, string> = { h1: '2.5rem', h2: '1.875rem', h3: '1.375rem', h4: '1.125rem' };
+        const font = fontFamily ? (fontFamily as string).split("'")[1] || (fontFamily as string).split(',')[0] : null;
+        const isGoogle = font && GOOGLE_FONTS.includes(font);
         return (
           <div style={{ background: bgColor, padding: `${paddingV}px ${paddingH}px` }}>
+            {isGoogle && (
+              <link href={`https://fonts.googleapis.com/css2?family=${font.replace(/ /g, '+')}:wght@400;700&display=swap`} rel="stylesheet" />
+            )}
             <Tag style={{
-              margin: 0, textAlign: alignment as 'left' | 'center' | 'right',
-              color, fontSize: fontSize ? `${fontSize}px` : sizes[nivel],
-              fontWeight: 700, lineHeight: 1.25,
+              margin: 0,
+              textAlign: alignment as 'left' | 'center' | 'right',
+              color,
+              fontSize: fontSize ? `${fontSize}px` : sizes[nivel],
+              fontWeight: negrita === 'si' ? 700 : 400,
+              fontStyle: cursiva === 'si' ? 'italic' : 'normal',
+              textDecoration: subrayado === 'si' ? 'underline' : 'none',
+              fontFamily: fontFamily || undefined,
+              lineHeight: 1.25,
             }}>
               {texto}
             </Tag>
@@ -271,14 +294,7 @@ export const puckConfig: Config = {
     Parrafo: {
       label: '¶ Párrafo',
       fields: {
-        contenido: { type: 'textarea', label: 'Texto' },
-        alignment: {
-          type: 'radio', label: 'Alineación',
-          options: [
-            { label: 'Izq', value: 'left' }, { label: 'Centro', value: 'center' },
-            { label: 'Der', value: 'right' }, { label: 'Just', value: 'justify' },
-          ],
-        },
+        contenido: { type: 'richtext', label: 'Texto' },
         color:    colorField('Color texto'),
         bgColor:  colorField('Color de fondo'),
         fontSize: { type: 'number', label: 'Tamaño fuente (px)' },
@@ -286,16 +302,15 @@ export const puckConfig: Config = {
         paddingV: { type: 'number', label: 'Padding vertical (px)' },
         paddingH: { type: 'number', label: 'Padding horizontal (px)' },
       },
-      defaultProps: { contenido: 'Escribí tu texto acá...', alignment: 'left', color: '#374151', bgColor: 'transparent', fontSize: 16, maxWidth: 0, paddingV: 8, paddingH: 32 },
-      render: ({ contenido, alignment, color, bgColor, fontSize, maxWidth, paddingV, paddingH }) => (
+      defaultProps: { contenido: '<p>Escribí tu texto acá...</p>', color: '#374151', bgColor: 'transparent', fontSize: 16, maxWidth: 0, paddingV: 8, paddingH: 32 },
+      render: ({ contenido, color, bgColor, fontSize, maxWidth, paddingV, paddingH }) => (
         <div style={{ background: bgColor, padding: `${paddingV}px ${paddingH}px` }}>
-          <p style={{
-            margin: 0, textAlign: alignment as 'left' | 'center' | 'right' | 'justify',
-            color, fontSize, lineHeight: 1.7, whiteSpace: 'pre-wrap',
-            maxWidth: maxWidth || 'none',
-          }}>
-            {contenido}
-          </p>
+          <div
+            style={{ color, fontSize, lineHeight: 1.7, maxWidth: maxWidth || 'none' }}
+            className="puck-richtext"
+            // eslint-disable-next-line react/no-danger
+            dangerouslySetInnerHTML={{ __html: contenido ?? '' }}
+          />
         </div>
       ),
     },
@@ -357,6 +372,64 @@ export const puckConfig: Config = {
               ▶️ Configurá la URL del video (YouTube o Vimeo)
             </div>;
       },
+    },
+
+    GaleriaLogos: {
+      label: '🖼️ Galería de logos / imágenes',
+      fields: {
+        imagenes: {
+          type: 'array',
+          label: 'Imágenes',
+          arrayFields: {
+            url:     imageField('Imagen / Logo'),
+            alt:     { type: 'text', label: 'Texto alternativo' },
+            linkUrl: { type: 'text', label: 'Link al hacer click (opcional)' },
+          },
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          defaultItemProps: { url: '', alt: '', linkUrl: '' } as any,
+        },
+        columnas: {
+          type: 'radio', label: 'Columnas',
+          options: [
+            { label: '2', value: '2' }, { label: '3', value: '3' },
+            { label: '4', value: '4' }, { label: '5', value: '5' }, { label: '6', value: '6' },
+          ],
+        },
+        alturaLogo: { type: 'number', label: 'Altura máxima (px)' },
+        gap:        { type: 'number', label: 'Espacio entre imágenes (px)' },
+        bgColor:    colorField('Color de fondo'),
+        paddingV:   { type: 'number', label: 'Padding vertical (px)' },
+      },
+      defaultProps: {
+        imagenes: [
+          { url: '', alt: 'Logo 1', linkUrl: '' },
+          { url: '', alt: 'Logo 2', linkUrl: '' },
+          { url: '', alt: 'Logo 3', linkUrl: '' },
+        ],
+        columnas: '3', alturaLogo: 48, gap: 24, bgColor: '#f1f5f9', paddingV: 32,
+      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      render: ({ imagenes, columnas, alturaLogo, gap, bgColor, paddingV }: any) => (
+        <div style={{ background: bgColor, padding: `${paddingV}px 2rem` }}>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: `repeat(${columnas}, 1fr)`,
+            gap,
+            alignItems: 'center',
+            maxWidth: '960px',
+            margin: '0 auto',
+          }}>
+            {(imagenes as { url: string; alt: string; linkUrl: string }[]).map((img, i) => {
+              const imgEl = img.url
+                ? <img key={i} src={img.url} alt={img.alt} style={{ maxHeight: alturaLogo, width: 'auto', maxWidth: '100%', objectFit: 'contain', display: 'block', margin: '0 auto' }} />
+                : <div key={i} style={{ height: alturaLogo, background: '#e2e8f0', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: '0.7rem' }}>Logo {i + 1}</div>;
+              return img.linkUrl
+                ? <a key={i} href={img.linkUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{imgEl}</a>
+                : <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{imgEl}</div>;
+            })}
+          </div>
+        </div>
+      ),
     },
 
     Boton: {
@@ -533,94 +606,63 @@ export const puckConfig: Config = {
       },
     },
 
-    // ── DINÁMICOS ─────────────────────────────────────────────────────────────
+    // ── CUENTA REGRESIVA ──────────────────────────────────────────────────────
 
-    Agenda: {
-      label: '📅 Agenda',
+    CuentaRegresiva: {
+      label: '⏱ Cuenta regresiva',
       fields: {
-        titulo: { type: 'text', label: 'Título de sección' },
-        displayMode: {
-          type: 'radio', label: 'Vista',
+        targetDate:       { type: 'text',   label: 'Fecha/hora del evento (YYYY-MM-DDTHH:MM)' },
+        titulo:           { type: 'text',   label: 'Título (opcional)' },
+        mostrarDias:      { type: 'radio',  label: 'Mostrar días',     options: [{ label: 'Sí', value: 'si' }, { label: 'No', value: 'no' }] },
+        mostrarHoras:     { type: 'radio',  label: 'Mostrar horas',    options: [{ label: 'Sí', value: 'si' }, { label: 'No', value: 'no' }] },
+        mostrarMinutos:   { type: 'radio',  label: 'Mostrar minutos',  options: [{ label: 'Sí', value: 'si' }, { label: 'No', value: 'no' }] },
+        mostrarSegundos:  { type: 'radio',  label: 'Mostrar segundos', options: [{ label: 'Sí', value: 'si' }, { label: 'No', value: 'no' }] },
+        labelDias:        { type: 'text',   label: 'Etiqueta días' },
+        labelHoras:       { type: 'text',   label: 'Etiqueta horas' },
+        labelMinutos:     { type: 'text',   label: 'Etiqueta minutos' },
+        labelSegundos:    { type: 'text',   label: 'Etiqueta segundos' },
+        color:            colorField('Color de los números'),
+        colorLabel:       colorField('Color de las etiquetas'),
+        bgColor:          colorField('Color de fondo'),
+        paddingV:         { type: 'number', label: 'Padding vertical (px)' },
+        fontSize:         { type: 'number', label: 'Tamaño números (px)' },
+        tituloFontSize:   { type: 'number', label: 'Tamaño título (px)' },
+        tituloColor:      colorField('Color título'),
+        fontFamily: {
+          type: 'select', label: 'Tipografía',
           options: [
-            { label: 'Lista', value: 'lista' }, { label: 'Tabs', value: 'tabs' }, { label: 'Acordeón', value: 'acordeon' },
+            { label: 'Heredar del sitio', value: '' },
+            { label: 'System UI', value: 'system-ui, sans-serif' },
+            ...GOOGLE_FONTS.map(f => ({ label: f, value: `'${f}', sans-serif` })),
+            { label: 'Georgia (serif)', value: 'Georgia, serif' },
           ],
         },
+        alineacion: {
+          type: 'radio', label: 'Alineación',
+          options: [{ label: 'Izq', value: 'left' }, { label: 'Centro', value: 'center' }, { label: 'Der', value: 'right' }],
+        },
       },
-      defaultProps: { titulo: 'Agenda', displayMode: 'lista' },
-      render: ({ titulo }) => (
-        <div style={{ padding: '2rem' }}>
-          <h2 style={{ margin: '0 0 1rem', fontSize: '1.875rem', fontWeight: 700 }}>{titulo}</h2>
-          <DynamicPlaceholder icon="📅" label="Agenda" desc="Lista de sesiones del evento" />
-        </div>
-      ),
-    },
-
-    Expositores: {
-      label: '👥 Expositores / Speakers',
-      fields: {
-        titulo:     { type: 'text',  label: 'Título de sección' },
-        columnas:   { type: 'radio', label: 'Columnas', options: [{ label: '2', value: '2' }, { label: '3', value: '3' }, { label: '4', value: '4' }] },
-        mostrarBio: { type: 'radio', label: 'Mostrar bio', options: [{ label: 'Sí', value: 'true' }, { label: 'No', value: 'false' }] },
+      defaultProps: {
+        targetDate: '',
+        titulo: '⏳ El evento comienza en',
+        mostrarDias: 'si', mostrarHoras: 'si', mostrarMinutos: 'si', mostrarSegundos: 'si',
+        labelDias: 'días', labelHoras: 'horas', labelMinutos: 'min', labelSegundos: 'seg',
+        color: '#1e3a5f', colorLabel: '#64748b', bgColor: '#f8fafc',
+        paddingV: 48, fontSize: 56, tituloFontSize: 18, tituloColor: '#334155',
+        fontFamily: '', alineacion: 'center',
       },
-      defaultProps: { titulo: 'Expositores', columnas: '3', mostrarBio: 'true' },
-      render: ({ titulo }) => (
-        <div style={{ padding: '2rem' }}>
-          <h2 style={{ margin: '0 0 1rem', fontSize: '1.875rem', fontWeight: 700 }}>{titulo}</h2>
-          <DynamicPlaceholder icon="👥" label="Expositores" desc="Grilla de speakers" />
-        </div>
-      ),
-    },
-
-    FechasImportantes: {
-      label: '📆 Fechas importantes',
-      fields: { titulo: { type: 'text', label: 'Título de sección' } },
-      defaultProps: { titulo: 'Fechas importantes' },
-      render: ({ titulo }) => (
-        <div style={{ padding: '2rem' }}>
-          <h2 style={{ margin: '0 0 1rem', fontSize: '1.875rem', fontWeight: 700 }}>{titulo}</h2>
-          <DynamicPlaceholder icon="📆" label="Fechas importantes" desc="Fechas clave del evento" />
-        </div>
-      ),
-    },
-
-    Organizadores: {
-      label: '🏢 Organizadores / Sponsors',
-      fields: {
-        titulo:   { type: 'text',  label: 'Título de sección' },
-        columnas: { type: 'radio', label: 'Columnas', options: [{ label: '2', value: '2' }, { label: '3', value: '3' }, { label: '4', value: '4' }, { label: '6', value: '6' }] },
+      render: (props) => {
+        const font = props.fontFamily;
+        const isGoogle = font && GOOGLE_FONTS.includes(font);
+        return (
+          <>
+            {isGoogle && <link rel="stylesheet" href={`https://fonts.googleapis.com/css2?family=${encodeURIComponent(font)}:wght@400;700&display=swap`} />}
+            <CountdownDisplay {...props} />
+          </>
+        );
       },
-      defaultProps: { titulo: 'Organizadores', columnas: '4' },
-      render: ({ titulo }) => (
-        <div style={{ padding: '2rem' }}>
-          <h2 style={{ margin: '0 0 1rem', fontSize: '1.875rem', fontWeight: 700 }}>{titulo}</h2>
-          <DynamicPlaceholder icon="🏢" label="Organizadores" desc="Logos de sponsors" />
-        </div>
-      ),
     },
 
-    Contacto: {
-      label: '📧 Contacto',
-      fields: { titulo: { type: 'text', label: 'Título de sección' } },
-      defaultProps: { titulo: 'Contacto' },
-      render: ({ titulo }) => (
-        <div style={{ padding: '2rem' }}>
-          <h2 style={{ margin: '0 0 1rem', fontSize: '1.875rem', fontWeight: 700 }}>{titulo}</h2>
-          <DynamicPlaceholder icon="📧" label="Contacto" desc="Info de contacto y venue" />
-        </div>
-      ),
-    },
-
-    Inscripciones: {
-      label: '✍️ Inscripciones',
-      fields: { titulo: { type: 'text', label: 'Título de sección' } },
-      defaultProps: { titulo: 'Inscripciones' },
-      render: ({ titulo }) => (
-        <div style={{ padding: '2rem' }}>
-          <h2 style={{ margin: '0 0 1rem', fontSize: '1.875rem', fontWeight: 700 }}>{titulo}</h2>
-          <DynamicPlaceholder icon="✍️" label="Inscripciones" desc="Link y aranceles" />
-        </div>
-      ),
-    },
   },
 };
 
@@ -635,11 +677,14 @@ export const DEFAULT_PUCK_DATA = {
         color: '#1e3a5f', logoUrl: '', bannerUrl: '', fechaInicio: '', fechaFin: '', lugar: '',
       },
     },
-    { type: 'FechasImportantes', props: { id: 'fechas-1', titulo: 'Fechas importantes' } },
-    { type: 'Agenda',            props: { id: 'agenda-1', titulo: 'Agenda', displayMode: 'lista' } },
-    { type: 'Expositores',       props: { id: 'expo-1',   titulo: 'Expositores', columnas: '3', mostrarBio: 'true' } },
-    { type: 'Organizadores',     props: { id: 'org-1',    titulo: 'Sponsors & Organizadores', columnas: '4' } },
-    { type: 'Contacto',          props: { id: 'contacto-1', titulo: 'Contacto' } },
+    {
+      type: 'Parrafo',
+      props: {
+        id: 'desc-1',
+        contenido: '<p>Describí tu congreso acá. Podés usar <strong>negrita</strong>, <em>cursiva</em> y listas.</p>',
+        color: '#374151', bgColor: 'transparent', fontSize: 18, maxWidth: 800, paddingV: 48, paddingH: 32,
+      },
+    },
   ],
   root: { props: { fontFamily: 'system-ui, sans-serif' } },
 };

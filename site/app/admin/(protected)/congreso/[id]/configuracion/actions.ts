@@ -17,6 +17,7 @@ export interface UpdateCongresoData {
   emailContacto?: string;
   instagram?: string;
   formularioInscripcionUrl?: string;
+  arancelesTexto?: string;
   informacionPago?: string;
   contactoAdicional?: string;
   mostrarFechas?: boolean;
