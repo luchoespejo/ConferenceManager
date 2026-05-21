@@ -133,11 +133,11 @@ export default function ConfiguracionClient({ congreso: init }: Props) {
 
   const Toggle = ({ value, onChange, label }: { value: boolean; onChange: (v: boolean) => void; label: string }) => (
     <label className="flex items-center gap-2.5 cursor-pointer select-none">
+      <span className="text-sm font-medium text-slate-500">{label}</span>
       <button type="button" onClick={() => onChange(!value)}
         className={`relative w-9 h-5 rounded-full transition-colors shrink-0 ${value ? 'bg-slate-900' : 'bg-slate-300'}`}>
         <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${value ? 'translate-x-4' : 'translate-x-0.5'}`} />
       </button>
-      <span className="text-sm font-medium text-slate-700">{label}</span>
     </label>
   );
 
@@ -219,7 +219,7 @@ export default function ConfiguracionClient({ congreso: init }: Props) {
         <section className="bg-white border border-slate-200 rounded-xl p-5">
           <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
             <h2 className="font-semibold text-slate-800">Inscripciones</h2>
-            <Toggle value={mostrarInscripciones} onChange={setMostrarInscripciones} label="Mostrar tab en el sitio" />
+            <Toggle value={mostrarInscripciones} onChange={setMostrarInscripciones} label="Mostrar tab" />
           </div>
           <div className="flex flex-col gap-4">
             <div>
@@ -295,7 +295,7 @@ export default function ConfiguracionClient({ congreso: init }: Props) {
         <section className="bg-white border border-slate-200 rounded-xl p-5">
           <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
             <h2 className="font-semibold text-slate-800">Ubicación</h2>
-            <Toggle value={mostrarUbicacion} onChange={setMostrarUbicacion} label="Mostrar en el sitio" />
+            <Toggle value={mostrarUbicacion} onChange={setMostrarUbicacion} label="Mostrar tab" />
           </div>
           {mostrarUbicacion && (
             <div className="flex flex-col gap-3">
@@ -319,7 +319,7 @@ export default function ConfiguracionClient({ congreso: init }: Props) {
         <section className="bg-white border border-slate-200 rounded-xl p-5">
           <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
             <h2 className="font-semibold text-slate-800">Contacto</h2>
-            <Toggle value={mostrarContacto} onChange={setMostrarContacto} label="Mostrar tab en el sitio" />
+            <Toggle value={mostrarContacto} onChange={setMostrarContacto} label="Mostrar tab" />
           </div>
           <div className="flex flex-col gap-3">
             <div className="grid grid-cols-2 gap-3">

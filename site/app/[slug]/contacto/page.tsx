@@ -49,11 +49,11 @@ export default async function ContactoPage({ params }: { params: Promise<{ slug:
   return (
     <div style={{ minHeight: '60vh', padding: '3rem 1.5rem', maxWidth: '760px', margin: '0 auto' }}>
 
-      {/* Sede */}
+      {/* Ubicación */}
       {hasVenue && (
         <section style={{ marginBottom: '2.5rem' }}>
           <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: primary, marginBottom: '1rem', paddingBottom: '.5rem', borderBottom: `2px solid ${primary}` }}>
-            Sede
+            Ubicación
           </h2>
           {conf.venueNombre && (
             <p style={{ fontSize: '1.05rem', fontWeight: 600, color: '#1e293b', marginBottom: '.35rem' }}>
