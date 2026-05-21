@@ -1,22 +1,5 @@
 import { DropZone, type Config, type CustomField } from '@puckeditor/core';
 import CountdownDisplay from './puck-components/CountdownDisplay';
-import { generateHTML } from '@tiptap/html';
-import Document from '@tiptap/extension-document';
-import Paragraph from '@tiptap/extension-paragraph';
-import Text from '@tiptap/extension-text';
-import Bold from '@tiptap/extension-bold';
-import Italic from '@tiptap/extension-italic';
-import Underline from '@tiptap/extension-underline';
-import Strike from '@tiptap/extension-strike';
-import Heading from '@tiptap/extension-heading';
-import { BulletList, OrderedList, ListItem } from '@tiptap/extension-list';
-import Blockquote from '@tiptap/extension-blockquote';
-import HardBreak from '@tiptap/extension-hard-break';
-import Link from '@tiptap/extension-link';
-import TextAlign from '@tiptap/extension-text-align';
-import Code from '@tiptap/extension-code';
-import CodeBlock from '@tiptap/extension-code-block';
-import HorizontalRule from '@tiptap/extension-horizontal-rule';
 
 // ── Campo color: swatch + hex input ─────────────────────────────────────────
 function ColorPicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
@@ -109,31 +92,6 @@ const imageField = (label: string): CustomField<string> => ({
   render: ({ value, onChange }: { value: string; onChange: (v: string) => void }) => <ImageField value={value} onChange={onChange} />,
 });
 
-// ── TipTap JSON → HTML converter ─────────────────────────────────────────────
-const TIPTAP_EXTENSIONS = [
-  Document, Paragraph, Text,
-  Bold, Italic, Underline, Strike,
-  Heading.configure({ levels: [1, 2, 3, 4, 5, 6] }),
-  BulletList, OrderedList, ListItem,
-  Blockquote, HardBreak,
-  Link.configure({ openOnClick: false }),
-  TextAlign.configure({ types: ['heading', 'paragraph'] }),
-  Code, CodeBlock, HorizontalRule,
-];
-
-function richToHtml(value: unknown): string {
-  if (!value) return '';
-  if (typeof value === 'string') return value;
-  if (typeof value === 'object') {
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return generateHTML(value as any, TIPTAP_EXTENSIONS);
-    } catch {
-      return '';
-    }
-  }
-  return '';
-}
 
 // ── Google Fonts ─────────────────────────────────────────────────────────────
 const GOOGLE_FONTS = [
@@ -345,14 +303,15 @@ export const puckConfig: Config = {
         paddingH: { type: 'number', label: 'Padding horizontal (px)' },
       },
       defaultProps: { contenido: '<p>Escribí tu texto acá...</p>', color: '#374151', bgColor: 'transparent', fontSize: 16, maxWidth: 0, paddingV: 8, paddingH: 32 },
-      render: ({ contenido, color, bgColor, fontSize, maxWidth, paddingV, paddingH }) => (
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      render: ({ contenido, color, bgColor, fontSize, maxWidth, paddingV, paddingH }: any) => (
         <div style={{ background: bgColor, padding: `${paddingV}px ${paddingH}px` }}>
           <div
             style={{ color, fontSize, lineHeight: 1.7, maxWidth: maxWidth || 'none' }}
             className="puck-richtext"
-            // eslint-disable-next-line react/no-danger
-            dangerouslySetInnerHTML={{ __html: richToHtml(contenido) }}
-          />
+          >
+            {contenido}
+          </div>
         </div>
       ),
     },
