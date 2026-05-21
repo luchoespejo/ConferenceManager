@@ -1,4 +1,4 @@
-import { getLayoutTemplates } from './actions';
+import { getLayoutTemplates, type LayoutTemplateDto } from './actions';
 import MaquetasClient from './MaquetasClient';
 
 export default async function MaquetasPage({
@@ -8,7 +8,7 @@ export default async function MaquetasPage({
 }) {
   const { id } = await params;
 
-  let templates = [];
+  let templates: LayoutTemplateDto[] = [];
   try {
     templates = await getLayoutTemplates(id);
   } catch {
