@@ -20,6 +20,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<FechaImportante> FechasImportantes => Set<FechaImportante>();
     public DbSet<EjeTematico> EjesTematicos => Set<EjeTematico>();
     public DbSet<SeccionConfig> SeccionConfigs => Set<SeccionConfig>();
+    public DbSet<ConferenciaLayout> ConferenciaLayouts => Set<ConferenciaLayout>();
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

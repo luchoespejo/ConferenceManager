@@ -1,13 +1,16 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Puck, usePuck } from '@puckeditor/core';
 import '@puckeditor/core/dist/index.css';
 import { puckConfig, DEFAULT_PUCK_DATA } from '@/lib/puck-config';
-import { saveLayoutAction } from './actions';
+import { createTemplateAction, updateTemplateAction } from './actions';
 
 interface Props {
   congresoId: string;
+  layoutId: string | null;
+  templateNombre: string | null;
   initialLayoutJson: string | null;
 }
 
@@ -23,20 +26,45 @@ function parsePuckData(layoutJson: string | null) {
   } catch { return null; }
 }
 
-export default function MaquetadorClient({ congresoId, initialLayoutJson }: Props) {
+export default function MaquetadorClient({ congresoId, layoutId, templateNombre, initialLayoutJson }: Props) {
+  const router = useRouter();
   const existingData = parsePuckData(initialLayoutJson);
-  const [started, setStarted] = useState(existingData !== null);
+
+  const [currentLayoutId, setCurrentLayoutId] = useState<string | null>(layoutId);
+  const [started, setStarted] = useState(existingData !== null || layoutId !== null);
   const [startEmpty, setStartEmpty] = useState(false);
   const [saving, setSaving] = useState(false);
   const [savedOk, setSavedOk] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showNameModal, setShowNameModal] = useState(false);
+  const [pendingData, setPendingData] = useState<unknown>(null);
+  const [pendingNombre, setPendingNombre] = useState('');
 
-  const handlePublish = async (data: unknown) => {
+  function handleSaveRequest(data: unknown) {
+    if (currentLayoutId) {
+      // Actualizar template existente
+      doSave(data, currentLayoutId, null);
+    } else {
+      // Nueva maqueta — pedir nombre
+      setPendingData(data);
+      setPendingNombre('');
+      setShowNameModal(true);
+    }
+  }
+
+  async function doSave(data: unknown, lId: string | null, nombre: string | null) {
     setSaving(true);
     setError(null);
     setSavedOk(false);
     try {
-      await saveLayoutAction(congresoId, data);
+      if (lId) {
+        await updateTemplateAction(congresoId, lId, data);
+      } else {
+        const created = await createTemplateAction(congresoId, nombre!, data);
+        setCurrentLayoutId(created.id);
+        // Actualizar URL sin recargar
+        router.replace(`/admin/congreso/${congresoId}/maquetador?layoutId=${created.id}`);
+      }
       setSavedOk(true);
       setTimeout(() => setSavedOk(false), 3000);
     } catch (e) {
@@ -44,34 +72,54 @@ export default function MaquetadorClient({ congresoId, initialLayoutJson }: Prop
     } finally {
       setSaving(false);
     }
-  };
+  }
 
-  // Definido dentro del componente para cerrar sobre saving/savedOk/handlePublish
-  // usePuck() funciona porque este componente se renderiza dentro del árbol de <Puck>
+  function confirmSave() {
+    const nombre = pendingNombre.trim();
+    if (!nombre) return;
+    setShowNameModal(false);
+    doSave(pendingData, null, nombre);
+  }
+
+  // SaveBtn vive dentro del árbol de Puck para poder usar usePuck()
   function SaveBtn() {
     const { appState } = usePuck();
     return (
-      <button
-        onClick={() => handlePublish(appState.data)}
-        disabled={saving}
-        style={{
-          padding: '6px 16px',
-          background: savedOk ? '#16a34a' : '#0f172a',
-          color: '#fff',
-          border: 'none',
-          borderRadius: 6,
-          fontSize: 13,
-          fontWeight: 600,
-          cursor: saving ? 'not-allowed' : 'pointer',
-          opacity: saving ? 0.7 : 1,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 6,
-          transition: 'background 0.2s',
-        }}
-      >
-        {saving ? '⏳ Guardando...' : savedOk ? '✓ Guardado' : '💾 Guardar'}
-      </button>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <button
+          onClick={() => router.push(`/admin/congreso/${congresoId}/maquetas`)}
+          style={{
+            padding: '5px 12px',
+            background: 'transparent',
+            color: '#64748b',
+            border: '1px solid #e2e8f0',
+            borderRadius: 6,
+            fontSize: 12,
+            fontWeight: 500,
+            cursor: 'pointer',
+          }}
+        >
+          ← Maquetas
+        </button>
+        <button
+          onClick={() => handleSaveRequest(appState.data)}
+          disabled={saving}
+          style={{
+            padding: '6px 16px',
+            background: savedOk ? '#16a34a' : '#0f172a',
+            color: '#fff',
+            border: 'none',
+            borderRadius: 6,
+            fontSize: 13,
+            fontWeight: 600,
+            cursor: saving ? 'not-allowed' : 'pointer',
+            opacity: saving ? 0.7 : 1,
+            transition: 'background 0.2s',
+          }}
+        >
+          {saving ? '⏳ Guardando...' : savedOk ? '✓ Guardado' : currentLayoutId ? '💾 Guardar' : '💾 Guardar maqueta'}
+        </button>
+      </div>
     );
   }
 
@@ -80,9 +128,9 @@ export default function MaquetadorClient({ congresoId, initialLayoutJson }: Prop
       <div className="flex items-center justify-center min-h-[calc(100vh-120px)] bg-slate-50">
         <div className="text-center max-w-sm">
           <div className="text-5xl mb-4">🧱</div>
-          <h2 className="text-xl font-bold text-slate-900 mb-2">Maquetador de página</h2>
+          <h2 className="text-xl font-bold text-slate-900 mb-2">Nueva maqueta</h2>
           <p className="text-sm text-slate-500 mb-6">
-            Todavía no configuraste el layout. Empezá con la plantilla por defecto o desde cero.
+            Empezá con la plantilla por defecto o desde cero.
           </p>
           <div className="flex flex-col gap-3">
             <button
@@ -98,6 +146,12 @@ export default function MaquetadorClient({ congresoId, initialLayoutJson }: Prop
               Empezar desde cero
             </button>
           </div>
+          <button
+            onClick={() => router.push(`/admin/congreso/${congresoId}/maquetas`)}
+            className="mt-4 text-sm text-slate-400 hover:text-slate-700 transition-colors"
+          >
+            ← Volver a maquetas
+          </button>
         </div>
       </div>
     );
@@ -113,16 +167,61 @@ export default function MaquetadorClient({ congresoId, initialLayoutJson }: Prop
         </div>
       )}
 
-      <div style={{ height: 'calc(100vh - 120px)' }}>
+      {templateNombre && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-white border border-slate-200 text-slate-700 text-xs px-3 py-1.5 rounded-full shadow-sm pointer-events-none">
+          {templateNombre}
+        </div>
+      )}
+
+      <div style={{ height: 'calc(100vh - 56px)' }}>
         <Puck
           config={puckConfig}
           data={puckData}
-          onPublish={handlePublish}
+          onPublish={handleSaveRequest}
           overrides={{
             headerActions: () => <SaveBtn />,
           }}
         />
       </div>
+
+      {/* Modal nombre maqueta nueva */}
+      {showNameModal && (
+        <div
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-[1000]"
+          onClick={() => setShowNameModal(false)}
+        >
+          <div
+            className="bg-white rounded-2xl p-8 w-full max-w-sm shadow-2xl"
+            onClick={e => e.stopPropagation()}
+          >
+            <h3 className="text-lg font-bold text-slate-900 mb-1">Guardar maqueta</h3>
+            <p className="text-sm text-slate-500 mb-5">Dale un nombre para identificarla</p>
+            <input
+              autoFocus
+              value={pendingNombre}
+              onChange={e => setPendingNombre(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') confirmSave(); if (e.key === 'Escape') setShowNameModal(false); }}
+              placeholder="Ej: Diseño principal"
+              className="w-full border border-slate-300 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 mb-4"
+            />
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setShowNameModal(false)}
+                className="px-4 py-2 text-sm border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={confirmSave}
+                disabled={!pendingNombre.trim() || saving}
+                className="px-4 py-2 text-sm font-semibold bg-slate-900 text-white rounded-lg hover:bg-slate-800 disabled:opacity-50 transition-colors"
+              >
+                {saving ? 'Guardando...' : 'Guardar'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

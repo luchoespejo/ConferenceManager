@@ -51,6 +51,8 @@ public class Conferencia
     public ICollection<FechaImportante> FechasImportantes { get; set; } = [];
     public ICollection<EjeTematico> EjesTematicos { get; set; } = [];
 
-    // Layout builder
+    // Layout builder (legacy single layout — kept for fallback)
     public string? LayoutJson { get; set; }
+
+    public ICollection<ConferenciaLayout> Layouts { get; set; } = [];
 }

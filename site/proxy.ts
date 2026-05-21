@@ -20,7 +20,8 @@ export function proxy(req: NextRequest) {
 
   // ── Subdomain → slug routing ─────────────────────────────────────────────
   const host = req.headers.get('host') ?? '';
-  const slug = host.split('.')[0];
+  const hostname = host.split(':')[0]; // strip port (localhost:3000 → localhost)
+  const slug = hostname.split('.')[0];
   if (['www', 'tuplataforma', 'localhost', 'conference-manager-irl1'].includes(slug)) {
     return NextResponse.next();
   }

@@ -12,7 +12,7 @@ interface Props {
 }
 
 const TABS = [
-  { key: 'maquetador',    label: '🧱 Maquetador' },
+  { key: 'maquetas',      label: '🧱 Maquetas' },
   { key: 'salas',         label: '🚪 Salas' },
   { key: 'expositores',   label: '🎤 Expositores' },
   { key: 'sesiones',      label: '📅 Sesiones' },
