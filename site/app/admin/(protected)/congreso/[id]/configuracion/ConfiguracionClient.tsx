@@ -160,7 +160,7 @@ export default function ConfiguracionClient({ congreso: init }: Props) {
               {lbl('Slug (subdominio)')}
               <input value={init.slug} disabled
                 className={inp + ' bg-slate-50 text-slate-400 cursor-not-allowed'} />
-              {estado !== 'Borrador' && <p className="text-xs text-slate-400 mt-1">No editable — congreso {estado.toLowerCase()}</p>}
+              {init.estado !== 'Borrador' && <p className="text-xs text-slate-400 mt-1">No editable — congreso {init.estado.toLowerCase()}</p>}
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
