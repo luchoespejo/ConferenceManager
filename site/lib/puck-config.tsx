@@ -92,7 +92,58 @@ const imageField = (label: string): CustomField<string> => ({
   render: ({ value, onChange }: { value: string; onChange: (v: string) => void }) => <ImageField value={value} onChange={onChange} />,
 });
 
-// ── Placeholder bloques dinámicos ────────────────────────────────────────────
+// ── TipTap JSON → HTML converter ─────────────────────────────────────────────
+interface TNode {
+  type: string;
+  text?: string;
+  content?: TNode[];
+  marks?: { type: string; attrs?: Record<string, unknown> }[];
+  attrs?: Record<string, unknown>;
+}
+
+function tiptapNodeToHtml(node: TNode): string {
+  if (node.type === 'text') {
+    let t = (node.text ?? '')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    if (node.marks) {
+      for (const m of node.marks) {
+        if (m.type === 'bold')      t = `<strong>${t}</strong>`;
+        else if (m.type === 'italic')     t = `<em>${t}</em>`;
+        else if (m.type === 'underline')  t = `<u>${t}</u>`;
+        else if (m.type === 'strike')     t = `<s>${t}</s>`;
+        else if (m.type === 'link')       t = `<a href="${m.attrs?.href ?? '#'}" target="_blank" rel="noopener">${t}</a>`;
+        else if (m.type === 'textStyle' && m.attrs?.color) t = `<span style="color:${m.attrs.color}">${t}</span>`;
+      }
+    }
+    return t;
+  }
+  const inner = (node.content ?? []).map(tiptapNodeToHtml).join('');
+  switch (node.type) {
+    case 'doc':         return inner;
+    case 'paragraph':   return `<p>${inner || ''}</p>`;
+    case 'hardBreak':   return '<br>';
+    case 'bulletList':  return `<ul>${inner}</ul>`;
+    case 'orderedList': return `<ol>${inner}</ol>`;
+    case 'listItem':    return `<li>${inner}</li>`;
+    case 'blockquote':  return `<blockquote>${inner}</blockquote>`;
+    case 'heading': {
+      const lvl = (node.attrs?.level as number) ?? 2;
+      return `<h${lvl}>${inner}</h${lvl}>`;
+    }
+    case 'horizontalRule': return '<hr>';
+    default: return inner;
+  }
+}
+
+function richToHtml(value: unknown): string {
+  if (!value) return '';
+  if (typeof value === 'string') return value;
+  if (typeof value === 'object') {
+    try { return tiptapNodeToHtml(value as TNode); } catch { return ''; }
+  }
+  return '';
+}
+
 // ── Google Fonts ─────────────────────────────────────────────────────────────
 const GOOGLE_FONTS = [
   'Inter', 'Roboto', 'Open Sans', 'Lato', 'Montserrat',
@@ -309,7 +360,7 @@ export const puckConfig: Config = {
             style={{ color, fontSize, lineHeight: 1.7, maxWidth: maxWidth || 'none' }}
             className="puck-richtext"
             // eslint-disable-next-line react/no-danger
-            dangerouslySetInnerHTML={{ __html: contenido ?? '' }}
+            dangerouslySetInnerHTML={{ __html: richToHtml(contenido) }}
           />
         </div>
       ),
