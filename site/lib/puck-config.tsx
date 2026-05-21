@@ -651,13 +651,25 @@ export const puckConfig: Config = {
         paddingV: 48, fontSize: 56, tituloFontSize: 18, tituloColor: '#334155',
         fontFamily: '', alineacion: 'center',
       },
-      render: (props) => {
-        const font = props.fontFamily;
-        const isGoogle = font && GOOGLE_FONTS.includes(font);
+      render: ({ targetDate, titulo, mostrarDias, mostrarHoras, mostrarMinutos, mostrarSegundos,
+                  labelDias, labelHoras, labelMinutos, labelSegundos,
+                  color, colorLabel, bgColor, paddingV, fontSize, tituloFontSize, tituloColor,
+                  fontFamily, alineacion }) => {
+        const isGoogle = fontFamily && GOOGLE_FONTS.includes(fontFamily);
         return (
           <>
-            {isGoogle && <link rel="stylesheet" href={`https://fonts.googleapis.com/css2?family=${encodeURIComponent(font)}:wght@400;700&display=swap`} />}
-            <CountdownDisplay {...props} />
+            {isGoogle && <link rel="stylesheet" href={`https://fonts.googleapis.com/css2?family=${encodeURIComponent(fontFamily)}:wght@400;700&display=swap`} />}
+            <CountdownDisplay
+              targetDate={targetDate} titulo={titulo}
+              mostrarDias={mostrarDias} mostrarHoras={mostrarHoras}
+              mostrarMinutos={mostrarMinutos} mostrarSegundos={mostrarSegundos}
+              labelDias={labelDias} labelHoras={labelHoras}
+              labelMinutos={labelMinutos} labelSegundos={labelSegundos}
+              color={color} colorLabel={colorLabel} bgColor={bgColor}
+              paddingV={paddingV} fontSize={fontSize}
+              tituloFontSize={tituloFontSize} tituloColor={tituloColor}
+              fontFamily={fontFamily} alineacion={alineacion}
+            />
           </>
         );
       },
