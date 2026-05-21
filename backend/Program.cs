@@ -95,6 +95,7 @@ builder.Services.AddScoped<ISalaService, SalaService>();
 builder.Services.AddScoped<IExpositorService, ExpositorService>();
 builder.Services.AddScoped<ISesionService, SesionService>();
 builder.Services.AddScoped<IPublicService, PublicService>();
+builder.Services.AddScoped<IGithubPublishService, GithubPublishService>();
 builder.Services.AddScoped<IParticipanteService, ParticipanteService>();
 builder.Services.AddScoped<IAvisoUrgenteService, AvisoUrgenteService>();
 

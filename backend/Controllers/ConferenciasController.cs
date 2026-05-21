@@ -16,6 +16,7 @@ namespace ConferenceManager.Controllers;
 public class ConferenciasController(
     IConferenciaService conferenciaService,
     IStaticSiteService staticSiteService,
+    IGithubPublishService githubPublishService,
     IHttpClientFactory httpClientFactory,
     IConfiguration config,
     ILogger<ConferenciasController> logger,
@@ -121,6 +122,8 @@ public class ConferenciasController(
         if (result.Success)
         {
             TriggerVercelDeploy();
+            // Publicar sitio estático en GitHub (fire & forget, no bloquea la respuesta)
+            _ = Task.Run(() => githubPublishService.PublishConferenceAsync(id, UsuarioId));
             return Ok(result.Data);
         }
 
