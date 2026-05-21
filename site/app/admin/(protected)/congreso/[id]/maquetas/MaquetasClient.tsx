@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import type { LayoutTemplateDto } from './actions';
 import {
   activateLayoutTemplate,
@@ -14,9 +15,10 @@ import {
 interface Props {
   congresoId: string;
   initial: LayoutTemplateDto[];
+  slug: string;
 }
 
-export default function MaquetasClient({ congresoId, initial }: Props) {
+export default function MaquetasClient({ congresoId, initial, slug }: Props) {
   const router = useRouter();
   const [templates, setTemplates] = useState<LayoutTemplateDto[]>(initial);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
@@ -103,6 +105,16 @@ export default function MaquetasClient({ congresoId, initial }: Props) {
           </p>
         </div>
         <div className="flex gap-2 flex-wrap">
+          {slug && (
+            <Link
+              href={`/${slug}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-4 py-2 text-sm font-medium border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
+            >
+              🌐 Ver sitio
+            </Link>
+          )}
           <button
             onClick={handleDesplegar}
             disabled={deploying || !hasActive || isPending}

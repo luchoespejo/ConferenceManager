@@ -19,7 +19,6 @@ const TABS = [
   { key: 'sesiones',       label: '📅 Sesiones' },
   { key: 'participantes',  label: '👥 Participantes' },
   { key: 'avisos',         label: '🔔 Avisos' },
-  { key: 'acciones',       label: '⚡ Acciones' },
 ];
 
 const ESTADO_BADGE: Record<string, string> = {
