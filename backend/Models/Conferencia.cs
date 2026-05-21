@@ -50,4 +50,7 @@ public class Conferencia
     public ICollection<Organizador> Organizadores { get; set; } = [];
     public ICollection<FechaImportante> FechasImportantes { get; set; } = [];
     public ICollection<EjeTematico> EjesTematicos { get; set; } = [];
+
+    // Layout builder
+    public string? LayoutJson { get; set; }
 }
