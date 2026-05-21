@@ -8,6 +8,8 @@ export interface UpdateCongresoData {
   nombre: string;
   fechaInicio: string;
   fechaFin: string;
+  colorPrimario?: string;
+  colorSecundario?: string;
   descripcion?: string;
   subtitulo?: string;
   lema?: string;

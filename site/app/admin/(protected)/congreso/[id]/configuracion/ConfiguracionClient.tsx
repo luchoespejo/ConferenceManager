@@ -10,6 +10,7 @@ interface ArancelFila { id: string; categoria: string; monto: string; }
 interface Congreso {
   id: string; nombre: string; slug: string; estado: string;
   fechaInicio: string; fechaFin: string;
+  colorPrimario?: string | null; colorSecundario?: string | null;
   descripcion?: string | null; subtitulo?: string | null; lema?: string | null;
   venueNombre?: string | null; venueDireccion?: string | null; venueLinkMaps?: string | null;
   emailContacto?: string | null; instagram?: string | null;
@@ -45,6 +46,8 @@ export default function ConfiguracionClient({ congreso: init }: Props) {
 
   // Info básica
   const [nombre, setNombre] = useState(init.nombre);
+  const [colorPrimario, setColorPrimario] = useState(init.colorPrimario ?? '#1a1a2e');
+  const [colorSecundario, setColorSecundario] = useState(init.colorSecundario ?? '#16213e');
   const [fechaInicio, setFechaInicio] = useState(init.fechaInicio);
   const [fechaFin, setFechaFin] = useState(init.fechaFin);
   const [descripcion, setDescripcion] = useState(init.descripcion ?? '');
@@ -89,6 +92,7 @@ export default function ConfiguracionClient({ congreso: init }: Props) {
 
     const data: UpdateCongresoData = {
       nombre, fechaInicio, fechaFin,
+      colorPrimario, colorSecundario,
       ...(descripcion ? { descripcion } : {}),
       ...(subtitulo ? { subtitulo } : {}),
       ...(lema ? { lema } : {}),
@@ -183,6 +187,26 @@ export default function ConfiguracionClient({ congreso: init }: Props) {
             <div>
               {lbl('Descripción')}
               <textarea value={descripcion} onChange={e => setDescripcion(e.target.value)} rows={3} className={inp + ' resize-y'} />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                {lbl('Color primario (barra de navegación del sitio)')}
+                <div className="flex gap-2 items-center mt-1">
+                  <input type="color" value={colorPrimario} onChange={e => setColorPrimario(e.target.value)}
+                    className="w-10 h-9 rounded border border-slate-300 cursor-pointer p-0.5 bg-white" />
+                  <input type="text" value={colorPrimario} onChange={e => setColorPrimario(e.target.value)}
+                    className={inp + ' font-mono'} placeholder="#1a1a2e" />
+                </div>
+              </div>
+              <div>
+                {lbl('Color secundario')}
+                <div className="flex gap-2 items-center mt-1">
+                  <input type="color" value={colorSecundario} onChange={e => setColorSecundario(e.target.value)}
+                    className="w-10 h-9 rounded border border-slate-300 cursor-pointer p-0.5 bg-white" />
+                  <input type="text" value={colorSecundario} onChange={e => setColorSecundario(e.target.value)}
+                    className={inp + ' font-mono'} placeholder="#16213e" />
+                </div>
+              </div>
             </div>
             <div>
               {lbl('Logo del evento (aparece en la barra de navegación del sitio)')}

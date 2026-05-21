@@ -6,5 +6,5 @@ export default async function CongresoIndex({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  redirect(`/admin/congreso/${id}/maquetador`);
+  redirect(`/admin/congreso/${id}/maquetas`);
 }
