@@ -48,7 +48,8 @@ export default function AccionesClient({ congreso: init }: Props) {
     });
   };
 
-  const siteUrl = `https://${init.slug}.tuplataforma.com`;
+  const siteBase = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://conference-manager-irl1.vercel.app';
+  const siteUrl = `${siteBase}/${init.slug}`;
   const info = ESTADO_COLOR[estado] ?? { badge: 'bg-slate-100 text-slate-600 border border-slate-200', desc: '' };
 
   return (
