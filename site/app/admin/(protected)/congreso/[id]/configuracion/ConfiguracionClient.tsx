@@ -136,7 +136,7 @@ export default function ConfiguracionClient({ congreso: init }: Props) {
       <span className="text-sm font-medium text-slate-500">{label}</span>
       <button type="button" onClick={() => onChange(!value)}
         className={`relative w-9 h-5 rounded-full transition-colors shrink-0 ${value ? 'bg-slate-900' : 'bg-slate-300'}`}>
-        <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${value ? 'translate-x-4' : 'translate-x-0.5'}`} />
+        <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${value ? 'translate-x-4' : 'translate-x-0'}`} />
       </button>
     </label>
   );
