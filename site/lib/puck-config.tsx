@@ -1,5 +1,22 @@
 import { DropZone, type Config, type CustomField } from '@puckeditor/core';
 import CountdownDisplay from './puck-components/CountdownDisplay';
+import { generateHTML } from '@tiptap/html';
+import Document from '@tiptap/extension-document';
+import Paragraph from '@tiptap/extension-paragraph';
+import Text from '@tiptap/extension-text';
+import Bold from '@tiptap/extension-bold';
+import Italic from '@tiptap/extension-italic';
+import Underline from '@tiptap/extension-underline';
+import Strike from '@tiptap/extension-strike';
+import Heading from '@tiptap/extension-heading';
+import { BulletList, OrderedList, ListItem } from '@tiptap/extension-list';
+import Blockquote from '@tiptap/extension-blockquote';
+import HardBreak from '@tiptap/extension-hard-break';
+import Link from '@tiptap/extension-link';
+import TextAlign from '@tiptap/extension-text-align';
+import Code from '@tiptap/extension-code';
+import CodeBlock from '@tiptap/extension-code-block';
+import HorizontalRule from '@tiptap/extension-horizontal-rule';
 
 // ── Campo color: swatch + hex input ─────────────────────────────────────────
 function ColorPicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
@@ -93,53 +110,27 @@ const imageField = (label: string): CustomField<string> => ({
 });
 
 // ── TipTap JSON → HTML converter ─────────────────────────────────────────────
-interface TNode {
-  type: string;
-  text?: string;
-  content?: TNode[];
-  marks?: { type: string; attrs?: Record<string, unknown> }[];
-  attrs?: Record<string, unknown>;
-}
-
-function tiptapNodeToHtml(node: TNode): string {
-  if (node.type === 'text') {
-    let t = (node.text ?? '')
-      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    if (node.marks) {
-      for (const m of node.marks) {
-        if (m.type === 'bold')      t = `<strong>${t}</strong>`;
-        else if (m.type === 'italic')     t = `<em>${t}</em>`;
-        else if (m.type === 'underline')  t = `<u>${t}</u>`;
-        else if (m.type === 'strike')     t = `<s>${t}</s>`;
-        else if (m.type === 'link')       t = `<a href="${m.attrs?.href ?? '#'}" target="_blank" rel="noopener">${t}</a>`;
-        else if (m.type === 'textStyle' && m.attrs?.color) t = `<span style="color:${m.attrs.color}">${t}</span>`;
-      }
-    }
-    return t;
-  }
-  const inner = (node.content ?? []).map(tiptapNodeToHtml).join('');
-  switch (node.type) {
-    case 'doc':         return inner;
-    case 'paragraph':   return `<p>${inner || ''}</p>`;
-    case 'hardBreak':   return '<br>';
-    case 'bulletList':  return `<ul>${inner}</ul>`;
-    case 'orderedList': return `<ol>${inner}</ol>`;
-    case 'listItem':    return `<li>${inner}</li>`;
-    case 'blockquote':  return `<blockquote>${inner}</blockquote>`;
-    case 'heading': {
-      const lvl = (node.attrs?.level as number) ?? 2;
-      return `<h${lvl}>${inner}</h${lvl}>`;
-    }
-    case 'horizontalRule': return '<hr>';
-    default: return inner;
-  }
-}
+const TIPTAP_EXTENSIONS = [
+  Document, Paragraph, Text,
+  Bold, Italic, Underline, Strike,
+  Heading.configure({ levels: [1, 2, 3, 4, 5, 6] }),
+  BulletList, OrderedList, ListItem,
+  Blockquote, HardBreak,
+  Link.configure({ openOnClick: false }),
+  TextAlign.configure({ types: ['heading', 'paragraph'] }),
+  Code, CodeBlock, HorizontalRule,
+];
 
 function richToHtml(value: unknown): string {
   if (!value) return '';
   if (typeof value === 'string') return value;
   if (typeof value === 'object') {
-    try { return tiptapNodeToHtml(value as TNode); } catch { return ''; }
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return generateHTML(value as any, TIPTAP_EXTENSIONS);
+    } catch {
+      return '';
+    }
   }
   return '';
 }
