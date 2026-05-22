@@ -20,20 +20,41 @@ public class GithubPublishService(
 
     public async Task<bool> PublishConferenceAsync(Guid conferenciaId, Guid usuarioId)
     {
-        var token = config["Github:Token"];
-        var owner = config["Github:Owner"] ?? "luchoespejo";
-        var repo  = config["Github:Repo"]  ?? "conference-sites";
+        logger.LogInformation("[GitHub] PublishConferenceAsync START — conferenciaId={Id}", conferenciaId);
+
+        var token  = config["Github:Token"];
+        var owner  = config["Github:Owner"]  ?? "luchoespejo";
+        var repo   = config["Github:Repo"]   ?? "conference-sites";
         var branch = config["Github:Branch"] ?? "main";
+
+        logger.LogInformation("[GitHub] Config — owner={Owner} repo={Repo} branch={Branch} tokenSet={HasToken}",
+            owner, repo, branch, !string.IsNullOrEmpty(token));
 
         if (string.IsNullOrEmpty(token))
         {
-            logger.LogWarning("Github:Token not configured — skipping static publish");
+            logger.LogWarning("[GitHub] Github:Token not configured — skipping static publish");
             return false;
         }
 
         // 1. Generar zip estático
-        var zip = await staticSiteService.GenerateZipAsync(conferenciaId, usuarioId);
-        if (zip is null) return false;
+        logger.LogInformation("[GitHub] Generating static zip...");
+        StaticSiteZip? zip;
+        try
+        {
+            zip = await staticSiteService.GenerateZipAsync(conferenciaId, usuarioId);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "[GitHub] GenerateZipAsync threw exception");
+            return false;
+        }
+
+        if (zip is null)
+        {
+            logger.LogWarning("[GitHub] GenerateZipAsync returned null — conferencia not found or access denied");
+            return false;
+        }
+        logger.LogInformation("[GitHub] Zip generated — slug={Slug} size={Bytes}B", zip.Slug, zip.Data.Length);
 
         // 2. Extraer archivos del zip → dict path→content
         var files = new Dictionary<string, string>();
@@ -45,47 +66,61 @@ public class GithubPublishService(
                 if (entry.Length == 0) continue;
                 using var reader = new StreamReader(entry.Open(), Encoding.UTF8);
                 var content = await reader.ReadToEndAsync();
-                // Ruta en el repo: {slug}/{path-dentro-del-zip}
                 files[$"{zip.Slug}/{entry.FullName}"] = content;
+                logger.LogDebug("[GitHub] File queued: {Path} ({Len} chars)", $"{zip.Slug}/{entry.FullName}", content.Length);
             }
         }
 
+        logger.LogInformation("[GitHub] Files to push: {Count}", files.Count);
         if (files.Count == 0) return false;
 
-        var client = CreateGithubClient(token);
+        var client  = CreateGithubClient(token);
         var baseUrl = $"https://api.github.com/repos/{owner}/{repo}";
 
         try
         {
             // 3. Obtener SHA del último commit de la branch
+            logger.LogInformation("[GitHub] Fetching latest commit SHA from {BaseUrl}...", baseUrl);
             var (commitSha, usedBranch) = await GetLatestCommitSha(client, baseUrl, branch);
+            logger.LogInformation("[GitHub] Latest commit SHA={Sha} branch={Branch}", commitSha, usedBranch);
 
             // 4. Obtener SHA del tree actual
             var treeSha = await GetTreeSha(client, baseUrl, commitSha);
+            logger.LogInformation("[GitHub] Current tree SHA={Sha}", treeSha);
 
             // 5. Crear blobs para cada archivo
             var treeItems = new List<TreeItem>();
             foreach (var (path, content) in files)
             {
+                logger.LogDebug("[GitHub] Creating blob for {Path}...", path);
                 var blobSha = await CreateBlob(client, baseUrl, content);
                 treeItems.Add(new TreeItem(path, "100644", "blob", blobSha));
             }
+            logger.LogInformation("[GitHub] {Count} blobs created", treeItems.Count);
 
             // 6. Crear nuevo tree
             var newTreeSha = await CreateTree(client, baseUrl, treeSha, treeItems);
+            logger.LogInformation("[GitHub] New tree SHA={Sha}", newTreeSha);
 
             // 7. Crear commit
             var newCommitSha = await CreateCommit(client, baseUrl, $"Deploy: {zip.Slug}", newTreeSha, commitSha);
+            logger.LogInformation("[GitHub] New commit SHA={Sha}", newCommitSha);
 
             // 8. Actualizar ref de la branch
             await UpdateRef(client, baseUrl, usedBranch, newCommitSha);
 
-            logger.LogInformation("Published conference '{Slug}' to GitHub ({Owner}/{Repo})", zip.Slug, owner, repo);
+            logger.LogInformation("[GitHub] ✅ Published '{Slug}' to {Owner}/{Repo} branch={Branch}",
+                zip.Slug, owner, repo, usedBranch);
             return true;
+        }
+        catch (HttpRequestException ex)
+        {
+            logger.LogError(ex, "[GitHub] HTTP error pushing to GitHub — status={Status}", ex.StatusCode);
+            return false;
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to publish conference '{Slug}' to GitHub", zip.Slug);
+            logger.LogError(ex, "[GitHub] Unexpected error publishing '{Slug}' to GitHub", zip.Slug);
             return false;
         }
     }

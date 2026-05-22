@@ -15,7 +15,7 @@ namespace ConferenceManager.Controllers;
 [Route("api/dashboard/conferencias/{conferenciaId:guid}/layouts")]
 public class ConferenciaLayoutsController(
     AppDbContext db,
-    IGithubPublishService githubPublishService,
+    IServiceScopeFactory scopeFactory,
     IConfiguration config,
     IHttpClientFactory httpClientFactory,
     ILogger<ConferenciaLayoutsController> logger) : ControllerBase
@@ -207,8 +207,25 @@ public class ConferenciaLayoutsController(
             .Where(c => c.Id == conferenciaId)
             .ExecuteUpdateAsync(s => s.SetProperty(c => c.LayoutJson, activeLayout.LayoutJson));
 
-        // Disparar GitHub publish en background
-        _ = Task.Run(() => githubPublishService.PublishConferenceAsync(conferenciaId, UsuarioId));
+        // Disparar GitHub publish en background con scope propio
+        // (el scope del request se dispone antes de que Task.Run ejecute)
+        var capturedConferenciaId = conferenciaId;
+        var capturedUsuarioId = UsuarioId;
+        logger.LogInformation("[Deploy] Starting background GitHub publish for conferenciaId={Id}", capturedConferenciaId);
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                using var scope = scopeFactory.CreateScope();
+                var svc = scope.ServiceProvider.GetRequiredService<IGithubPublishService>();
+                var ok = await svc.PublishConferenceAsync(capturedConferenciaId, capturedUsuarioId);
+                logger.LogInformation("[Deploy] Background GitHub publish finished — success={Ok}", ok);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "[Deploy] Background GitHub publish threw unhandled exception");
+            }
+        });
 
         // Disparar Vercel deploy hook
         TriggerVercelDeploy();
