@@ -1,5 +1,5 @@
 import { apiFetch } from '@/lib/api';
-import CongresoNav from './_components/CongresoNav';
+import CongresoLayoutClient from './CongresoLayoutClient';
 
 interface ConferenciaDetalle {
   id: string;
@@ -25,11 +25,13 @@ export default async function CongresoLayout({
   }
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <CongresoNav id={id} nombre={congreso?.nombre ?? '...'} slug={congreso?.slug ?? ''} estado={congreso?.estado ?? ''} />
-      <div className="flex-1">
-        {children}
-      </div>
-    </div>
+    <CongresoLayoutClient
+      id={id}
+      nombre={congreso?.nombre ?? '...'}
+      slug={congreso?.slug ?? ''}
+      estado={congreso?.estado ?? ''}
+    >
+      {children}
+    </CongresoLayoutClient>
   );
 }
