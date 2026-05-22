@@ -106,6 +106,17 @@ function toRem(v: number, fallback = '1rem'): string {
   if (!v) return fallback;
   return v > 4 ? `${v / 16}rem` : `${v}rem`;
 }
+
+// Fluid font size: clamp(min, preferred, max) so text scales gracefully
+// between small screens and desktop. Enforces a minimum of 0.875rem (14px).
+// Formula: at 320px viewport → ~70% of desktop size; at ~960px → full size.
+function toFluidFontRem(v: number, fallback = '1rem'): string {
+  if (!v) return fallback;
+  const rem = v > 4 ? v / 16 : v;
+  const minRem = Math.max(rem * 0.7, 0.875);
+  const preferred = rem * 0.5;
+  return `clamp(${minRem.toFixed(3)}rem, ${preferred.toFixed(3)}rem + 2.5vw, ${rem}rem)`;
+}
 function toPaddingRem(v: number, h: number): string {
   return `${toRem(v, '0rem')} ${toRem(h, '0rem')}`;
 }
@@ -279,7 +290,7 @@ export const puckConfig: Config = {
       defaultProps: { texto: 'Título de sección', nivel: 'h2', alignment: 'left', negrita: 'si', cursiva: 'no', subrayado: 'no', fontFamily: '', color: '#111827', bgColor: 'transparent', fontSize: 0, paddingV: 1, paddingH: 2 },
       render: ({ texto, nivel, alignment, negrita, cursiva, subrayado, fontFamily, color, bgColor, fontSize, paddingV, paddingH }) => {
         const Tag = nivel as 'h1' | 'h2' | 'h3' | 'h4';
-        const sizes: Record<string, string> = { h1: '2.5rem', h2: '1.875rem', h3: '1.375rem', h4: '1.125rem' };
+        const sizes: Record<string, string> = { h1: toFluidFontRem(2.5), h2: toFluidFontRem(1.875), h3: toFluidFontRem(1.375), h4: toFluidFontRem(1.125) };
         const font = fontFamily ? (fontFamily as string).split("'")[1] || (fontFamily as string).split(',')[0] : null;
         const isGoogle = font && GOOGLE_FONTS.includes(font);
         return (
@@ -291,7 +302,7 @@ export const puckConfig: Config = {
               margin: 0,
               textAlign: alignment as 'left' | 'center' | 'right',
               color,
-              fontSize: fontSize ? toRem(fontSize, sizes[nivel]) : sizes[nivel],
+              fontSize: fontSize ? toFluidFontRem(fontSize) : sizes[nivel],
               fontWeight: negrita === 'si' ? 700 : 400,
               fontStyle: cursiva === 'si' ? 'italic' : 'normal',
               textDecoration: subrayado === 'si' ? 'underline' : 'none',
@@ -321,7 +332,7 @@ export const puckConfig: Config = {
       render: ({ contenido, color, bgColor, fontSize, maxWidth, paddingV, paddingH }: any) => (
         <div style={{ background: bgColor, padding: toPaddingRem(paddingV, paddingH) }}>
           <div
-            style={{ color, fontSize: toRem(fontSize, '1rem'), lineHeight: 1.7, maxWidth: maxWidth || 'none' }}
+            style={{ color, fontSize: toFluidFontRem(fontSize, '1rem'), lineHeight: 1.7, maxWidth: maxWidth || 'none' }}
             className="puck-richtext"
           >
             {contenido}
@@ -515,7 +526,7 @@ export const puckConfig: Config = {
           justifyContent: alignment === 'left' ? 'flex-start' : alignment === 'right' ? 'flex-end' : 'center',
           padding: '1rem 2rem',
         }}>
-          {texto && <p style={{ margin: 0, color, fontSize: toRem(fontSize, '1.125rem'), fontWeight: 600, textAlign: alignment as 'left' | 'center' | 'right' }}>{texto}</p>}
+          {texto && <p style={{ margin: 0, color, fontSize: toFluidFontRem(fontSize, '1.125rem'), fontWeight: 600, textAlign: alignment as 'left' | 'center' | 'right' }}>{texto}</p>}
         </div>
       ),
     },
