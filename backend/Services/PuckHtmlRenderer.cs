@@ -227,16 +227,14 @@ public static class PuckHtmlRenderer
         var paddingH   = Num(p, "paddingH", 32);
 
         var tag = nivel is "h1" or "h2" or "h3" or "h4" ? nivel : "h2";
-        var defaultSizes = new Dictionary<string, string>
+        var levelDefaults = new Dictionary<string, string>
         {
-            ["h1"] = "2.5rem", ["h2"] = "1.875rem", ["h3"] = "1.375rem", ["h4"] = "1.125rem"
+            ["h1"] = "fs-4xl", ["h2"] = "fs-3xl", ["h3"] = "fs-2xl", ["h4"] = "fs-xl"
         };
-        var fsStr = fontSize > 0
-            ? RemVal(fontSize)
-            : (defaultSizes.TryGetValue(tag, out var ds) ? ds : "1.5rem");
+        var fsClass = FontSizeClass(p, levelDefaults.GetValueOrDefault(tag, "fs-2xl"));
 
         var tagStyle =
-            $"margin:0;text-align:{Esc(alignment)};color:{Esc(color)};font-size:{fsStr};" +
+            $"margin:0;text-align:{Esc(alignment)};color:{Esc(color)};" +
             $"font-weight:{(negrita == "si" ? "700" : "400")};" +
             $"font-style:{(cursiva == "si" ? "italic" : "normal")};" +
             $"text-decoration:{(subrayado == "si" ? "underline" : "none")};" +
@@ -248,7 +246,7 @@ public static class PuckHtmlRenderer
         var sb = new StringBuilder();
         AppendGoogleFontLink(sb, fontFamily);
         sb.AppendLine($"<div style=\"{wrapStyle}\">");
-        sb.AppendLine($"  <{tag} style=\"{tagStyle}\">{Esc(texto)}</{tag}>");
+        sb.AppendLine($"  <{tag} class=\"{fsClass}\" style=\"{tagStyle}\">{Esc(texto)}</{tag}>");
         sb.AppendLine("</div>");
         return sb.ToString();
     }
@@ -259,22 +257,22 @@ public static class PuckHtmlRenderer
     {
         var color    = Str(p, "color", "#374151");
         var bgColor  = Str(p, "bgColor", "transparent");
-        var fontSize = Num(p, "fontSize", 16);
         var maxWidth = Num(p, "maxWidth");
         var paddingV = Num(p, "paddingV", 8);
         var paddingH = Num(p, "paddingH", 32);
+        var fsClass  = FontSizeClass(p, "fs-base");
 
         var contenidoHtml = "";
         if (p.ValueKind != JsonValueKind.Undefined && p.TryGetProperty("contenido", out var contenidoEl))
             contenidoHtml = TipTapHtmlConverter.ToHtml(contenidoEl);
 
         var wrapStyle  = $"background:{Esc(bgColor)};padding:{RemVal(paddingV)} {RemVal(paddingH)}";
-        var innerStyle = $"color:{Esc(color)};font-size:{RemVal(fontSize)};line-height:1.7;" +
+        var innerStyle = $"color:{Esc(color)};line-height:1.7;" +
                          (maxWidth > 0 ? $"max-width:{maxWidth}px;margin:0 auto" : "");
 
         return $"""
             <div style="{wrapStyle}">
-              <div style="{innerStyle}" class="puck-richtext">
+              <div style="{innerStyle}" class="puck-richtext {fsClass}">
                 {contenidoHtml}
               </div>
             </div>
@@ -408,8 +406,9 @@ public static class PuckHtmlRenderer
             _       => "center"
         };
 
+        var fsClass   = FontSizeClass(p, "fs-lg");
         var textoHtml = !string.IsNullOrEmpty(texto)
-            ? $"""<p style="margin:0;color:{Esc(color)};font-size:{RemVal(fontSize)};font-weight:600;text-align:{Esc(alignment)}">{Esc(texto)}</p>"""
+            ? $"""<p class="{fsClass}" style="margin:0;color:{Esc(color)};font-weight:600;text-align:{Esc(alignment)}">{Esc(texto)}</p>"""
             : "";
 
         return $"""
@@ -835,4 +834,41 @@ public static class PuckHtmlRenderer
     // (divide by 16), values ≤4 are already in rem (use directly).
     private static string RemVal(double v) =>
         v > 4 ? $"{v / 16:0.###}rem" : $"{v:0.###}rem";
+
+    // Maps a stored fontSize prop to one of the fs-* CSS classes (defined in
+    // globals.css and the ZIP style block).  Handles both new string values
+    // ("fs-2xl") and legacy numeric values stored before the design-token
+    // migration.  defaultClass is returned when the prop is absent or zero.
+    private static string FontSizeClass(JsonElement props, string defaultClass)
+    {
+        if (props.ValueKind == JsonValueKind.Undefined ||
+            !props.TryGetProperty("fontSize", out var fsProp))
+            return defaultClass;
+
+        if (fsProp.ValueKind == JsonValueKind.String)
+        {
+            var s = fsProp.GetString() ?? "";
+            return s.StartsWith("fs-") ? s : defaultClass;
+        }
+
+        if (fsProp.ValueKind == JsonValueKind.Number)
+        {
+            var num = fsProp.GetDouble();
+            if (num <= 0) return defaultClass;
+            var rem = num > 4 ? num / 16 : num;
+            return rem switch
+            {
+                <= 0.8125 => "fs-xs",
+                <= 0.9375 => "fs-sm",
+                <= 1.0625 => "fs-base",
+                <= 1.25   => "fs-lg",
+                <= 1.625  => "fs-xl",
+                <= 2.125  => "fs-2xl",
+                <= 2.75   => "fs-3xl",
+                _         => "fs-4xl",
+            };
+        }
+
+        return defaultClass;
+    }
 }

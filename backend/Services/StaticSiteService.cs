@@ -265,6 +265,16 @@ public class StaticSiteService(
               <title>{{Esc(c.Nombre)}}</title>
               <link rel="stylesheet" href="assets/style.css" />
               <style>
+                /* Fluid type scale — Utopia linear interpolation (320 → 1280 px) */
+                .fs-xs   { font-size: clamp(0.75rem,  0.7083rem + 0.2083vw, 0.875rem); }
+                .fs-sm   { font-size: clamp(0.875rem, 0.8333rem + 0.2083vw, 1rem);     }
+                .fs-base { font-size: clamp(1rem,     0.9583rem + 0.2083vw, 1.125rem); }
+                .fs-lg   { font-size: clamp(1.125rem, 1.0417rem + 0.4167vw, 1.375rem); }
+                .fs-xl   { font-size: clamp(1.375rem, 1.2083rem + 0.8333vw, 1.875rem); }
+                .fs-2xl  { font-size: clamp(1.5rem,   1.25rem   + 1.25vw,   2.25rem);  }
+                .fs-3xl  { font-size: clamp(1.75rem,  1.3333rem + 2.0833vw, 3rem);     }
+                .fs-4xl  { font-size: clamp(2rem,     1.4167rem + 2.9167vw, 3.75rem);  }
+                /* Puck richtext */
                 .puck-richtext h1,.puck-richtext h2,.puck-richtext h3,
                 .puck-richtext h4,.puck-richtext h5,.puck-richtext h6 { font-size: inherit; font-weight: 700; margin: .5em 0 .25em; }
                 .puck-richtext p { margin: .5em 0; }

@@ -107,23 +107,23 @@ function toRem(v: number, fallback = '1rem'): string {
   return v > 4 ? `${v / 16}rem` : `${v}rem`;
 }
 
-// Fluid font size — Utopia linear-interpolation method.
-// Scales linearly from minRem at 320px (20rem) viewport to maxRem at 1280px (80rem).
-// minRem = max(value × 0.65, 0.875rem) so text is never below 14 px on any screen.
-// CSS output: clamp(min, Xrem + Yvw, max)  — no JS, no media queries, no hacks.
-// Reference: https://utopia.fyi/type/calculator
-function toFluidFontRem(v: number, fallback = '1rem'): string {
-  if (!v) return fallback;
-  const maxRem = v > 4 ? v / 16 : v;
-  const minRem = Math.max(maxRem * 0.65, 0.875);
-  if (minRem >= maxRem) {
-    // Value is below readability floor — enforce minimum at all sizes
-    return `${minRem.toFixed(3)}rem`;
-  }
-  // Linear interpolation: slope = Δsize / Δviewport (320 → 1280 px = 20 → 80 rem)
-  const slope     = (maxRem - minRem) / 60;   // rem per rem of viewport width
-  const intercept = minRem - slope * 20;       // y-intercept (rem)
-  return `clamp(${minRem.toFixed(3)}rem, ${intercept.toFixed(4)}rem + ${(slope * 100).toFixed(4)}vw, ${maxRem}rem)`;
+// Maps a fontSize prop to one of the fs-* CSS classes defined in globals.css.
+// Handles both new string values ("fs-2xl") and legacy numeric values (1.5, 24).
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function getFontSizeClass(fontSize: any, fallback: string): string {
+  if (!fontSize) return fallback;
+  if (typeof fontSize === 'string' && fontSize.startsWith('fs-')) return fontSize;
+  const num = typeof fontSize === 'number' ? fontSize : parseFloat(String(fontSize));
+  if (isNaN(num) || num === 0) return fallback;
+  const rem = num > 4 ? num / 16 : num;
+  if (rem <= 0.8125) return 'fs-xs';
+  if (rem <= 0.9375) return 'fs-sm';
+  if (rem <= 1.0625) return 'fs-base';
+  if (rem <= 1.25)   return 'fs-lg';
+  if (rem <= 1.625)  return 'fs-xl';
+  if (rem <= 2.125)  return 'fs-2xl';
+  if (rem <= 2.75)   return 'fs-3xl';
+  return 'fs-4xl';
 }
 function toPaddingRem(v: number, h: number): string {
   return `${toRem(v, '0rem')} ${toRem(h, '0rem')}`;
@@ -291,14 +291,28 @@ export const puckConfig: Config = {
         },
         color:    colorField('Color texto'),
         bgColor:  colorField('Color de fondo'),
-        fontSize: { type: 'number', label: 'Tamaño fuente (rem, 0=auto)' },
+        fontSize: {
+          type: 'select', label: 'Tamaño fuente',
+          options: [
+            { label: 'Auto (según nivel H1/H2…)', value: '' },
+            { label: 'xs — muy pequeño',          value: 'fs-xs'   },
+            { label: 'sm — pequeño',              value: 'fs-sm'   },
+            { label: 'base — normal',             value: 'fs-base' },
+            { label: 'lg — grande',               value: 'fs-lg'   },
+            { label: 'xl — título chico',         value: 'fs-xl'   },
+            { label: '2xl — título',              value: 'fs-2xl'  },
+            { label: '3xl — título grande',       value: 'fs-3xl'  },
+            { label: '4xl — título enorme',       value: 'fs-4xl'  },
+          ],
+        },
         paddingV: { type: 'number', label: 'Padding vertical (rem)' },
         paddingH: { type: 'number', label: 'Padding horizontal (rem)' },
       },
-      defaultProps: { texto: 'Título de sección', nivel: 'h2', alignment: 'left', negrita: 'si', cursiva: 'no', subrayado: 'no', fontFamily: '', color: '#111827', bgColor: 'transparent', fontSize: 0, paddingV: 1, paddingH: 2 },
+      defaultProps: { texto: 'Título de sección', nivel: 'h2', alignment: 'left', negrita: 'si', cursiva: 'no', subrayado: 'no', fontFamily: '', color: '#111827', bgColor: 'transparent', fontSize: '', paddingV: 1, paddingH: 2 },
       render: ({ texto, nivel, alignment, negrita, cursiva, subrayado, fontFamily, color, bgColor, fontSize, paddingV, paddingH }) => {
         const Tag = nivel as 'h1' | 'h2' | 'h3' | 'h4';
-        const sizes: Record<string, string> = { h1: toFluidFontRem(2.5), h2: toFluidFontRem(1.875), h3: toFluidFontRem(1.375), h4: toFluidFontRem(1.125) };
+        const levelDefaults: Record<string, string> = { h1: 'fs-4xl', h2: 'fs-3xl', h3: 'fs-2xl', h4: 'fs-xl' };
+        const fsClass = getFontSizeClass(fontSize, levelDefaults[nivel] || 'fs-2xl');
         const font = fontFamily ? (fontFamily as string).split("'")[1] || (fontFamily as string).split(',')[0] : null;
         const isGoogle = font && GOOGLE_FONTS.includes(font);
         return (
@@ -306,17 +320,19 @@ export const puckConfig: Config = {
             {isGoogle && (
               <link href={`https://fonts.googleapis.com/css2?family=${font.replace(/ /g, '+')}:wght@400;700&display=swap`} rel="stylesheet" />
             )}
-            <Tag style={{
-              margin: 0,
-              textAlign: alignment as 'left' | 'center' | 'right',
-              color,
-              fontSize: fontSize ? toFluidFontRem(fontSize) : sizes[nivel],
-              fontWeight: negrita === 'si' ? 700 : 400,
-              fontStyle: cursiva === 'si' ? 'italic' : 'normal',
-              textDecoration: subrayado === 'si' ? 'underline' : 'none',
-              fontFamily: fontFamily || undefined,
-              lineHeight: 1.25,
-            }}>
+            <Tag
+              className={fsClass}
+              style={{
+                margin: 0,
+                textAlign: alignment as 'left' | 'center' | 'right',
+                color,
+                fontWeight: negrita === 'si' ? 700 : 400,
+                fontStyle: cursiva === 'si' ? 'italic' : 'normal',
+                textDecoration: subrayado === 'si' ? 'underline' : 'none',
+                fontFamily: fontFamily || undefined,
+                lineHeight: 1.25,
+              }}
+            >
               {texto}
             </Tag>
           </div>
@@ -330,18 +346,30 @@ export const puckConfig: Config = {
         contenido: { type: 'richtext', label: 'Texto' },
         color:    colorField('Color texto'),
         bgColor:  colorField('Color de fondo'),
-        fontSize: { type: 'number', label: 'Tamaño fuente (rem)' },
+        fontSize: {
+          type: 'select', label: 'Tamaño fuente',
+          options: [
+            { label: 'xs — muy pequeño',    value: 'fs-xs'   },
+            { label: 'sm — pequeño',        value: 'fs-sm'   },
+            { label: 'base — normal',       value: 'fs-base' },
+            { label: 'lg — grande',         value: 'fs-lg'   },
+            { label: 'xl — título chico',   value: 'fs-xl'   },
+            { label: '2xl — título',        value: 'fs-2xl'  },
+            { label: '3xl — título grande', value: 'fs-3xl'  },
+            { label: '4xl — título enorme', value: 'fs-4xl'  },
+          ],
+        },
         maxWidth: { type: 'number', label: 'Ancho máximo (px, 0=full)' },
         paddingV: { type: 'number', label: 'Padding vertical (rem)' },
         paddingH: { type: 'number', label: 'Padding horizontal (rem)' },
       },
-      defaultProps: { contenido: '<p>Escribí tu texto acá...</p>', color: '#374151', bgColor: 'transparent', fontSize: 1, maxWidth: 0, paddingV: 0.5, paddingH: 2 },
+      defaultProps: { contenido: '<p>Escribí tu texto acá...</p>', color: '#374151', bgColor: 'transparent', fontSize: 'fs-base', maxWidth: 0, paddingV: 0.5, paddingH: 2 },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       render: ({ contenido, color, bgColor, fontSize, maxWidth, paddingV, paddingH }: any) => (
         <div style={{ background: bgColor, padding: toPaddingRem(paddingV, paddingH) }}>
           <div
-            style={{ color, fontSize: toFluidFontRem(fontSize, '1rem'), lineHeight: 1.7, maxWidth: maxWidth || 'none' }}
-            className="puck-richtext"
+            style={{ color, lineHeight: 1.7, maxWidth: maxWidth || 'none' }}
+            className={`puck-richtext ${getFontSizeClass(fontSize, 'fs-base')}`}
           >
             {contenido}
           </div>
@@ -518,7 +546,19 @@ export const puckConfig: Config = {
         texto:     { type: 'text',   label: 'Texto (opcional)' },
         color:     colorField('Color texto'),
         height:    { type: 'number', label: 'Alto mínimo (px)' },
-        fontSize:  { type: 'number', label: 'Tamaño fuente (rem)' },
+        fontSize: {
+          type: 'select', label: 'Tamaño fuente',
+          options: [
+            { label: 'xs — muy pequeño',    value: 'fs-xs'   },
+            { label: 'sm — pequeño',        value: 'fs-sm'   },
+            { label: 'base — normal',       value: 'fs-base' },
+            { label: 'lg — grande',         value: 'fs-lg'   },
+            { label: 'xl — título chico',   value: 'fs-xl'   },
+            { label: '2xl — título',        value: 'fs-2xl'  },
+            { label: '3xl — título grande', value: 'fs-3xl'  },
+            { label: '4xl — título enorme', value: 'fs-4xl'  },
+          ],
+        },
         alignment: {
           type: 'radio', label: 'Alineación texto',
           options: [
@@ -526,7 +566,7 @@ export const puckConfig: Config = {
           ],
         },
       },
-      defaultProps: { bgColor: '#4f46e5', texto: '', color: '#ffffff', height: 80, fontSize: 1.125, alignment: 'center' },
+      defaultProps: { bgColor: '#4f46e5', texto: '', color: '#ffffff', height: 80, fontSize: 'fs-lg', alignment: 'center' },
       render: ({ bgColor, texto, color, height, fontSize, alignment }) => (
         <div style={{
           background: bgColor, minHeight: height,
@@ -534,7 +574,7 @@ export const puckConfig: Config = {
           justifyContent: alignment === 'left' ? 'flex-start' : alignment === 'right' ? 'flex-end' : 'center',
           padding: '1rem 2rem',
         }}>
-          {texto && <p style={{ margin: 0, color, fontSize: toFluidFontRem(fontSize, '1.125rem'), fontWeight: 600, textAlign: alignment as 'left' | 'center' | 'right' }}>{texto}</p>}
+          {texto && <p className={getFontSizeClass(fontSize, 'fs-lg')} style={{ margin: 0, color, fontWeight: 600, textAlign: alignment as 'left' | 'center' | 'right' }}>{texto}</p>}
         </div>
       ),
     },
