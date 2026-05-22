@@ -1,4 +1,0 @@
-<Solution>
-  <Project Path="ConferenceManager.csproj" />
-  <Project Path="ConferenceManager.Tests/ConferenceManager.Tests.csproj" />
-</Solution>

@@ -29,3 +29,16 @@ Thumbs.db
 .vs/
 *.suo
 .vscode/settings.json
+
+# Claude / AI tooling
+.claude/settings.local.json
+.claude/worktrees/
+.claude/agent-memory/
+.claude/launch.json
+.claude/skills/
+.agents/
+.continue/
+skills-lock.json
+
+# Demo / scratch
+puck-demo/
