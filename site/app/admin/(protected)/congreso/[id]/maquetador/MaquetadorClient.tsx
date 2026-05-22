@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Puck, usePuck } from '@puckeditor/core';
 import '@puckeditor/core/dist/index.css';
@@ -42,17 +42,9 @@ export default function MaquetadorClient({ congresoId, layoutId, templateNombre,
   const [pendingData, setPendingData] = useState<unknown>(null);
   const [pendingNombre, setPendingNombre] = useState('');
 
-  // Lock body scroll while editor is mounted — prevents outer page scroll
-  // which offsets Puck's selection overlay calculation
-  useEffect(() => {
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    document.documentElement.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = prev;
-      document.documentElement.style.overflow = '';
-    };
-  }, []);
+  // No body lock needed — wrapper is height:100vh so page body has nothing
+  // to scroll (scrollY stays 0). Puck's _PuckCanvas{overflow:auto} handles
+  // canvas scroll without interference.
 
   const MAX_PAYLOAD_MB = 8; // margen bajo el límite de 10MB del server action
 
@@ -219,7 +211,7 @@ export default function MaquetadorClient({ congresoId, layoutId, templateNombre,
   const puckData = existingData ?? (startEmpty ? EMPTY_PUCK_DATA : DEFAULT_PUCK_DATA);
 
   return (
-    <div className="relative">
+    <div style={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column' }} className="relative">
       {error && (
         <div className="fixed top-4 right-4 z-50 bg-red-600 text-white text-sm px-4 py-2 rounded-lg shadow-lg">
           ❌ {error}
@@ -232,12 +224,12 @@ export default function MaquetadorClient({ congresoId, layoutId, templateNombre,
         </div>
       )}
 
-      <div style={{ height: '100vh' }}>
+      <div style={{ flex: '1 1 0%', minHeight: 0, display: 'flex', flexDirection: 'column' }}>
         <Puck
           config={puckConfig}
           data={puckData}
           onPublish={handleSaveRequest}
-
+          height="100%"
           overrides={{
             headerActions: () => <SaveBtn />,
           }}
