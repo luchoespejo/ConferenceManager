@@ -617,7 +617,8 @@ export const puckConfig: Config = {
         zoom:   { type: 'number', label: 'Zoom (1–20)' },
       },
       defaultProps: { query: '', height: 400, zoom: 14 },
-      render: ({ query, height, zoom }: { query: string; height: number; zoom: number }) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      render: ({ query, height, zoom }: any) => {
         if (!query) {
           return (
             <div style={{ height, background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af', fontSize: '0.875rem' }}>
