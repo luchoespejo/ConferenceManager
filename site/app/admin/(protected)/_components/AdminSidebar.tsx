@@ -64,7 +64,7 @@ export default function AdminSidebar() {
   return (
     <aside
       style={{ width: isCollapsed ? 60 : 224 }}
-      className="min-h-screen bg-white border-r border-slate-200 flex flex-col shrink-0 transition-[width] duration-200 overflow-hidden"
+      className="h-screen sticky top-0 bg-white border-r border-slate-200 flex flex-col shrink-0 transition-[width] duration-200 overflow-hidden"
     >
       {/* Header */}
       <div className={`flex items-center border-b border-slate-100 h-14 shrink-0 ${isCollapsed ? 'justify-center px-0' : 'justify-between px-3'}`}>
