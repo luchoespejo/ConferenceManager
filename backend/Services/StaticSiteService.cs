@@ -15,6 +15,38 @@ public class StaticSiteService(
 {
     private static readonly CultureInfo EsAr = new("es-AR");
 
+    // ── Nav config — mirrors layout.tsx logic exactly ─────────────────────────
+
+    private readonly record struct NavConfig(
+        bool TieneSesiones,
+        bool TieneExpositores,
+        bool MostrarInscripciones,
+        bool MostrarContacto
+    );
+
+    /// <summary>
+    /// Builds the &lt;nav&gt; HTML for a page. prefix = "" for root pages, "../../" for s/{id}/.
+    /// </summary>
+    private static string BuildNav(Conferencia c, NavConfig nav, string prefix = "")
+    {
+        var links = new StringBuilder();
+        if (nav.TieneSesiones)
+            links.Append($"""<a href="{prefix}programa.html">Programa</a>""");
+        if (nav.TieneExpositores)
+            links.Append($"""<a href="{prefix}expositores.html">Expositores</a>""");
+        if (nav.MostrarInscripciones)
+            links.Append($"""<a href="{prefix}inscripciones.html" style="font-weight:700">Inscripciones</a>""");
+        if (nav.MostrarContacto)
+            links.Append($"""<a href="{prefix}contacto.html">Contacto</a>""");
+
+        return $"""
+            <nav class="nav">
+              <a href="{prefix}index.html" class="nav-brand">{Esc(c.Nombre)}</a>
+              <div class="nav-links">{links}</div>
+            </nav>
+            """;
+    }
+
     public async Task<StaticSiteZip?> GenerateZipAsync(Guid conferenciaId, Guid usuarioId)
     {
         var conferencia = await context.Conferencias
@@ -50,20 +82,45 @@ public class StaticSiteService(
             .OrderBy(f => f.Fecha)
             .ToListAsync();
 
+        // Compute nav flags — same logic as layout.tsx
+        var hasContacto =
+            conferencia.MostrarContacto ||
+            !string.IsNullOrEmpty(conferencia.VenueNombre) ||
+            !string.IsNullOrEmpty(conferencia.VenueDireccion) ||
+            !string.IsNullOrEmpty(conferencia.EmailContacto) ||
+            !string.IsNullOrEmpty(conferencia.Instagram);
+
+        var nav = new NavConfig(
+            TieneSesiones:        sesiones.Count > 0,
+            TieneExpositores:     expositores.Count > 0,
+            MostrarInscripciones: conferencia.MostrarInscripciones,
+            MostrarContacto:      hasContacto
+        );
+
         using var ms = new MemoryStream();
         using (var zip = new ZipArchive(ms, ZipArchiveMode.Create, leaveOpen: true))
         {
             AddTextEntry(zip, "assets/style.css", GenerateCss(conferencia));
 
             var indexHtml = !string.IsNullOrEmpty(conferencia.LayoutJson)
-                ? GeneratePuckHomeHtml(conferencia, organizadores, fechasImportantes)
-                : await GenerateHomeHtmlAsync(conferencia);
+                ? GeneratePuckHomeHtml(conferencia, organizadores, fechasImportantes, nav)
+                : await GenerateHomeHtmlAsync(conferencia, nav);
             AddTextEntry(zip, "index.html", indexHtml);
-            AddTextEntry(zip, "programa.html", GenerateProgramaHtml(conferencia, sesiones));
-            AddTextEntry(zip, "expositores.html", await GenerateExpositoresHtmlAsync(conferencia, expositores));
+
+            if (nav.TieneSesiones)
+                AddTextEntry(zip, "programa.html", GenerateProgramaHtml(conferencia, sesiones, nav));
+
+            if (nav.TieneExpositores)
+                AddTextEntry(zip, "expositores.html", await GenerateExpositoresHtmlAsync(conferencia, expositores, nav));
+
+            if (nav.MostrarContacto)
+                AddTextEntry(zip, "contacto.html", GenerateContactoHtml(conferencia, nav));
+
+            if (nav.MostrarInscripciones)
+                AddTextEntry(zip, "inscripciones.html", GenerateInscripcionesHtml(conferencia, nav));
 
             foreach (var sesion in sesiones)
-                AddTextEntry(zip, $"s/{sesion.Id}/index.html", GenerateSesionHtml(conferencia, sesion));
+                AddTextEntry(zip, $"s/{sesion.Id}/index.html", GenerateSesionHtml(conferencia, sesion, nav));
         }
 
         return new StaticSiteZip(ms.ToArray(), conferencia.Slug);
@@ -193,13 +250,11 @@ public class StaticSiteService(
     private string GeneratePuckHomeHtml(
         Conferencia c,
         List<Organizador> organizadores,
-        List<FechaImportante> fechasImportantes)
+        List<FechaImportante> fechasImportantes,
+        NavConfig nav)
     {
-        var mainContent = PuckHtmlRenderer.RenderMainContent(
-            c.LayoutJson!,
-            c,
-            organizadores,
-            fechasImportantes);
+        var mainContent = PuckHtmlRenderer.RenderMainContent(c.LayoutJson!, c, organizadores, fechasImportantes);
+        var navHtml = BuildNav(c, nav);
 
         return $$"""
             <!DOCTYPE html>
@@ -218,23 +273,15 @@ public class StaticSiteService(
               </style>
             </head>
             <body>
-              <nav class="nav">
-                <a href="index.html" class="nav-brand">{{Esc(c.Nombre)}}</a>
-                <div class="nav-links">
-                  <a href="programa.html">Programa</a>
-                  <a href="expositores.html">Expositores</a>
-                </div>
-              </nav>
-              <main>
-                {{mainContent}}
-              </main>
+              {{navHtml}}
+              <main>{{mainContent}}</main>
               <footer class="footer">{{Esc(c.Nombre)}} — Sitio generado estáticamente</footer>
             </body>
             </html>
             """;
     }
 
-    private async Task<string> GenerateHomeHtmlAsync(Conferencia c)
+    private async Task<string> GenerateHomeHtmlAsync(Conferencia c, NavConfig nav)
     {
         var logoHtml = "";
         if (!string.IsNullOrEmpty(c.LogoUrl))
@@ -256,6 +303,14 @@ public class StaticSiteService(
             ? $"""<span><a href="{Esc(c.VenueLinkMaps)}" target="_blank" rel="noopener">📌 Ver en mapa</a></span>"""
             : "";
 
+        var ctaHtml = new StringBuilder();
+        if (nav.TieneSesiones)
+            ctaHtml.Append("""<a href="programa.html" class="btn btn-primary">📋 Ver Programa</a>""");
+        if (nav.TieneExpositores)
+            ctaHtml.Append("""<a href="expositores.html" class="btn btn-outline">🎤 Ver Expositores</a>""");
+
+        var navHtml = BuildNav(c, nav);
+
         return $$"""
             <!DOCTYPE html>
             <html lang="es">
@@ -266,13 +321,7 @@ public class StaticSiteService(
               <link rel="stylesheet" href="assets/style.css" />
             </head>
             <body>
-              <nav class="nav">
-                <a href="index.html" class="nav-brand">{{Esc(c.Nombre)}}</a>
-                <div class="nav-links">
-                  <a href="programa.html">Programa</a>
-                  <a href="expositores.html">Expositores</a>
-                </div>
-              </nav>
+              {{navHtml}}
               <div class="hero">
                 {{logoHtml}}
                 <h1>{{Esc(c.Nombre)}}</h1>
@@ -284,10 +333,7 @@ public class StaticSiteService(
                 {{mapsHtml}}
               </div>
               <div class="container">
-                <div class="cta-row">
-                  <a href="programa.html" class="btn btn-primary">📋 Ver Programa</a>
-                  <a href="expositores.html" class="btn btn-outline">🎤 Ver Expositores</a>
-                </div>
+                <div class="cta-row">{{ctaHtml}}</div>
               </div>
               <footer class="footer">{{Esc(c.Nombre)}} — Sitio generado estáticamente</footer>
             </body>
@@ -295,7 +341,7 @@ public class StaticSiteService(
             """;
     }
 
-    private string GenerateProgramaHtml(Conferencia c, List<Sesion> sesiones)
+    private string GenerateProgramaHtml(Conferencia c, List<Sesion> sesiones, NavConfig nav)
     {
         string content;
         if (sesiones.Count == 0)
@@ -333,6 +379,7 @@ public class StaticSiteService(
             content = sb.ToString();
         }
 
+        var navHtml = BuildNav(c, nav);
         return $$"""
             <!DOCTYPE html>
             <html lang="es">
@@ -343,13 +390,7 @@ public class StaticSiteService(
               <link rel="stylesheet" href="assets/style.css" />
             </head>
             <body>
-              <nav class="nav">
-                <a href="index.html" class="nav-brand">{{Esc(c.Nombre)}}</a>
-                <div class="nav-links">
-                  <a href="programa.html">Programa</a>
-                  <a href="expositores.html">Expositores</a>
-                </div>
-              </nav>
+              {{navHtml}}
               <div class="container">
                 <h2 class="section-title">Programa del Evento</h2>
                 {{content}}
@@ -360,7 +401,7 @@ public class StaticSiteService(
             """;
     }
 
-    private async Task<string> GenerateExpositoresHtmlAsync(Conferencia c, List<Expositor> expositores)
+    private async Task<string> GenerateExpositoresHtmlAsync(Conferencia c, List<Expositor> expositores, NavConfig nav)
     {
         string content;
         if (expositores.Count == 0)
@@ -406,6 +447,7 @@ public class StaticSiteService(
             content = sb.ToString();
         }
 
+        var navHtml = BuildNav(c, nav);
         return $$"""
             <!DOCTYPE html>
             <html lang="es">
@@ -416,13 +458,7 @@ public class StaticSiteService(
               <link rel="stylesheet" href="assets/style.css" />
             </head>
             <body>
-              <nav class="nav">
-                <a href="index.html" class="nav-brand">{{Esc(c.Nombre)}}</a>
-                <div class="nav-links">
-                  <a href="programa.html">Programa</a>
-                  <a href="expositores.html">Expositores</a>
-                </div>
-              </nav>
+              {{navHtml}}
               <div class="container">
                 <h2 class="section-title">Expositores</h2>
                 {{content}}
@@ -433,7 +469,96 @@ public class StaticSiteService(
             """;
     }
 
-    private static string GenerateSesionHtml(Conferencia c, Sesion s)
+    private static string GenerateContactoHtml(Conferencia c, NavConfig nav)
+    {
+        var sb = new StringBuilder();
+
+        if (!string.IsNullOrEmpty(c.VenueNombre) || !string.IsNullOrEmpty(c.VenueDireccion))
+        {
+            sb.AppendLine("""<section style="margin-bottom:2.5rem">""");
+            sb.AppendLine("""  <h2 class="section-title">Ubicación</h2>""");
+            if (!string.IsNullOrEmpty(c.VenueNombre))
+                sb.AppendLine($"""  <p style="font-size:1.05rem;font-weight:600;color:#1e293b;margin-bottom:.35rem">{Esc(c.VenueNombre)}</p>""");
+            if (!string.IsNullOrEmpty(c.VenueDireccion))
+                sb.AppendLine($"""  <p style="font-size:.95rem;color:#475569;margin-bottom:.75rem">📍 {Esc(c.VenueDireccion)}</p>""");
+            if (!string.IsNullOrEmpty(c.VenueLinkMaps))
+                sb.AppendLine($"""  <a href="{Esc(c.VenueLinkMaps)}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:.4rem;background:var(--primary);color:#fff;font-weight:600;padding:8px 18px;border-radius:8px;text-decoration:none;font-size:.9rem;margin-bottom:1.25rem">🗺 Abrir en Google Maps</a>""");
+            sb.AppendLine("</section>");
+        }
+
+        var hasContactInfo = !string.IsNullOrEmpty(c.EmailContacto) || !string.IsNullOrEmpty(c.Instagram) ||
+                             !string.IsNullOrEmpty(c.FormularioInscripcionUrl) || !string.IsNullOrEmpty(c.ContactoAdicional);
+        if (hasContactInfo)
+        {
+            sb.AppendLine("""<section>""");
+            sb.AppendLine("""  <h2 class="section-title">Contacto e Informes</h2>""");
+            sb.AppendLine("""  <div style="display:flex;flex-direction:column;gap:.75rem">""");
+            if (!string.IsNullOrEmpty(c.EmailContacto))
+                sb.AppendLine($"""    <a href="mailto:{Esc(c.EmailContacto)}" style="display:inline-flex;align-items:center;gap:.5rem;color:var(--primary);font-weight:600;font-size:1rem">✉ {Esc(c.EmailContacto)}</a>""");
+            if (!string.IsNullOrEmpty(c.Instagram))
+                sb.AppendLine($"""    <a href="https://instagram.com/{Esc(c.Instagram)}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:.5rem;color:var(--primary);font-weight:600;font-size:1rem">📷 @{Esc(c.Instagram)}</a>""");
+            if (!string.IsNullOrEmpty(c.FormularioInscripcionUrl))
+                sb.AppendLine($"""    <a href="{Esc(c.FormularioInscripcionUrl)}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:.5rem;color:var(--primary);font-weight:600;font-size:1rem">📝 Formulario de inscripción</a>""");
+            if (!string.IsNullOrEmpty(c.ContactoAdicional))
+                sb.AppendLine($"""    <p style="font-size:.95rem;color:#475569;white-space:pre-line;margin-top:.5rem">{Esc(c.ContactoAdicional)}</p>""");
+            sb.AppendLine("  </div>");
+            sb.AppendLine("</section>");
+        }
+
+        var navHtml = BuildNav(c, nav);
+        return $$"""
+            <!DOCTYPE html>
+            <html lang="es">
+            <head>
+              <meta charset="UTF-8" />
+              <meta name="viewport" content="width=device-width, initial-scale=1" />
+              <title>Contacto — {{Esc(c.Nombre)}}</title>
+              <link rel="stylesheet" href="assets/style.css" />
+            </head>
+            <body>
+              {{navHtml}}
+              <div class="container" style="max-width:760px">
+                {{sb}}
+              </div>
+              <footer class="footer">{{Esc(c.Nombre)}} — Sitio generado estáticamente</footer>
+            </body>
+            </html>
+            """;
+    }
+
+    private static string GenerateInscripcionesHtml(Conferencia c, NavConfig nav)
+    {
+        var sb = new StringBuilder();
+        if (!string.IsNullOrEmpty(c.ArancelesTexto))
+            sb.AppendLine($"""<p style="color:#374151;white-space:pre-line;margin-bottom:1.5rem;font-size:.9375rem;line-height:1.7">{Esc(c.ArancelesTexto)}</p>""");
+        if (!string.IsNullOrEmpty(c.FormularioInscripcionUrl))
+            sb.AppendLine($"""<a href="{Esc(c.FormularioInscripcionUrl)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary">📝 Formulario de inscripción</a>""");
+        if (!string.IsNullOrEmpty(c.InformacionPago))
+            sb.AppendLine($"""<div style="margin-top:1.5rem;padding:1.25rem;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px"><h3 style="font-size:1rem;font-weight:600;margin-bottom:.5rem">Información de pago</h3><p style="font-size:.9rem;color:#475569;white-space:pre-line">{Esc(c.InformacionPago)}</p></div>""");
+
+        var navHtml = BuildNav(c, nav);
+        return $$"""
+            <!DOCTYPE html>
+            <html lang="es">
+            <head>
+              <meta charset="UTF-8" />
+              <meta name="viewport" content="width=device-width, initial-scale=1" />
+              <title>Inscripciones — {{Esc(c.Nombre)}}</title>
+              <link rel="stylesheet" href="assets/style.css" />
+            </head>
+            <body>
+              {{navHtml}}
+              <div class="container" style="max-width:700px">
+                <h2 class="section-title">Inscripciones</h2>
+                {{sb}}
+              </div>
+              <footer class="footer">{{Esc(c.Nombre)}} — Sitio generado estáticamente</footer>
+            </body>
+            </html>
+            """;
+    }
+
+    private static string GenerateSesionHtml(Conferencia c, Sesion s, NavConfig nav)
     {
         var qrHtml = !string.IsNullOrEmpty(s.QrCodeUrl)
             ? $"""
@@ -456,6 +581,7 @@ public class StaticSiteService(
             ? $"""<div style="margin-top:1.5rem"><a href="{Esc(s.EncuestaUrl)}" target="_blank" rel="noopener" class="btn btn-primary">📝 Completar encuesta</a></div>"""
             : "";
 
+        var navHtml = BuildNav(c, nav, "../../");
         return $$"""
             <!DOCTYPE html>
             <html lang="es">
@@ -466,13 +592,7 @@ public class StaticSiteService(
               <link rel="stylesheet" href="../../assets/style.css" />
             </head>
             <body>
-              <nav class="nav">
-                <a href="../../index.html" class="nav-brand">{{Esc(c.Nombre)}}</a>
-                <div class="nav-links">
-                  <a href="../../programa.html">Programa</a>
-                  <a href="../../expositores.html">Expositores</a>
-                </div>
-              </nav>
+              {{navHtml}}
               <div class="container">
                 <a href="../../programa.html" class="back-link">← Volver al programa</a>
                 <div class="detail-wrap">
