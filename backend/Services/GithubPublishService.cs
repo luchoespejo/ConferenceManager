@@ -178,14 +178,19 @@ public class GithubPublishService(
     private static async Task<string> CreateTree(
         HttpClient client, string baseUrl, string baseTreeSha, List<TreeItem> items)
     {
+        // GitHub API requires lowercase field names — DO NOT use anonymous type with PascalCase properties
         var body = JsonSerializer.Serialize(new
         {
             base_tree = baseTreeSha,
-            tree = items.Select(i => new { i.Path, i.Mode, i.Type, i.Sha })
+            tree = items.Select(i => new { path = i.Path, mode = i.Mode, type = i.Type, sha = i.Sha })
         });
         var res = await client.PostAsync($"{baseUrl}/git/trees",
             new StringContent(body, Encoding.UTF8, "application/json"));
-        res.EnsureSuccessStatusCode();
+        if (!res.IsSuccessStatusCode)
+        {
+            var err = await res.Content.ReadAsStringAsync();
+            throw new HttpRequestException($"CreateTree failed {(int)res.StatusCode}: {err}", null, res.StatusCode);
+        }
         var json = JsonDocument.Parse(await res.Content.ReadAsStringAsync());
         return json.RootElement.GetProperty("sha").GetString()!;
     }
