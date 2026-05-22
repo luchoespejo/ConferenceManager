@@ -38,11 +38,27 @@ public class StaticSiteService(
             .ThenBy(s => s.HoraInicio)
             .ToListAsync();
 
+        var organizadores = await context.Organizadores
+            .AsNoTracking()
+            .Where(o => o.ConferenciaId == conferenciaId)
+            .OrderBy(o => o.Orden)
+            .ToListAsync();
+
+        var fechasImportantes = await context.FechasImportantes
+            .AsNoTracking()
+            .Where(f => f.ConferenciaId == conferenciaId)
+            .OrderBy(f => f.Fecha)
+            .ToListAsync();
+
         using var ms = new MemoryStream();
         using (var zip = new ZipArchive(ms, ZipArchiveMode.Create, leaveOpen: true))
         {
             AddTextEntry(zip, "assets/style.css", GenerateCss(conferencia));
-            AddTextEntry(zip, "index.html", await GenerateHomeHtmlAsync(conferencia));
+
+            var indexHtml = !string.IsNullOrEmpty(conferencia.LayoutJson)
+                ? GeneratePuckHomeHtml(conferencia, organizadores, fechasImportantes)
+                : await GenerateHomeHtmlAsync(conferencia);
+            AddTextEntry(zip, "index.html", indexHtml);
             AddTextEntry(zip, "programa.html", GenerateProgramaHtml(conferencia, sesiones));
             AddTextEntry(zip, "expositores.html", await GenerateExpositoresHtmlAsync(conferencia, expositores));
 
@@ -171,6 +187,50 @@ public class StaticSiteService(
               .detail-card { padding: 1.25rem; }
               .hero { padding: 2.5rem 1rem; }
             }
+            """;
+    }
+
+    private string GeneratePuckHomeHtml(
+        Conferencia c,
+        List<Organizador> organizadores,
+        List<FechaImportante> fechasImportantes)
+    {
+        var mainContent = PuckHtmlRenderer.RenderMainContent(
+            c.LayoutJson!,
+            c,
+            organizadores,
+            fechasImportantes);
+
+        return $$"""
+            <!DOCTYPE html>
+            <html lang="es">
+            <head>
+              <meta charset="UTF-8" />
+              <meta name="viewport" content="width=device-width, initial-scale=1" />
+              <title>{{Esc(c.Nombre)}}</title>
+              <link rel="stylesheet" href="assets/style.css" />
+              <style>
+                .puck-richtext p { margin: .5em 0; }
+                .puck-richtext ul, .puck-richtext ol { padding-left: 1.5em; margin: .5em 0; }
+                .puck-richtext a { color: var(--primary); }
+                .puck-richtext blockquote { border-left: 3px solid #e5e7eb; margin: 0; padding-left: 1rem; color: #64748b; }
+                .puck-richtext pre { background: #f1f5f9; padding: 1rem; border-radius: 6px; overflow-x: auto; }
+              </style>
+            </head>
+            <body>
+              <nav class="nav">
+                <a href="index.html" class="nav-brand">{{Esc(c.Nombre)}}</a>
+                <div class="nav-links">
+                  <a href="programa.html">Programa</a>
+                  <a href="expositores.html">Expositores</a>
+                </div>
+              </nav>
+              <main>
+                {{mainContent}}
+              </main>
+              <footer class="footer">{{Esc(c.Nombre)}} — Sitio generado estáticamente</footer>
+            </body>
+            </html>
             """;
     }
 

@@ -107,7 +107,7 @@ export default function MaquetasClient({ congresoId, initial, slug }: Props) {
         <div className="flex gap-2 flex-wrap">
           {slug && (
             <Link
-              href={`/${slug}`}
+              href={`${process.env.NEXT_PUBLIC_CONFERENCE_SITES_URL ?? ''}/${slug}/`}
               target="_blank"
               rel="noopener noreferrer"
               className="px-4 py-2 text-sm font-medium border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
