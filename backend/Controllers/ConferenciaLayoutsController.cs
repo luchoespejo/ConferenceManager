@@ -15,6 +15,7 @@ namespace ConferenceManager.Controllers;
 [Route("api/dashboard/conferencias/{conferenciaId:guid}/layouts")]
 public class ConferenciaLayoutsController(
     AppDbContext db,
+    IStaticSiteService staticSiteService,
     IServiceScopeFactory scopeFactory,
     IConfiguration config,
     IHttpClientFactory httpClientFactory,
@@ -186,6 +187,19 @@ public class ConferenciaLayoutsController(
         await db.SaveChangesAsync();
 
         return CreatedAtAction(nameof(GetLayout), new { conferenciaId, layoutId = copy.Id }, MapDto(copy));
+    }
+
+    // GET /api/dashboard/conferencias/{conferenciaId}/layouts/descargar-zip
+    // Devuelve el ZIP estático del sitio listo para desplegar en servidor propio
+    [HttpGet("descargar-zip")]
+    public async Task<IActionResult> DescargarZip(Guid conferenciaId)
+    {
+        if (!await ConferenciaExiste(conferenciaId)) return NotFound();
+
+        var zip = await staticSiteService.GenerateZipAsync(conferenciaId, UsuarioId);
+        if (zip is null) return NotFound();
+
+        return File(zip.Data, "application/zip", $"{zip.Slug}-sitio.zip");
     }
 
     // POST /api/dashboard/conferencias/{conferenciaId}/layouts/desplegar

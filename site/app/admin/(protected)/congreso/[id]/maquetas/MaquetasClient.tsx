@@ -177,6 +177,14 @@ export default function MaquetasClient({ congresoId, initial, slug }: Props) {
                       <button onClick={() => handleDuplicar(t)} className="block w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50">📋 Duplicar</button>
                       <button onClick={() => startEdit(t)} className="block w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50">✏️ Renombrar</button>
                       {!t.isActive && <button onClick={() => handleActivar(t)} className="block w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50">✅ Activar</button>}
+                      <a
+                        href={`/api/admin/congreso/${congresoId}/zip`}
+                        download
+                        onClick={() => setOpenMenuId(null)}
+                        className="block w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50"
+                      >
+                        📦 Descargar ZIP
+                      </a>
                       <button onClick={() => handleEliminar(t)} className="block w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50">🗑️ Eliminar</button>
                     </div>
                   )}
