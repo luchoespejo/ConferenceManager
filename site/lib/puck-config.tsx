@@ -107,15 +107,23 @@ function toRem(v: number, fallback = '1rem'): string {
   return v > 4 ? `${v / 16}rem` : `${v}rem`;
 }
 
-// Fluid font size: clamp(min, preferred, max) so text scales gracefully
-// between small screens and desktop. Enforces a minimum of 0.875rem (14px).
-// Formula: at 320px viewport → ~70% of desktop size; at ~960px → full size.
+// Fluid font size — Utopia linear-interpolation method.
+// Scales linearly from minRem at 320px (20rem) viewport to maxRem at 1280px (80rem).
+// minRem = max(value × 0.65, 0.875rem) so text is never below 14 px on any screen.
+// CSS output: clamp(min, Xrem + Yvw, max)  — no JS, no media queries, no hacks.
+// Reference: https://utopia.fyi/type/calculator
 function toFluidFontRem(v: number, fallback = '1rem'): string {
   if (!v) return fallback;
-  const rem = v > 4 ? v / 16 : v;
-  const minRem = Math.max(rem * 0.7, 0.875);
-  const preferred = rem * 0.5;
-  return `clamp(${minRem.toFixed(3)}rem, ${preferred.toFixed(3)}rem + 2.5vw, ${rem}rem)`;
+  const maxRem = v > 4 ? v / 16 : v;
+  const minRem = Math.max(maxRem * 0.65, 0.875);
+  if (minRem >= maxRem) {
+    // Value is below readability floor — enforce minimum at all sizes
+    return `${minRem.toFixed(3)}rem`;
+  }
+  // Linear interpolation: slope = Δsize / Δviewport (320 → 1280 px = 20 → 80 rem)
+  const slope     = (maxRem - minRem) / 60;   // rem per rem of viewport width
+  const intercept = minRem - slope * 20;       // y-intercept (rem)
+  return `clamp(${minRem.toFixed(3)}rem, ${intercept.toFixed(4)}rem + ${(slope * 100).toFixed(4)}vw, ${maxRem}rem)`;
 }
 function toPaddingRem(v: number, h: number): string {
   return `${toRem(v, '0rem')} ${toRem(h, '0rem')}`;
