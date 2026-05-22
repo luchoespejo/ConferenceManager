@@ -1,1 +1,0 @@
-- [US-2 technical decisions](project_us2_decisions.md) — Cascade delete requirement for child entities (US-3/4/5) and CantidadSesiones deferred to US-5

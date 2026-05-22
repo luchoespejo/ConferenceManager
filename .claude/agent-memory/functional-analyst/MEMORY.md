@@ -1,3 +1,0 @@
-- [User profile](user_profile.md) — organizer: luchoespejo, senior lead, drives ConferenceManager SaaS end-to-end
-- [Project context](project_context.md) — multi-tenant SaaS, Phase 1 MVP in progress, US-1 Done, US-2 Ready
-- [Story conventions](story_conventions.md) — story format rules, Gherkin style, risk escalation thresholds observed in US-1/US-2

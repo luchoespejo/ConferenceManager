@@ -31,9 +31,12 @@ Thumbs.db
 .vscode/settings.json
 
 # Claude / AI tooling
+.claire/
 .claude/settings.local.json
 .claude/worktrees/
 .claude/agent-memory/
+.claude/agents/
+.claude/commands/
 .claude/launch.json
 .claude/skills/
 .agents/
