@@ -344,17 +344,20 @@ export const puckConfig: Config = {
           ],
         },
         rounded: { type: 'number', label: 'Bordes redondeados (px)' },
+        bgColor:  colorField('Color de fondo'),
+        paddingV: { type: 'number', label: 'Padding vertical (rem)' },
+        paddingH: { type: 'number', label: 'Padding horizontal (rem)' },
         linkUrl: { type: 'text',   label: 'Link al hacer click (opcional)' },
       },
-      defaultProps: { url: '', alt: '', width: '100%', maxHeight: 0, align: 'center', rounded: 0, linkUrl: '' },
-      render: ({ url, alt, width, maxHeight, align, rounded, linkUrl }) => {
+      defaultProps: { url: '', alt: '', width: '100%', maxHeight: 0, align: 'center', rounded: 0, bgColor: 'transparent', paddingV: 0, paddingH: 0, linkUrl: '' },
+      render: ({ url, alt, width, maxHeight, align, rounded, bgColor, paddingV, paddingH, linkUrl }) => {
         const img = url
           ? <img src={url} alt={alt} style={{ width, maxHeight: maxHeight || 'none', objectFit: 'cover', borderRadius: rounded, display: 'block' }} />
           : <div style={{ padding: '2rem', textAlign: 'center', background: '#f3f4f6', color: '#9ca3af', borderRadius: rounded, width }}>
               🖼️ Configurá la URL de imagen
             </div>;
         return (
-          <div style={{ display: 'flex', justifyContent: align }}>
+          <div style={{ background: bgColor, padding: toPaddingRem(paddingV, paddingH), display: 'flex', justifyContent: align }}>
             {linkUrl ? <a href={linkUrl} target="_blank" rel="noopener">{img}</a> : img}
           </div>
         );

@@ -291,10 +291,16 @@ public static class PuckHtmlRenderer
         var maxHeight = Num(p, "maxHeight");
         var align     = Str(p, "align", "center");
         var rounded   = Num(p, "rounded");
+        var bgColor   = Str(p, "bgColor", "transparent");
+        var paddingV  = p.TryGetProperty("paddingV", out var pvEl) ? pvEl.GetDouble() : 0;
+        var paddingH  = p.TryGetProperty("paddingH", out var phEl) ? phEl.GetDouble() : 0;
         var linkUrl   = Str(p, "linkUrl");
 
         if (string.IsNullOrEmpty(url)) return "";
 
+        var paddingStr = (paddingV > 0 || paddingH > 0)
+            ? $"padding:{RemVal(paddingV)} {RemVal(paddingH)};"
+            : "";
         var maxHStr  = maxHeight > 0 ? $"max-height:{maxHeight}px;" : "";
         var imgStyle = $"width:{Esc(width)};{maxHStr}object-fit:cover;border-radius:{rounded}px;display:block";
         var img      = $"""<img src="{Esc(url)}" alt="{Esc(alt)}" style="{imgStyle}" />""";
@@ -302,7 +308,7 @@ public static class PuckHtmlRenderer
         if (!string.IsNullOrEmpty(linkUrl))
             img = $"""<a href="{Esc(linkUrl)}" target="_blank" rel="noopener">{img}</a>""";
 
-        return $"""<div style="display:flex;justify-content:{Esc(align)}">{img}</div>""" + "\n";
+        return $"""<div style="background:{Esc(bgColor)};{paddingStr}display:flex;justify-content:{Esc(align)}">{img}</div>""" + "\n";
     }
 
     // ── VIDEO ─────────────────────────────────────────────────────────────────
@@ -823,4 +829,10 @@ public static class PuckHtmlRenderer
     private static string Esc(string? s) =>
         string.IsNullOrEmpty(s) ? "" :
         s.Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;").Replace("\"", "&quot;");
+
+    // Converts a stored numeric value to a CSS rem string using the same
+    // smart-migration logic as puck-config.tsx: values >4 are legacy px
+    // (divide by 16), values ≤4 are already in rem (use directly).
+    private static string RemVal(double v) =>
+        v > 4 ? $"{v / 16:0.###}rem" : $"{v:0.###}rem";
 }
