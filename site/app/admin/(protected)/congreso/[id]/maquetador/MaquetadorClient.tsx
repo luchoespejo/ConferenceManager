@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Puck, usePuck } from '@puckeditor/core';
 import '@puckeditor/core/dist/index.css';
@@ -41,6 +41,18 @@ export default function MaquetadorClient({ congresoId, layoutId, templateNombre,
   const [showNameModal, setShowNameModal] = useState(false);
   const [pendingData, setPendingData] = useState<unknown>(null);
   const [pendingNombre, setPendingNombre] = useState('');
+
+  // Lock body scroll while editor is mounted — prevents outer page scroll
+  // which offsets Puck's selection overlay calculation
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+      document.documentElement.style.overflow = '';
+    };
+  }, []);
 
   const MAX_PAYLOAD_MB = 8; // margen bajo el límite de 10MB del server action
 
@@ -225,7 +237,6 @@ export default function MaquetadorClient({ congresoId, layoutId, templateNombre,
           config={puckConfig}
           data={puckData}
           onPublish={handleSaveRequest}
-          iframe={{ enabled: true }}
           overrides={{
             headerActions: () => <SaveBtn />,
           }}

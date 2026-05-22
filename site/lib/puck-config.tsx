@@ -99,6 +99,20 @@ const GOOGLE_FONTS = [
   'Raleway', 'Poppins', 'Merriweather', 'Playfair Display', 'Source Sans 3',
 ];
 
+// ── Helpers ──────────────────────────────────────────────────────────────────
+// Converts a stored value to rem. Values >4 are legacy px (divide by 16).
+// Values ≤4 are already in rem (use directly). Zero means "auto".
+function toRem(v: number, fallback = '1rem'): string {
+  if (!v) return fallback;
+  return v > 4 ? `${v / 16}rem` : `${v}rem`;
+}
+function toPaddingRem(v: number, h: number): string {
+  return `${toRem(v, '0rem')} ${toRem(h, '0rem')}`;
+}
+function toGapRem(v: number): string {
+  return v > 4 ? `${v / 16}rem` : `${v}rem`;
+}
+
 // ── Config ───────────────────────────────────────────────────────────────────
 export const puckConfig: Config = {
   root: {
@@ -149,14 +163,14 @@ export const puckConfig: Config = {
       fields: {
         bgColor:  colorField('Color de fondo'),
         bgImage:  imageField('Imagen de fondo (opcional)'),
-        padding:  { type: 'number', label: 'Padding vertical (px)' },
+        padding:  { type: 'number', label: 'Padding vertical (rem)' },
         maxWidth: { type: 'number', label: 'Ancho máximo contenido (px, 0=full)' },
       },
-      defaultProps: { bgColor: '#ffffff', bgImage: '', padding: 48, maxWidth: 900 },
+      defaultProps: { bgColor: '#ffffff', bgImage: '', padding: 3, maxWidth: 900 },
       render: ({ bgColor, bgImage, padding, maxWidth }) => (
         <section style={{
           background: bgImage ? `url(${bgImage}) center/cover no-repeat` : bgColor,
-          padding: `${padding / 16}rem 2rem`,
+          padding: `${toRem(padding, '3rem')} 2rem`,
         }}>
           <div style={{ maxWidth: maxWidth || '100%', margin: '0 auto' }}>
             <DropZone zone="content" />
@@ -168,9 +182,9 @@ export const puckConfig: Config = {
     DosColumnas: {
       label: '⬛⬛ Dos columnas',
       fields: {
-        gap:  { type: 'number', label: 'Espacio entre columnas (px)' },
-        paddingV: { type: 'number', label: 'Padding vertical (px)' },
-        paddingH: { type: 'number', label: 'Padding horizontal (px)' },
+        gap:  { type: 'number', label: 'Espacio entre columnas (rem)' },
+        paddingV: { type: 'number', label: 'Padding vertical (rem)' },
+        paddingH: { type: 'number', label: 'Padding horizontal (rem)' },
         ratio: {
           type: 'radio', label: 'Proporción',
           options: [
@@ -189,9 +203,9 @@ export const puckConfig: Config = {
           ],
         },
       },
-      defaultProps: { gap: 32, paddingV: 32, paddingH: 32, ratio: '1fr 1fr', alignItems: 'flex-start' },
+      defaultProps: { gap: 2, paddingV: 2, paddingH: 2, ratio: '1fr 1fr', alignItems: 'flex-start' },
       render: ({ gap, paddingV, paddingH, ratio, alignItems }) => (
-        <div style={{ display: 'grid', gridTemplateColumns: ratio, gap: `${gap / 16}rem`, alignItems, padding: `${paddingV / 16}rem ${paddingH / 16}rem` }}>
+        <div style={{ display: 'grid', gridTemplateColumns: ratio, gap: toGapRem(gap), alignItems, padding: toPaddingRem(paddingV, paddingH) }}>
           <DropZone zone="left" />
           <DropZone zone="right" />
         </div>
@@ -201,13 +215,13 @@ export const puckConfig: Config = {
     TresColumnas: {
       label: '⬛⬛⬛ Tres columnas',
       fields: {
-        gap: { type: 'number', label: 'Espacio entre columnas (px)' },
-        paddingV: { type: 'number', label: 'Padding vertical (px)' },
-        paddingH: { type: 'number', label: 'Padding horizontal (px)' },
+        gap: { type: 'number', label: 'Espacio entre columnas (rem)' },
+        paddingV: { type: 'number', label: 'Padding vertical (rem)' },
+        paddingH: { type: 'number', label: 'Padding horizontal (rem)' },
       },
-      defaultProps: { gap: 24, paddingV: 32, paddingH: 32 },
+      defaultProps: { gap: 1.5, paddingV: 2, paddingH: 2 },
       render: ({ gap, paddingV, paddingH }) => (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: `${gap / 16}rem`, padding: `${paddingV / 16}rem ${paddingH / 16}rem` }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: toGapRem(gap), padding: toPaddingRem(paddingV, paddingH) }}>
           <DropZone zone="col1" />
           <DropZone zone="col2" />
           <DropZone zone="col3" />
@@ -258,18 +272,18 @@ export const puckConfig: Config = {
         },
         color:    colorField('Color texto'),
         bgColor:  colorField('Color de fondo'),
-        fontSize: { type: 'number', label: 'Tamaño fuente (px, 0=auto)' },
-        paddingV: { type: 'number', label: 'Padding vertical (px)' },
-        paddingH: { type: 'number', label: 'Padding horizontal (px)' },
+        fontSize: { type: 'number', label: 'Tamaño fuente (rem, 0=auto)' },
+        paddingV: { type: 'number', label: 'Padding vertical (rem)' },
+        paddingH: { type: 'number', label: 'Padding horizontal (rem)' },
       },
-      defaultProps: { texto: 'Título de sección', nivel: 'h2', alignment: 'left', negrita: 'si', cursiva: 'no', subrayado: 'no', fontFamily: '', color: '#111827', bgColor: 'transparent', fontSize: 0, paddingV: 16, paddingH: 32 },
+      defaultProps: { texto: 'Título de sección', nivel: 'h2', alignment: 'left', negrita: 'si', cursiva: 'no', subrayado: 'no', fontFamily: '', color: '#111827', bgColor: 'transparent', fontSize: 0, paddingV: 1, paddingH: 2 },
       render: ({ texto, nivel, alignment, negrita, cursiva, subrayado, fontFamily, color, bgColor, fontSize, paddingV, paddingH }) => {
         const Tag = nivel as 'h1' | 'h2' | 'h3' | 'h4';
         const sizes: Record<string, string> = { h1: '2.5rem', h2: '1.875rem', h3: '1.375rem', h4: '1.125rem' };
         const font = fontFamily ? (fontFamily as string).split("'")[1] || (fontFamily as string).split(',')[0] : null;
         const isGoogle = font && GOOGLE_FONTS.includes(font);
         return (
-          <div style={{ background: bgColor, padding: `${paddingV / 16}rem ${paddingH / 16}rem` }}>
+          <div style={{ background: bgColor, padding: toPaddingRem(paddingV, paddingH) }}>
             {isGoogle && (
               <link href={`https://fonts.googleapis.com/css2?family=${font.replace(/ /g, '+')}:wght@400;700&display=swap`} rel="stylesheet" />
             )}
@@ -277,7 +291,7 @@ export const puckConfig: Config = {
               margin: 0,
               textAlign: alignment as 'left' | 'center' | 'right',
               color,
-              fontSize: fontSize ? `${fontSize / 16}rem` : sizes[nivel],
+              fontSize: fontSize ? toRem(fontSize, sizes[nivel]) : sizes[nivel],
               fontWeight: negrita === 'si' ? 700 : 400,
               fontStyle: cursiva === 'si' ? 'italic' : 'normal',
               textDecoration: subrayado === 'si' ? 'underline' : 'none',
@@ -297,17 +311,17 @@ export const puckConfig: Config = {
         contenido: { type: 'richtext', label: 'Texto' },
         color:    colorField('Color texto'),
         bgColor:  colorField('Color de fondo'),
-        fontSize: { type: 'number', label: 'Tamaño fuente (px)' },
+        fontSize: { type: 'number', label: 'Tamaño fuente (rem)' },
         maxWidth: { type: 'number', label: 'Ancho máximo (px, 0=full)' },
-        paddingV: { type: 'number', label: 'Padding vertical (px)' },
-        paddingH: { type: 'number', label: 'Padding horizontal (px)' },
+        paddingV: { type: 'number', label: 'Padding vertical (rem)' },
+        paddingH: { type: 'number', label: 'Padding horizontal (rem)' },
       },
-      defaultProps: { contenido: '<p>Escribí tu texto acá...</p>', color: '#374151', bgColor: 'transparent', fontSize: 16, maxWidth: 0, paddingV: 8, paddingH: 32 },
+      defaultProps: { contenido: '<p>Escribí tu texto acá...</p>', color: '#374151', bgColor: 'transparent', fontSize: 1, maxWidth: 0, paddingV: 0.5, paddingH: 2 },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       render: ({ contenido, color, bgColor, fontSize, maxWidth, paddingV, paddingH }: any) => (
-        <div style={{ background: bgColor, padding: `${paddingV / 16}rem ${paddingH / 16}rem` }}>
+        <div style={{ background: bgColor, padding: toPaddingRem(paddingV, paddingH) }}>
           <div
-            style={{ color, fontSize: `${fontSize / 16}rem`, lineHeight: 1.7, maxWidth: maxWidth || 'none' }}
+            style={{ color, fontSize: toRem(fontSize, '1rem'), lineHeight: 1.7, maxWidth: maxWidth || 'none' }}
             className="puck-richtext"
           >
             {contenido}
@@ -482,7 +496,7 @@ export const puckConfig: Config = {
         texto:     { type: 'text',   label: 'Texto (opcional)' },
         color:     colorField('Color texto'),
         height:    { type: 'number', label: 'Alto mínimo (px)' },
-        fontSize:  { type: 'number', label: 'Tamaño fuente (px)' },
+        fontSize:  { type: 'number', label: 'Tamaño fuente (rem)' },
         alignment: {
           type: 'radio', label: 'Alineación texto',
           options: [
@@ -490,7 +504,7 @@ export const puckConfig: Config = {
           ],
         },
       },
-      defaultProps: { bgColor: '#4f46e5', texto: '', color: '#ffffff', height: 80, fontSize: 18, alignment: 'center' },
+      defaultProps: { bgColor: '#4f46e5', texto: '', color: '#ffffff', height: 80, fontSize: 1.125, alignment: 'center' },
       render: ({ bgColor, texto, color, height, fontSize, alignment }) => (
         <div style={{
           background: bgColor, minHeight: height,
@@ -498,7 +512,7 @@ export const puckConfig: Config = {
           justifyContent: alignment === 'left' ? 'flex-start' : alignment === 'right' ? 'flex-end' : 'center',
           padding: '1rem 2rem',
         }}>
-          {texto && <p style={{ margin: 0, color, fontSize: `${fontSize / 16}rem`, fontWeight: 600, textAlign: alignment as 'left' | 'center' | 'right' }}>{texto}</p>}
+          {texto && <p style={{ margin: 0, color, fontSize: toRem(fontSize, '1.125rem'), fontWeight: 600, textAlign: alignment as 'left' | 'center' | 'right' }}>{texto}</p>}
         </div>
       ),
     },
@@ -659,9 +673,9 @@ export const puckConfig: Config = {
         color:            colorField('Color de los números'),
         colorLabel:       colorField('Color de las etiquetas'),
         bgColor:          colorField('Color de fondo'),
-        paddingV:         { type: 'number', label: 'Padding vertical (px)' },
-        fontSize:         { type: 'number', label: 'Tamaño números (px)' },
-        tituloFontSize:   { type: 'number', label: 'Tamaño título (px)' },
+        paddingV:         { type: 'number', label: 'Padding vertical (rem)' },
+        fontSize:         { type: 'number', label: 'Tamaño números (rem)' },
+        tituloFontSize:   { type: 'number', label: 'Tamaño título (rem)' },
         tituloColor:      colorField('Color título'),
         fontFamily: {
           type: 'select', label: 'Tipografía',
@@ -683,7 +697,7 @@ export const puckConfig: Config = {
         mostrarDias: 'si', mostrarHoras: 'si', mostrarMinutos: 'si', mostrarSegundos: 'si',
         labelDias: 'días', labelHoras: 'horas', labelMinutos: 'min', labelSegundos: 'seg',
         color: '#1e3a5f', colorLabel: '#64748b', bgColor: '#f8fafc',
-        paddingV: 48, fontSize: 56, tituloFontSize: 18, tituloColor: '#334155',
+        paddingV: 3, fontSize: 3.5, tituloFontSize: 1.125, tituloColor: '#334155',
         fontFamily: '', alineacion: 'center',
       },
       render: ({ targetDate, titulo, mostrarDias, mostrarHoras, mostrarMinutos, mostrarSegundos,
@@ -729,7 +743,7 @@ export const DEFAULT_PUCK_DATA = {
       props: {
         id: 'desc-1',
         contenido: '<p>Describí tu congreso acá. Podés usar <strong>negrita</strong>, <em>cursiva</em> y listas.</p>',
-        color: '#374151', bgColor: 'transparent', fontSize: 18, maxWidth: 800, paddingV: 48, paddingH: 32,
+        color: '#374151', bgColor: 'transparent', fontSize: 1.125, maxWidth: 800, paddingV: 3, paddingH: 2,
       },
     },
   ],
