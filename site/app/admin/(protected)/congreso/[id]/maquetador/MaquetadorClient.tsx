@@ -220,7 +220,7 @@ export default function MaquetadorClient({ congresoId, layoutId, templateNombre,
         </div>
       )}
 
-      <div style={{ height: 'calc(100vh - 56px)' }}>
+      <div style={{ height: '100vh', overflow: 'hidden' }}>
         <Puck
           config={puckConfig}
           data={puckData}

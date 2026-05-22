@@ -67,25 +67,36 @@ export default function AdminSidebar() {
       className="min-h-screen bg-white border-r border-slate-200 flex flex-col shrink-0 transition-[width] duration-200 overflow-hidden"
     >
       {/* Header */}
-      <div className={`flex items-center border-b border-slate-100 h-14 px-3 ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
-        <div className="flex items-center gap-2.5 min-w-0 overflow-hidden">
-          <div className="w-7 h-7 bg-slate-900 rounded-lg flex items-center justify-center shrink-0">
-            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-            </svg>
-          </div>
-          {!isCollapsed && (
+      <div className={`flex items-center border-b border-slate-100 h-14 shrink-0 ${isCollapsed ? 'justify-center px-0' : 'justify-between px-3'}`}>
+        {!isCollapsed && (
+          <div className="flex items-center gap-2.5 min-w-0 overflow-hidden">
+            <div className="w-7 h-7 bg-slate-900 rounded-lg flex items-center justify-center shrink-0">
+              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+            </div>
             <span className="font-semibold text-slate-900 text-sm whitespace-nowrap overflow-hidden">CongressMgr</span>
-          )}
-        </div>
+          </div>
+        )}
         <button
           onClick={toggle}
-          className={`p-1.5 rounded-md text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors shrink-0 ${isCollapsed ? 'ml-0' : 'ml-1'}`}
-          title={isCollapsed ? 'Expandir' : 'Colapsar'}
+          className="p-1.5 rounded-md text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors shrink-0"
+          title={isCollapsed ? 'Expandir menú' : 'Colapsar menú'}
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-              d={isCollapsed ? 'M9 5l7 7-7 7' : 'M15 19l-7-7 7-7'} />
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            {isCollapsed ? (
+              /* panel-right / expand icon */
+              <>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M4 6h16M4 12h16M4 18h16" />
+              </>
+            ) : (
+              /* panel-left / collapse icon */
+              <>
+                <rect x="3" y="3" width="18" height="18" rx="2" strokeWidth={1.75} />
+                <line x1="9" y1="3" x2="9" y2="21" strokeWidth={1.75} />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M14 9l-3 3 3 3" />
+              </>
+            )}
           </svg>
         </button>
       </div>
