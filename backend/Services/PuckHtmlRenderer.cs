@@ -232,7 +232,7 @@ public static class PuckHtmlRenderer
             ["h1"] = "2.5rem", ["h2"] = "1.875rem", ["h3"] = "1.375rem", ["h4"] = "1.125rem"
         };
         var fsStr = fontSize > 0
-            ? $"{fontSize}px"
+            ? RemVal(fontSize)
             : (defaultSizes.TryGetValue(tag, out var ds) ? ds : "1.5rem");
 
         var tagStyle =
@@ -243,7 +243,7 @@ public static class PuckHtmlRenderer
             (!string.IsNullOrEmpty(fontFamily) ? $"font-family:{Esc(fontFamily)};" : "") +
             "line-height:1.25";
 
-        var wrapStyle = $"background:{Esc(bgColor)};padding:{paddingV}px {paddingH}px";
+        var wrapStyle = $"background:{Esc(bgColor)};padding:{RemVal(paddingV)} {RemVal(paddingH)}";
 
         var sb = new StringBuilder();
         AppendGoogleFontLink(sb, fontFamily);
@@ -268,8 +268,8 @@ public static class PuckHtmlRenderer
         if (p.ValueKind != JsonValueKind.Undefined && p.TryGetProperty("contenido", out var contenidoEl))
             contenidoHtml = TipTapHtmlConverter.ToHtml(contenidoEl);
 
-        var wrapStyle  = $"background:{Esc(bgColor)};padding:{paddingV}px {paddingH}px";
-        var innerStyle = $"color:{Esc(color)};font-size:{fontSize}px;line-height:1.7;" +
+        var wrapStyle  = $"background:{Esc(bgColor)};padding:{RemVal(paddingV)} {RemVal(paddingH)}";
+        var innerStyle = $"color:{Esc(color)};font-size:{RemVal(fontSize)};line-height:1.7;" +
                          (maxWidth > 0 ? $"max-width:{maxWidth}px;margin:0 auto" : "");
 
         return $"""
@@ -409,7 +409,7 @@ public static class PuckHtmlRenderer
         };
 
         var textoHtml = !string.IsNullOrEmpty(texto)
-            ? $"""<p style="margin:0;color:{Esc(color)};font-size:{fontSize}px;font-weight:600;text-align:{Esc(alignment)}">{Esc(texto)}</p>"""
+            ? $"""<p style="margin:0;color:{Esc(color)};font-size:{RemVal(fontSize)};font-weight:600;text-align:{Esc(alignment)}">{Esc(texto)}</p>"""
             : "";
 
         return $"""
@@ -493,8 +493,8 @@ public static class PuckHtmlRenderer
         var paddingV   = Num(p, "paddingV", 32);
 
         var sb = new StringBuilder();
-        sb.AppendLine($"""<div style="background:{Esc(bgColor)};padding:{paddingV}px 2rem">""");
-        sb.AppendLine($"""  <div style="display:grid;grid-template-columns:repeat({Esc(columnas)},1fr);gap:{gap}px;align-items:center;max-width:960px;margin:0 auto">""");
+        sb.AppendLine($"""<div style="background:{Esc(bgColor)};padding:{RemVal(paddingV)} 2rem">""");
+        sb.AppendLine($"""  <div style="display:grid;grid-template-columns:repeat({Esc(columnas)},1fr);gap:{RemVal(gap)};align-items:center;max-width:960px;margin:0 auto">""");
 
         if (p.ValueKind != JsonValueKind.Undefined && p.TryGetProperty("imagenes", out var imgs))
         {
@@ -576,16 +576,16 @@ public static class PuckHtmlRenderer
         var sb = new StringBuilder();
         AppendGoogleFontLink(sb, fontFamily);
 
-        sb.AppendLine($"""<div id="{uniqueId}" style="background:{Esc(bgColor)};padding:{paddingV}px 2rem;{fontStyle}text-align:{alignText}">""");
+        sb.AppendLine($"""<div id="{uniqueId}" style="background:{Esc(bgColor)};padding:{RemVal(paddingV)} 2rem;{fontStyle}text-align:{alignText}">""");
 
         if (!string.IsNullOrEmpty(titulo))
-            sb.AppendLine($"""  <div style="font-size:{tituloFontSz}px;color:{Esc(tituloColor)};margin-bottom:1.5rem;font-weight:600">{Esc(titulo)}</div>""");
+            sb.AppendLine($"""  <div style="font-size:{RemVal(tituloFontSz)};color:{Esc(tituloColor)};margin-bottom:1.5rem;font-weight:600">{Esc(titulo)}</div>""");
 
         sb.AppendLine($"""  <div class="cd-display" style="display:inline-flex;gap:1.5rem;flex-wrap:wrap;justify-content:{alignText}">""");
         foreach (var (val, lbl) in countdownItems)
         {
             sb.AppendLine("    <div>");
-            sb.AppendLine($"""      <div class="cd-val" style="font-size:{fontSize}px;font-weight:900;color:{Esc(color)};line-height:1">{val}</div>""");
+            sb.AppendLine($"""      <div class="cd-val" style="font-size:{RemVal(fontSize)};font-weight:900;color:{Esc(color)};line-height:1">{val}</div>""");
             sb.AppendLine($"""      <div style="font-size:.875rem;color:{Esc(colorLabel)};margin-top:.25rem">{Esc(lbl)}</div>""");
             sb.AppendLine("    </div>");
         }
@@ -641,7 +641,7 @@ public static class PuckHtmlRenderer
         var inner = RenderZone(id, "content", ctx);
 
         return $"""
-            <section style="background:{bg};padding:{padding}px 2rem">
+            <section style="background:{bg};padding:{RemVal(padding)} 2rem">
               <div style="max-width:{mw};margin:0 auto">
                 {inner}
               </div>
@@ -661,7 +661,7 @@ public static class PuckHtmlRenderer
         var right = RenderZone(id, "right", ctx);
 
         return $"""
-            <div style="display:grid;grid-template-columns:{Esc(ratio)};gap:{gap}px;align-items:{Esc(alignItems)};padding:{paddingV}px {paddingH}px">
+            <div style="display:grid;grid-template-columns:{Esc(ratio)};gap:{RemVal(gap)};align-items:{Esc(alignItems)};padding:{RemVal(paddingV)} {RemVal(paddingH)}">
               <div>{left}</div>
               <div>{right}</div>
             </div>
@@ -679,7 +679,7 @@ public static class PuckHtmlRenderer
         var col3 = RenderZone(id, "col3", ctx);
 
         return $"""
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:{gap}px;padding:{paddingV}px {paddingH}px">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:{RemVal(gap)};padding:{RemVal(paddingV)} {RemVal(paddingH)}">
               <div>{col1}</div>
               <div>{col2}</div>
               <div>{col3}</div>
