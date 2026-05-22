@@ -265,9 +265,13 @@ public class StaticSiteService(
               <title>{{Esc(c.Nombre)}}</title>
               <link rel="stylesheet" href="assets/style.css" />
               <style>
+                .puck-richtext h1,.puck-richtext h2,.puck-richtext h3,
+                .puck-richtext h4,.puck-richtext h5,.puck-richtext h6 { font-size: inherit; font-weight: 700; margin: .5em 0 .25em; }
                 .puck-richtext p { margin: .5em 0; }
                 .puck-richtext ul, .puck-richtext ol { padding-left: 1.5em; margin: .5em 0; }
-                .puck-richtext a { color: var(--primary); }
+                .puck-richtext strong { font-weight: 700; }
+                .puck-richtext em { font-style: italic; }
+                .puck-richtext a { color: var(--primary); text-decoration: underline; }
                 .puck-richtext blockquote { border-left: 3px solid #e5e7eb; margin: 0; padding-left: 1rem; color: #64748b; }
                 .puck-richtext pre { background: #f1f5f9; padding: 1rem; border-radius: 6px; overflow-x: auto; }
               </style>
