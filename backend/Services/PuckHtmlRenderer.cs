@@ -132,6 +132,7 @@ public static class PuckHtmlRenderer
             "Stats"             => RenderStats(props),
             "GaleriaLogos"      => RenderGaleriaLogos(props),
             "CuentaRegresiva"   => RenderCuentaRegresiva(props),
+            "Mapa"              => RenderMapa(props),
             "SeccionFondo"      => RenderSeccionFondo(props, id, ctx),
             "DosColumnas"       => RenderDosColumnas(props, id, ctx),
             "TresColumnas"      => RenderTresColumnas(props, id, ctx),
@@ -425,6 +426,22 @@ public static class PuckHtmlRenderer
             : "";
 
         return $"""<div style="height:{height}px;display:flex;align-items:center;padding:0 2rem">{hrHtml}</div>""" + "\n";
+    }
+
+    // ── MAPA ──────────────────────────────────────────────────────────────────
+
+    private static string RenderMapa(JsonElement p)
+    {
+        var query  = Str(p, "query");
+        var height = Num(p, "height", 400);
+        var zoom   = Num(p, "zoom", 14);
+
+        if (string.IsNullOrWhiteSpace(query)) return "";
+
+        var encodedQuery = Uri.EscapeDataString(query);
+        var src = $"https://maps.google.com/maps?q={encodedQuery}&z={zoom}&output=embed";
+
+        return $"""<iframe src="{src}" width="100%" height="{height}" style="border:none;display:block" loading="lazy" allowfullscreen title="Mapa de ubicación"></iframe>""" + "\n";
     }
 
     // ── STATS ─────────────────────────────────────────────────────────────────

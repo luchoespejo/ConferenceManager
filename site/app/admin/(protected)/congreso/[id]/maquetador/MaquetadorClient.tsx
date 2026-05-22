@@ -225,6 +225,7 @@ export default function MaquetadorClient({ congresoId, layoutId, templateNombre,
           config={puckConfig}
           data={puckData}
           onPublish={handleSaveRequest}
+          iframe={{ enabled: true }}
           overrides={{
             headerActions: () => <SaveBtn />,
           }}

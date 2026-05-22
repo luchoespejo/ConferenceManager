@@ -136,7 +136,7 @@ export const puckConfig: Config = {
 
   categories: {
     layout:      { title: '📐 Layout',      components: ['SeccionFondo', 'DosColumnas', 'TresColumnas'] },
-    basicos:     { title: '✏️ Básicos',      components: ['Heading', 'Parrafo', 'GaleriaLogos', 'Imagen', 'Video', 'Boton', 'BandaColor', 'Separador'] },
+    basicos:     { title: '✏️ Básicos',      components: ['Heading', 'Parrafo', 'GaleriaLogos', 'Imagen', 'Video', 'Boton', 'BandaColor', 'Separador', 'Mapa'] },
     conferencia: { title: '🎪 Conferencia', components: ['Hero', 'Stats', 'CuentaRegresiva'] },
   },
 
@@ -156,7 +156,7 @@ export const puckConfig: Config = {
       render: ({ bgColor, bgImage, padding, maxWidth }) => (
         <section style={{
           background: bgImage ? `url(${bgImage}) center/cover no-repeat` : bgColor,
-          padding: `${padding}px 2rem`,
+          padding: `${padding / 16}rem 2rem`,
         }}>
           <div style={{ maxWidth: maxWidth || '100%', margin: '0 auto' }}>
             <DropZone zone="content" />
@@ -191,7 +191,7 @@ export const puckConfig: Config = {
       },
       defaultProps: { gap: 32, paddingV: 32, paddingH: 32, ratio: '1fr 1fr', alignItems: 'flex-start' },
       render: ({ gap, paddingV, paddingH, ratio, alignItems }) => (
-        <div style={{ display: 'grid', gridTemplateColumns: ratio, gap, alignItems, padding: `${paddingV}px ${paddingH}px` }}>
+        <div style={{ display: 'grid', gridTemplateColumns: ratio, gap: `${gap / 16}rem`, alignItems, padding: `${paddingV / 16}rem ${paddingH / 16}rem` }}>
           <DropZone zone="left" />
           <DropZone zone="right" />
         </div>
@@ -207,7 +207,7 @@ export const puckConfig: Config = {
       },
       defaultProps: { gap: 24, paddingV: 32, paddingH: 32 },
       render: ({ gap, paddingV, paddingH }) => (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap, padding: `${paddingV}px ${paddingH}px` }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: `${gap / 16}rem`, padding: `${paddingV / 16}rem ${paddingH / 16}rem` }}>
           <DropZone zone="col1" />
           <DropZone zone="col2" />
           <DropZone zone="col3" />
@@ -269,7 +269,7 @@ export const puckConfig: Config = {
         const font = fontFamily ? (fontFamily as string).split("'")[1] || (fontFamily as string).split(',')[0] : null;
         const isGoogle = font && GOOGLE_FONTS.includes(font);
         return (
-          <div style={{ background: bgColor, padding: `${paddingV}px ${paddingH}px` }}>
+          <div style={{ background: bgColor, padding: `${paddingV / 16}rem ${paddingH / 16}rem` }}>
             {isGoogle && (
               <link href={`https://fonts.googleapis.com/css2?family=${font.replace(/ /g, '+')}:wght@400;700&display=swap`} rel="stylesheet" />
             )}
@@ -277,7 +277,7 @@ export const puckConfig: Config = {
               margin: 0,
               textAlign: alignment as 'left' | 'center' | 'right',
               color,
-              fontSize: fontSize ? `${fontSize}px` : sizes[nivel],
+              fontSize: fontSize ? `${fontSize / 16}rem` : sizes[nivel],
               fontWeight: negrita === 'si' ? 700 : 400,
               fontStyle: cursiva === 'si' ? 'italic' : 'normal',
               textDecoration: subrayado === 'si' ? 'underline' : 'none',
@@ -305,9 +305,9 @@ export const puckConfig: Config = {
       defaultProps: { contenido: '<p>Escribí tu texto acá...</p>', color: '#374151', bgColor: 'transparent', fontSize: 16, maxWidth: 0, paddingV: 8, paddingH: 32 },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       render: ({ contenido, color, bgColor, fontSize, maxWidth, paddingV, paddingH }: any) => (
-        <div style={{ background: bgColor, padding: `${paddingV}px ${paddingH}px` }}>
+        <div style={{ background: bgColor, padding: `${paddingV / 16}rem ${paddingH / 16}rem` }}>
           <div
-            style={{ color, fontSize, lineHeight: 1.7, maxWidth: maxWidth || 'none' }}
+            style={{ color, fontSize: `${fontSize / 16}rem`, lineHeight: 1.7, maxWidth: maxWidth || 'none' }}
             className="puck-richtext"
           >
             {contenido}
@@ -498,7 +498,7 @@ export const puckConfig: Config = {
           justifyContent: alignment === 'left' ? 'flex-start' : alignment === 'right' ? 'flex-end' : 'center',
           padding: '1rem 2rem',
         }}>
-          {texto && <p style={{ margin: 0, color, fontSize, fontWeight: 600, textAlign: alignment as 'left' | 'center' | 'right' }}>{texto}</p>}
+          {texto && <p style={{ margin: 0, color, fontSize: `${fontSize / 16}rem`, fontWeight: 600, textAlign: alignment as 'left' | 'center' | 'right' }}>{texto}</p>}
         </div>
       ),
     },
@@ -603,6 +603,39 @@ export const puckConfig: Config = {
               ))}
             </div>
           </div>
+        );
+      },
+    },
+
+    // ── MAPA ──────────────────────────────────────────────────────────────────
+
+    Mapa: {
+      label: '🗺️ Mapa (Google Maps)',
+      fields: {
+        query:  { type: 'text',   label: 'Dirección o nombre del lugar' },
+        height: { type: 'number', label: 'Alto del mapa (px)' },
+        zoom:   { type: 'number', label: 'Zoom (1–20)' },
+      },
+      defaultProps: { query: '', height: 400, zoom: 14 },
+      render: ({ query, height, zoom }: { query: string; height: number; zoom: number }) => {
+        if (!query) {
+          return (
+            <div style={{ height, background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af', fontSize: '0.875rem' }}>
+              🗺️ Configurá la dirección del lugar
+            </div>
+          );
+        }
+        const src = `https://maps.google.com/maps?q=${encodeURIComponent(query)}&z=${zoom}&output=embed`;
+        return (
+          <iframe
+            src={src}
+            width="100%"
+            height={height}
+            style={{ border: 'none', display: 'block' }}
+            loading="lazy"
+            allowFullScreen
+            title="Mapa de ubicación"
+          />
         );
       },
     },
