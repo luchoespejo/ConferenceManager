@@ -15,6 +15,16 @@ const NAV = [
   },
 ];
 
+const CONGRESO_TABS = [
+  { key: 'maquetas',      label: 'Maquetas',      emoji: '🧱' },
+  { key: 'configuracion', label: 'Configuración',  emoji: '⚙️' },
+  { key: 'salas',         label: 'Salas',          emoji: '🚪' },
+  { key: 'expositores',   label: 'Expositores',    emoji: '🎤' },
+  { key: 'sesiones',      label: 'Sesiones',       emoji: '📅' },
+  { key: 'participantes', label: 'Participantes',  emoji: '👥' },
+  { key: 'avisos',        label: 'Avisos',         emoji: '🔔' },
+];
+
 const LS_KEY = 'admin-sidebar-collapsed';
 
 export default function AdminSidebar() {
@@ -23,6 +33,10 @@ export default function AdminSidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
   const [mounted, setMounted] = useState(false);
+
+  // Detect if we're inside a congreso
+  const congresoMatch = pathname.match(/^\/admin\/congreso\/([^/]+)/);
+  const congresoId = congresoMatch?.[1] ?? null;
 
   useEffect(() => {
     const saved = localStorage.getItem(LS_KEY);
@@ -77,9 +91,9 @@ export default function AdminSidebar() {
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 px-2 py-3 flex flex-col gap-1">
+      <nav className="flex-1 px-2 py-3 flex flex-col gap-1 overflow-y-auto">
         {NAV.map(({ href, label, icon, exact }) => {
-          const active = exact ? pathname === href : pathname.startsWith(href);
+          const active = exact ? pathname === href : (pathname.startsWith(href) && !congresoId);
           return (
             <Link
               key={href}
@@ -96,6 +110,38 @@ export default function AdminSidebar() {
             </Link>
           );
         })}
+
+        {/* Congreso sub-section — visible when inside /admin/congreso/[id] */}
+        {congresoId && (
+          <div className="mt-2 pt-2 border-t border-slate-100 flex flex-col gap-0.5">
+            {!isCollapsed && (
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 pb-1 pt-0.5">
+                Congreso
+              </p>
+            )}
+            {CONGRESO_TABS.map(({ key, label, emoji }) => {
+              const href = `/admin/congreso/${congresoId}/${key}`;
+              const active = pathname === href || pathname.startsWith(href + '/');
+              return (
+                <Link
+                  key={key}
+                  href={href}
+                  title={isCollapsed ? label : undefined}
+                  className={`flex items-center rounded-lg transition-colors ${
+                    isCollapsed ? 'justify-center p-2' : 'gap-2.5 px-3 py-2'
+                  } ${
+                    active
+                      ? 'bg-slate-900 text-white'
+                      : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                  }`}
+                >
+                  <span className="text-base leading-none shrink-0">{emoji}</span>
+                  {!isCollapsed && <span className="text-sm font-medium whitespace-nowrap">{label}</span>}
+                </Link>
+              );
+            })}
+          </div>
+        )}
       </nav>
 
       {/* Logout */}

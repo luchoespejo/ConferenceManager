@@ -41,7 +41,7 @@ public class StaticSiteService(
 
         return $"""
             <nav class="nav">
-              <a href="{prefix}index.html" class="nav-brand">{Esc(c.Nombre)}</a>
+              <a href="{prefix}index.html" class="nav-brand">Inicio</a>
               <div class="nav-links">{links}</div>
             </nav>
             """;
@@ -275,7 +275,7 @@ public class StaticSiteService(
             <body>
               {{navHtml}}
               <main>{{mainContent}}</main>
-              <footer class="footer">{{Esc(c.Nombre)}} — Sitio generado estáticamente</footer>
+              <footer class="footer">{{Esc(c.Nombre)}}</footer>
             </body>
             </html>
             """;
@@ -335,7 +335,7 @@ public class StaticSiteService(
               <div class="container">
                 <div class="cta-row">{{ctaHtml}}</div>
               </div>
-              <footer class="footer">{{Esc(c.Nombre)}} — Sitio generado estáticamente</footer>
+              <footer class="footer">{{Esc(c.Nombre)}}</footer>
             </body>
             </html>
             """;
@@ -395,7 +395,7 @@ public class StaticSiteService(
                 <h2 class="section-title">Programa del Evento</h2>
                 {{content}}
               </div>
-              <footer class="footer">{{Esc(c.Nombre)}} — Sitio generado estáticamente</footer>
+              <footer class="footer">{{Esc(c.Nombre)}}</footer>
             </body>
             </html>
             """;
@@ -463,7 +463,7 @@ public class StaticSiteService(
                 <h2 class="section-title">Expositores</h2>
                 {{content}}
               </div>
-              <footer class="footer">{{Esc(c.Nombre)}} — Sitio generado estáticamente</footer>
+              <footer class="footer">{{Esc(c.Nombre)}}</footer>
             </body>
             </html>
             """;
@@ -520,7 +520,7 @@ public class StaticSiteService(
               <div class="container" style="max-width:760px">
                 {{sb}}
               </div>
-              <footer class="footer">{{Esc(c.Nombre)}} — Sitio generado estáticamente</footer>
+              <footer class="footer">{{Esc(c.Nombre)}}</footer>
             </body>
             </html>
             """;
@@ -552,7 +552,7 @@ public class StaticSiteService(
                 <h2 class="section-title">Inscripciones</h2>
                 {{sb}}
               </div>
-              <footer class="footer">{{Esc(c.Nombre)}} — Sitio generado estáticamente</footer>
+              <footer class="footer">{{Esc(c.Nombre)}}</footer>
             </body>
             </html>
             """;
@@ -610,7 +610,7 @@ public class StaticSiteService(
                   </div>
                 </div>
               </div>
-              <footer class="footer">{{Esc(c.Nombre)}} — Sitio generado estáticamente</footer>
+              <footer class="footer">{{Esc(c.Nombre)}}</footer>
             </body>
             </html>
             """;
