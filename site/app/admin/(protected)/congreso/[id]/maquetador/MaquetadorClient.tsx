@@ -232,7 +232,7 @@ export default function MaquetadorClient({ congresoId, layoutId, templateNombre,
         </div>
       )}
 
-      <div style={{ height: '100vh', overflow: 'hidden' }}>
+      <div style={{ height: '100vh' }}>
         <Puck
           config={puckConfig}
           data={puckData}
