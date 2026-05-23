@@ -245,6 +245,20 @@ public class StaticSiteService(
               .detail-card { padding: 1.25rem; }
               .hero { padding: 2.5rem 1rem; }
             }
+            @media (prefers-color-scheme: dark) {
+              :root {
+                color-scheme: light;
+                --bg: #f1f5f9;
+                --surface: #ffffff;
+                --text: #0f172a;
+                --muted: #64748b;
+                --border: #e2e8f0;
+              }
+              body {
+                background-color: #f1f5f9 !important;
+                color: #0f172a !important;
+              }
+            }
             """;
     }
 
