@@ -175,6 +175,7 @@ public class StaticSiteService(
 
         return $$"""
             :root {
+              color-scheme: light;
               --primary: {{primary}};
               --secondary: {{secondary}};
               --text: #0f172a;
@@ -262,6 +263,7 @@ public class StaticSiteService(
             <head>
               <meta charset="UTF-8" />
               <meta name="viewport" content="width=device-width, initial-scale=1" />
+              <meta name="color-scheme" content="light" />
               <title>{{Esc(c.Nombre)}}</title>
               <link rel="stylesheet" href="assets/style.css" />
               <style>
@@ -331,6 +333,7 @@ public class StaticSiteService(
             <head>
               <meta charset="UTF-8" />
               <meta name="viewport" content="width=device-width, initial-scale=1" />
+              <meta name="color-scheme" content="light" />
               <title>{{Esc(c.Nombre)}}</title>
               <link rel="stylesheet" href="assets/style.css" />
             </head>
@@ -400,6 +403,7 @@ public class StaticSiteService(
             <head>
               <meta charset="UTF-8" />
               <meta name="viewport" content="width=device-width, initial-scale=1" />
+              <meta name="color-scheme" content="light" />
               <title>Programa — {{Esc(c.Nombre)}}</title>
               <link rel="stylesheet" href="assets/style.css" />
             </head>
@@ -468,6 +472,7 @@ public class StaticSiteService(
             <head>
               <meta charset="UTF-8" />
               <meta name="viewport" content="width=device-width, initial-scale=1" />
+              <meta name="color-scheme" content="light" />
               <title>Expositores — {{Esc(c.Nombre)}}</title>
               <link rel="stylesheet" href="assets/style.css" />
             </head>
@@ -526,6 +531,7 @@ public class StaticSiteService(
             <head>
               <meta charset="UTF-8" />
               <meta name="viewport" content="width=device-width, initial-scale=1" />
+              <meta name="color-scheme" content="light" />
               <title>Contacto — {{Esc(c.Nombre)}}</title>
               <link rel="stylesheet" href="assets/style.css" />
             </head>
@@ -557,6 +563,7 @@ public class StaticSiteService(
             <head>
               <meta charset="UTF-8" />
               <meta name="viewport" content="width=device-width, initial-scale=1" />
+              <meta name="color-scheme" content="light" />
               <title>Inscripciones — {{Esc(c.Nombre)}}</title>
               <link rel="stylesheet" href="assets/style.css" />
             </head>
@@ -602,6 +609,7 @@ public class StaticSiteService(
             <head>
               <meta charset="UTF-8" />
               <meta name="viewport" content="width=device-width, initial-scale=1" />
+              <meta name="color-scheme" content="light" />
               <title>{{Esc(s.Titulo)}} — {{Esc(c.Nombre)}}</title>
               <link rel="stylesheet" href="../../assets/style.css" />
             </head>
