@@ -29,6 +29,12 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
         npgsqlOpt.EnableRetryOnFailure(maxRetryCount: 3));
     opt.ConfigureWarnings(w => w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
 });
+// Clean Architecture: handlers depend on IAppDbContext (Application), resolved to AppDbContext (Infrastructure)
+builder.Services.AddScoped<ConferenceManager.Application.Common.Interfaces.IAppDbContext>(
+    sp => sp.GetRequiredService<AppDbContext>());
+// MediatR scans the Application assembly for IRequestHandler<,> implementations
+builder.Services.AddMediatR(cfg =>
+    cfg.RegisterServicesFromAssembly(typeof(ConferenceManager.Application.Common.Interfaces.IAppDbContext).Assembly));
 
 // ── Authentication ────────────────────────────────────────────────────────────
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
