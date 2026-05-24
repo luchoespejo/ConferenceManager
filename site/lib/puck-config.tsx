@@ -384,6 +384,12 @@ export const puckConfig: Config = {
         alt:       { type: 'text',   label: 'Texto alternativo' },
         width:     { type: 'text',   label: "Ancho (px, % o 'auto')" },
         maxHeight: { type: 'number', label: 'Alto máximo (px, 0=auto)' },
+        fit: {
+          type: 'radio', label: 'Ajuste de imagen',
+          options: [
+            { label: 'Contener', value: 'contain' }, { label: 'Recortar', value: 'cover' },
+          ],
+        },
         align: {
           type: 'radio', label: 'Alineación',
           options: [
@@ -391,21 +397,36 @@ export const puckConfig: Config = {
           ],
         },
         rounded: { type: 'number', label: 'Bordes redondeados (px)' },
-        bgColor:  colorField('Color de fondo'),
+        bgColor:  colorField('Color del marco'),
+        cardPadding: { type: 'number', label: 'Espacio del marco (rem)' },
+        shadow: {
+          type: 'radio', label: 'Sombra del marco',
+          options: [
+            { label: 'Ninguna', value: 'none' }, { label: 'Suave', value: 'subtle' },
+          ],
+        },
         paddingV: { type: 'number', label: 'Padding vertical (rem)' },
         paddingH: { type: 'number', label: 'Padding horizontal (rem)' },
         linkUrl: { type: 'text',   label: 'Link al hacer click (opcional)' },
       },
-      defaultProps: { url: '', alt: '', width: '100%', maxHeight: 0, align: 'center', rounded: 0, bgColor: 'transparent', paddingV: 0, paddingH: 0, linkUrl: '' },
-      render: ({ url, alt, width, maxHeight, align, rounded, bgColor, paddingV, paddingH, linkUrl }) => {
+      defaultProps: { url: '', alt: '', width: '100%', maxHeight: 0, fit: 'contain', align: 'center', rounded: 12, bgColor: '#ffffff', cardPadding: 1, shadow: 'subtle', paddingV: 0.5, paddingH: 0, linkUrl: '' },
+      render: ({ url, alt, width, maxHeight, fit, align, rounded, bgColor, cardPadding, shadow, paddingV, paddingH, linkUrl }) => {
+        const objectFit = fit ?? 'cover';
+        const cardPad = toRem(cardPadding ?? 0, '0rem');
+        const boxShadow = (shadow ?? 'none') === 'subtle' ? '0 1px 4px rgba(0,0,0,.12)' : 'none';
         const img = url
-          ? <img src={url} alt={alt} style={{ width, maxHeight: maxHeight || 'none', objectFit: 'cover', borderRadius: rounded, display: 'block' }} />
-          : <div style={{ padding: '2rem', textAlign: 'center', background: '#f3f4f6', color: '#9ca3af', borderRadius: rounded, width }}>
+          ? <img src={url} alt={alt} style={{ width: '100%', maxHeight: maxHeight || 'none', objectFit, borderRadius: rounded, display: 'block' }} />
+          : <div style={{ padding: '2rem', textAlign: 'center', background: '#f3f4f6', color: '#9ca3af', borderRadius: rounded, width: '100%' }}>
               🖼️ Configurá la URL de imagen
             </div>;
-        return (
-          <div style={{ background: bgColor, padding: toPaddingRem(paddingV, paddingH), display: 'flex', justifyContent: align }}>
+        const card = (
+          <div style={{ display: 'inline-block', width, boxSizing: 'border-box', background: bgColor, padding: cardPad, borderRadius: rounded, boxShadow }}>
             {linkUrl ? <a href={linkUrl} target="_blank" rel="noopener">{img}</a> : img}
+          </div>
+        );
+        return (
+          <div style={{ padding: toPaddingRem(paddingV, paddingH), display: 'flex', justifyContent: align }}>
+            {card}
           </div>
         );
       },

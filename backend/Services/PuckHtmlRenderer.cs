@@ -283,30 +283,39 @@ public static class PuckHtmlRenderer
 
     private static string RenderImagen(JsonElement p)
     {
-        var url       = Str(p, "url");
-        var alt       = Str(p, "alt");
-        var width     = Str(p, "width", "100%");
-        var maxHeight = Num(p, "maxHeight");
-        var align     = Str(p, "align", "center");
-        var rounded   = Num(p, "rounded");
-        var bgColor   = Str(p, "bgColor", "transparent");
-        var paddingV  = p.TryGetProperty("paddingV", out var pvEl) ? pvEl.GetDouble() : 0;
-        var paddingH  = p.TryGetProperty("paddingH", out var phEl) ? phEl.GetDouble() : 0;
-        var linkUrl   = Str(p, "linkUrl");
+        var url         = Str(p, "url");
+        var alt         = Str(p, "alt");
+        var width       = Str(p, "width", "100%");
+        var maxHeight   = Num(p, "maxHeight");
+        var fit         = Str(p, "fit", "cover");
+        var align       = Str(p, "align", "center");
+        var rounded     = Num(p, "rounded");
+        var bgColor     = Str(p, "bgColor", "transparent");
+        var cardPadding = p.TryGetProperty("cardPadding", out var cpEl) ? cpEl.GetDouble() : 0;
+        var shadow      = Str(p, "shadow", "none");
+        var paddingV    = p.TryGetProperty("paddingV", out var pvEl) ? pvEl.GetDouble() : 0;
+        var paddingH    = p.TryGetProperty("paddingH", out var phEl) ? phEl.GetDouble() : 0;
+        var linkUrl     = Str(p, "linkUrl");
 
         if (string.IsNullOrEmpty(url)) return "";
 
-        var paddingStr = (paddingV > 0 || paddingH > 0)
+        var outerPad = (paddingV > 0 || paddingH > 0)
             ? $"padding:{RemVal(paddingV)} {RemVal(paddingH)};"
             : "";
-        var maxHStr  = maxHeight > 0 ? $"max-height:{maxHeight}px;" : "";
-        var imgStyle = $"width:{Esc(width)};{maxHStr}object-fit:cover;border-radius:{rounded}px;display:block";
+        var cardPad   = cardPadding > 0 ? $"padding:{RemVal(cardPadding)};" : "";
+        var boxShadow = shadow == "subtle" ? "box-shadow:0 1px 4px rgba(0,0,0,.12);" : "";
+        var maxHStr   = maxHeight > 0 ? $"max-height:{maxHeight}px;" : "";
+
+        var imgStyle = $"width:100%;{maxHStr}object-fit:{Esc(fit)};border-radius:{rounded}px;display:block";
         var img      = $"""<img src="{Esc(url)}" alt="{Esc(alt)}" style="{imgStyle}" />""";
 
         if (!string.IsNullOrEmpty(linkUrl))
             img = $"""<a href="{Esc(linkUrl)}" target="_blank" rel="noopener">{img}</a>""";
 
-        return $"""<div style="background:{Esc(bgColor)};{paddingStr}display:flex;justify-content:{Esc(align)}">{img}</div>""" + "\n";
+        var cardStyle = $"display:inline-block;width:{Esc(width)};box-sizing:border-box;background:{Esc(bgColor)};{cardPad}border-radius:{rounded}px;{boxShadow}";
+        var card      = $"""<div style="{cardStyle}">{img}</div>""";
+
+        return $"""<div style="{outerPad}display:flex;justify-content:{Esc(align)}">{card}</div>""" + "\n";
     }
 
     // ── VIDEO ─────────────────────────────────────────────────────────────────
