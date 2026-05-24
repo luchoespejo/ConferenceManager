@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/backend.tests/">
+    <Project Path="backend.tests/ConferenceManager.Tests.csproj" />
+  </Folder>
+  <Folder Name="/backend/">
+    <Project Path="backend/ConferenceManager.csproj" />
+  </Folder>
+  <Project Path="ConferenceManager.Application/ConferenceManager.Application.csproj" />
+  <Project Path="ConferenceManager.Domain/ConferenceManager.Domain.csproj" />
+  <Project Path="ConferenceManager.Infrastructure/ConferenceManager.Infrastructure.csproj" />
+</Solution>

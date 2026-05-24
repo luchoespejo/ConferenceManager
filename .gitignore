@@ -1,10 +1,8 @@
 # .NET
-backend/bin/
-backend/obj/
-backend/*.user
+**/bin/
+**/obj/
+*.user
 backend/appsettings.Development.json
-tests/bin/
-tests/obj/
 
 # Next.js
 site/node_modules/
