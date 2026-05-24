@@ -6,11 +6,6 @@ backend/appsettings.Development.json
 tests/bin/
 tests/obj/
 
-# Angular
-admin/node_modules/
-admin/dist/
-admin/.angular/
-
 # Next.js
 site/node_modules/
 site/.next/
