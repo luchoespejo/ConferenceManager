@@ -135,8 +135,8 @@ Este link es único para ti. No lo compartas.
 ¡Saludos!
 ";
 
-            var emailResult = await emailService.SendAsync(expositor.Email, subject, body, replyTo: organizadorEmail, fromDisplayName: conferencia.Nombre);
-            if (emailResult.Success)
+            var emailSent = await emailService.SendAsync(expositor.Email, subject, body, replyTo: organizadorEmail, fromDisplayName: conferencia.Nombre);
+            if (emailSent)
                 successCount++;
         }
 

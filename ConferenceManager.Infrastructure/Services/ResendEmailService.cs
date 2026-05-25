@@ -1,5 +1,7 @@
 using System.Text;
 using System.Text.Json;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace ConferenceManager.Services;
 
@@ -49,7 +51,7 @@ public class ResendEmailService(
         }
     }
 
-    public async Task<ServiceResult> SendAsync(string toEmail, string subject, string body, string? replyTo = null, string? fromDisplayName = null)
+    public async Task<bool> SendAsync(string toEmail, string subject, string body, string? replyTo = null, string? fromDisplayName = null)
     {
         try
         {
@@ -78,15 +80,15 @@ public class ResendEmailService(
             if (!response.IsSuccessStatusCode)
             {
                 logger.LogWarning("Failed to send email to {Email}. Status: {Status}", toEmail, response.StatusCode);
-                return ServiceResult.Fail("EMAIL_FAILED", "No se pudo enviar el email");
+                return false;
             }
 
-            return ServiceResult.Ok();
+            return true;
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Exception sending email to {Email}", toEmail);
-            return ServiceResult.Fail("EMAIL_ERROR", "Error enviando email");
+            return false;
         }
     }
 }
