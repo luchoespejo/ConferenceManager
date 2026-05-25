@@ -78,8 +78,7 @@ builder.Services.AddHttpClient<IStaticSiteService, StaticSiteService>();
 
 // ── Application Services ──────────────────────────────────────────────────────
 // CQRS Handlers
-builder.Services.AddScoped<ConferenceManager.Features.Auth.Commands.ILoginCommandHandler, ConferenceManager.Features.Auth.Commands.LoginCommandHandler>();
-// Files slice migrated to Application (MediatR + ErrorOr) — resolved via AddMediatR
+// Auth + Files slices migrated to Application (MediatR + ErrorOr) — resolved via AddMediatR
 builder.Services.AddScoped<ConferenceManager.Features.Dashboard.Commands.IUpdateConferenciaCommandHandler, ConferenceManager.Features.Dashboard.Commands.UpdateConferenciaCommandHandler>();
 
 builder.Services.AddScoped<IJwtService, JwtService>();
@@ -94,7 +93,6 @@ if (builder.Configuration.GetValue<bool>("Email:UseFake"))
 else
     builder.Services.AddScoped<IEmailService, ResendEmailService>();
 
-builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IConferenciaService, ConferenciaService>();
 builder.Services.AddScoped<ISalaService, SalaService>();
 builder.Services.AddScoped<IExpositorService, ExpositorService>();

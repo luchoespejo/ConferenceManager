@@ -1,5 +1,6 @@
+using ConferenceManager.Application.Auth.Commands;
 using ConferenceManager.DTOs.Auth;
-using ConferenceManager.Services;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,67 +9,63 @@ namespace ConferenceManager.Controllers;
 [Route("api/auth")]
 [ApiController]
 [AllowAnonymous]
-public class AuthController(IAuthService authService) : ControllerBase
+public class AuthController(IMediator mediator) : ControllerBase
 {
     [HttpPost("registro")]
     public async Task<IActionResult> Registro([FromBody] RegistroRequest dto)
     {
-        var result = await authService.RegistrarAsync(dto);
+        var result = await mediator.Send(new RegisterCommand(dto.Email, dto.Password, dto.Nombre, dto.Organizacion));
 
-        if (result.Success)
-            return StatusCode(201, new { message = "Registro exitoso. Revisá tu email para verificar tu cuenta." });
-
-        return result.ErrorCode switch
-        {
-            "EMAIL_ALREADY_EXISTS" => Conflict(new { error = result.ErrorCode, message = result.ErrorMessage }),
-            "INVALID_PASSWORD" => BadRequest(new { errors = new { password = new[] { result.ErrorMessage } } }),
-            _ => StatusCode(500, new { error = "INTERNAL_ERROR", message = "Error inesperado." })
-        };
+        return result.Match<IActionResult>(
+            _ => StatusCode(201, new { message = "Registro exitoso. Revisá tu email para verificar tu cuenta." }),
+            errors => errors[0].Code switch
+            {
+                "EMAIL_ALREADY_EXISTS" => Conflict(new { error = errors[0].Code, message = errors[0].Description }),
+                "INVALID_PASSWORD" => BadRequest(new { errors = new { password = new[] { errors[0].Description } } }),
+                _ => StatusCode(500, new { error = "INTERNAL_ERROR", message = "Error inesperado." })
+            });
     }
 
     [HttpGet("verificar-email")]
     public async Task<IActionResult> VerificarEmail([FromQuery] string token)
     {
-        var result = await authService.VerificarEmailAsync(token);
+        var result = await mediator.Send(new VerifyEmailCommand(token));
 
-        if (result.Success)
-            return Ok(new { message = "Email verificado correctamente. Ya podés iniciar sesión." });
-
-        return BadRequest(new { error = result.ErrorCode, message = result.ErrorMessage });
+        return result.Match<IActionResult>(
+            _ => Ok(new { message = "Email verificado correctamente. Ya podés iniciar sesión." }),
+            errors => BadRequest(new { error = errors[0].Code, message = errors[0].Description }));
     }
 
     [HttpPost("reenviar-verificacion")]
     public async Task<IActionResult> ReenviarVerificacion([FromBody] ReenviarVerificacionRequest dto)
     {
-        await authService.ReenviarVerificacionAsync(dto.Email);
+        await mediator.Send(new ResendVerificationCommand(dto.Email));
         return Ok(new { message = "Si el email existe y no está verificado, recibirás un nuevo enlace." });
     }
 
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest dto)
     {
-        var result = await authService.LoginAsync(dto);
+        var result = await mediator.Send(new LoginCommand(dto.Email, dto.Password));
 
-        if (result.Success)
-            return Ok(result.Data);
-
-        return result.ErrorCode switch
-        {
-            "INVALID_CREDENTIALS" => Unauthorized(new { error = result.ErrorCode, message = result.ErrorMessage }),
-            "EMAIL_NOT_VERIFIED" => StatusCode(403, new { error = result.ErrorCode, message = result.ErrorMessage }),
-            _ => StatusCode(500, new { error = "INTERNAL_ERROR", message = "Error inesperado." })
-        };
+        return result.Match<IActionResult>(
+            data => Ok(data),
+            errors => errors[0].Code switch
+            {
+                "INVALID_CREDENTIALS" => Unauthorized(new { error = errors[0].Code, message = errors[0].Description }),
+                "EMAIL_NOT_VERIFIED" => StatusCode(403, new { error = errors[0].Code, message = errors[0].Description }),
+                _ => StatusCode(500, new { error = "INTERNAL_ERROR", message = "Error inesperado." })
+            });
     }
 
     [HttpPost("refresh")]
     public async Task<IActionResult> Refresh([FromBody] RefreshRequest dto)
     {
-        var result = await authService.RefreshAsync(dto.RefreshToken);
+        var result = await mediator.Send(new RefreshCommand(dto.RefreshToken));
 
-        if (result.Success)
-            return Ok(result.Data);
-
-        return Unauthorized(new { error = result.ErrorCode, message = result.ErrorMessage });
+        return result.Match<IActionResult>(
+            data => Ok(data),
+            errors => Unauthorized(new { error = errors[0].Code, message = errors[0].Description }));
     }
 
     [HttpGet("debug/hash")]
