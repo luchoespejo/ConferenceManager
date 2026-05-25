@@ -1,9 +1,9 @@
-using ConferenceManager.Data;
+using ConferenceManager.Application.FechasImportantes.Commands;
+using ConferenceManager.Application.FechasImportantes.Queries;
 using ConferenceManager.DTOs.FechasImportantes;
-using ConferenceManager.Models;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace ConferenceManager.Controllers;
@@ -11,7 +11,7 @@ namespace ConferenceManager.Controllers;
 [ApiController]
 [Authorize]
 [Route("api/dashboard/conferencias/{conferenciaId:guid}/fechas-importantes")]
-public class FechasImportantesController(AppDbContext db) : ControllerBase
+public class FechasImportantesController(IMediator mediator) : ControllerBase
 {
     private Guid UsuarioId =>
         Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -19,103 +19,30 @@ public class FechasImportantesController(AppDbContext db) : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetFechas(Guid conferenciaId)
     {
-        var existe = await db.Conferencias
-            .AsNoTracking()
-            .AnyAsync(c => c.Id == conferenciaId && c.UsuarioId == UsuarioId);
-
-        if (!existe) return NotFound();
-
-        var lista = await db.FechasImportantes
-            .AsNoTracking()
-            .Where(f => f.ConferenciaId == conferenciaId)
-            .OrderBy(f => f.Fecha)
-            .Select(f => new FechaImportanteDto
-            {
-                Id = f.Id,
-                Descripcion = f.Descripcion,
-                Fecha = f.Fecha,
-                FechaFin = f.FechaFin
-            })
-            .ToListAsync();
-
-        return Ok(lista);
+        var result = await mediator.Send(new GetFechasImportantesQuery(conferenciaId, UsuarioId));
+        return result.Match<IActionResult>(data => Ok(data), _ => NotFound());
     }
 
     [HttpPost]
     public async Task<IActionResult> Create(Guid conferenciaId, [FromBody] CreateFechaImportanteDto dto)
     {
-        var existe = await db.Conferencias
-            .AsNoTracking()
-            .AnyAsync(c => c.Id == conferenciaId && c.UsuarioId == UsuarioId);
-
-        if (!existe) return NotFound();
-
-        var fecha = new FechaImportante
-        {
-            ConferenciaId = conferenciaId,
-            Descripcion = dto.Descripcion,
-            Fecha = dto.Fecha,
-            FechaFin = dto.FechaFin
-        };
-
-        db.FechasImportantes.Add(fecha);
-        await db.SaveChangesAsync();
-
-        return CreatedAtAction(nameof(GetFechas), new { conferenciaId }, new FechaImportanteDto
-        {
-            Id = fecha.Id,
-            Descripcion = fecha.Descripcion,
-            Fecha = fecha.Fecha,
-            FechaFin = fecha.FechaFin
-        });
+        var result = await mediator.Send(new CreateFechaImportanteCommand(conferenciaId, UsuarioId, dto));
+        return result.Match<IActionResult>(
+            data => CreatedAtAction(nameof(GetFechas), new { conferenciaId }, data),
+            _ => NotFound());
     }
 
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update(Guid conferenciaId, Guid id, [FromBody] UpdateFechaImportanteDto dto)
     {
-        var existe = await db.Conferencias
-            .AsNoTracking()
-            .AnyAsync(c => c.Id == conferenciaId && c.UsuarioId == UsuarioId);
-
-        if (!existe) return NotFound();
-
-        var fecha = await db.FechasImportantes
-            .FirstOrDefaultAsync(f => f.Id == id && f.ConferenciaId == conferenciaId);
-
-        if (fecha is null) return NotFound();
-
-        fecha.Descripcion = dto.Descripcion;
-        fecha.Fecha = dto.Fecha;
-        fecha.FechaFin = dto.FechaFin;
-
-        await db.SaveChangesAsync();
-
-        return Ok(new FechaImportanteDto
-        {
-            Id = fecha.Id,
-            Descripcion = fecha.Descripcion,
-            Fecha = fecha.Fecha,
-            FechaFin = fecha.FechaFin
-        });
+        var result = await mediator.Send(new UpdateFechaImportanteCommand(id, conferenciaId, UsuarioId, dto));
+        return result.Match<IActionResult>(data => Ok(data), _ => NotFound());
     }
 
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid conferenciaId, Guid id)
     {
-        var existe = await db.Conferencias
-            .AsNoTracking()
-            .AnyAsync(c => c.Id == conferenciaId && c.UsuarioId == UsuarioId);
-
-        if (!existe) return NotFound();
-
-        var fecha = await db.FechasImportantes
-            .FirstOrDefaultAsync(f => f.Id == id && f.ConferenciaId == conferenciaId);
-
-        if (fecha is null) return NotFound();
-
-        db.FechasImportantes.Remove(fecha);
-        await db.SaveChangesAsync();
-
-        return NoContent();
+        var result = await mediator.Send(new DeleteFechaImportanteCommand(id, conferenciaId, UsuarioId));
+        return result.Match<IActionResult>(_ => NoContent(), _ => NotFound());
     }
 }
