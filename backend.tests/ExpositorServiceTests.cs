@@ -1,15 +1,16 @@
+using ConferenceManager.Application.Expositores.Commands;
+using ConferenceManager.Application.Expositores.Queries;
 using ConferenceManager.Data;
 using ConferenceManager.DTOs.Expositores;
 using ConferenceManager.Models;
-using ConferenceManager.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace ConferenceManager.Tests;
 
+// Tests the migrated Expositores slice (Clean Architecture handlers, MediatR + ErrorOr).
 public class ExpositorServiceTests : IDisposable
 {
     private readonly AppDbContext _db;
-    private readonly ExpositorService _svc;
     private readonly Guid _userId = Guid.NewGuid();
     private readonly Guid _otherUserId = Guid.NewGuid();
     private readonly Guid _conferenciaId = Guid.NewGuid();
@@ -20,7 +21,6 @@ public class ExpositorServiceTests : IDisposable
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
         _db = new AppDbContext(opts);
-        _svc = new ExpositorService(_db);
 
         _db.Conferencias.Add(new Conferencia
         {
@@ -42,21 +42,24 @@ public class ExpositorServiceTests : IDisposable
     {
         var dto = new CreateExpositorDto { Nombre = "Dr. Smith", Email = "smith@conf.com" };
 
-        var result = await _svc.CreateAsync(_conferenciaId, _userId, dto);
+        var result = await new CreateExpositorCommandHandler(_db)
+            .Handle(new CreateExpositorCommand(_conferenciaId, _userId, dto), default);
 
-        Assert.True(result.Success);
-        Assert.NotNull(result.Data!.TokenAcceso);
-        Assert.NotEmpty(result.Data.TokenAcceso);
-        Assert.Equal("Dr. Smith", result.Data.Nombre);
+        Assert.False(result.IsError);
+        Assert.NotNull(result.Value.TokenAcceso);
+        Assert.NotEmpty(result.Value.TokenAcceso);
+        Assert.Equal("Dr. Smith", result.Value.Nombre);
     }
 
     [Fact]
     public async Task Create_WrongOwner_Fails()
     {
         var dto = new CreateExpositorDto { Nombre = "X" };
-        var result = await _svc.CreateAsync(_conferenciaId, _otherUserId, dto);
 
-        Assert.False(result.Success);
+        var result = await new CreateExpositorCommandHandler(_db)
+            .Handle(new CreateExpositorCommand(_conferenciaId, _otherUserId, dto), default);
+
+        Assert.True(result.IsError);
     }
 
     [Fact]
@@ -71,20 +74,21 @@ public class ExpositorServiceTests : IDisposable
         });
         await _db.SaveChangesAsync();
 
-        var result = await _svc.GetAllAsync(_conferenciaId, _userId);
+        var result = await new GetExpositoresQueryHandler(_db)
+            .Handle(new GetExpositoresQuery(_conferenciaId, _userId), default);
 
-        Assert.True(result.Success);
-        var expositor = result.Data!.First();
-        Assert.Equal("my-token-123", expositor.TokenAcceso);
+        Assert.False(result.IsError);
+        Assert.Equal("my-token-123", result.Value.First().TokenAcceso);
     }
 
     [Fact]
     public async Task GetById_NotFound_ReturnsError()
     {
-        var result = await _svc.GetByIdAsync(Guid.NewGuid(), _conferenciaId, _userId);
+        var result = await new GetExpositorByIdQueryHandler(_db)
+            .Handle(new GetExpositorByIdQuery(Guid.NewGuid(), _conferenciaId, _userId), default);
 
-        Assert.False(result.Success);
-        Assert.Equal(ExpositorErrorCodes.NotFound, result.ErrorCode);
+        Assert.True(result.IsError);
+        Assert.Equal("EXPOSITOR_NOT_FOUND", result.FirstError.Code);
     }
 
     [Fact]
@@ -102,11 +106,12 @@ public class ExpositorServiceTests : IDisposable
         await _db.SaveChangesAsync();
 
         var dto = new UpdateExpositorDto { Nombre = "Actualizado" };
-        var result = await _svc.UpdateAsync(expositor.Id, _conferenciaId, _userId, dto);
+        var result = await new UpdateExpositorCommandHandler(_db)
+            .Handle(new UpdateExpositorCommand(expositor.Id, _conferenciaId, _userId, dto), default);
 
-        Assert.True(result.Success);
-        Assert.Equal("Actualizado", result.Data!.Nombre);
-        Assert.Equal("orig@test.com", result.Data.Email);
+        Assert.False(result.IsError);
+        Assert.Equal("Actualizado", result.Value.Nombre);
+        Assert.Equal("orig@test.com", result.Value.Email);
     }
 
     [Fact]
@@ -122,9 +127,10 @@ public class ExpositorServiceTests : IDisposable
         _db.Expositores.Add(expositor);
         await _db.SaveChangesAsync();
 
-        var result = await _svc.DeleteAsync(expositor.Id, _conferenciaId, _userId);
+        var result = await new DeleteExpositorCommandHandler(_db)
+            .Handle(new DeleteExpositorCommand(expositor.Id, _conferenciaId, _userId), default);
 
-        Assert.True(result.Success);
+        Assert.False(result.IsError);
         Assert.Equal(0, await _db.Expositores.CountAsync());
     }
 
@@ -157,10 +163,11 @@ public class ExpositorServiceTests : IDisposable
         });
         await _db.SaveChangesAsync();
 
-        var result = await _svc.DeleteAsync(expositor.Id, _conferenciaId, _userId);
+        var result = await new DeleteExpositorCommandHandler(_db)
+            .Handle(new DeleteExpositorCommand(expositor.Id, _conferenciaId, _userId), default);
 
-        Assert.False(result.Success);
-        Assert.Equal(ExpositorErrorCodes.CannotDeleteWithSessions, result.ErrorCode);
+        Assert.True(result.IsError);
+        Assert.Equal("CANNOT_DELETE_WITH_SESSIONS", result.FirstError.Code);
     }
 
     [Fact]
@@ -177,9 +184,10 @@ public class ExpositorServiceTests : IDisposable
         _db.Expositores.Add(expositor);
         await _db.SaveChangesAsync();
 
-        var result = await _svc.GetByIdAsync(expositor.Id, _conferenciaId, _userId);
+        var result = await new GetExpositorByIdQueryHandler(_db)
+            .Handle(new GetExpositorByIdQuery(expositor.Id, _conferenciaId, _userId), default);
 
-        Assert.True(result.Success);
-        Assert.Null(result.Data!.RedesSociales);
+        Assert.False(result.IsError);
+        Assert.Null(result.Value.RedesSociales);
     }
 }
