@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.IO.Compression;
 using System.Text;
+using System.Text.RegularExpressions;
 using ConferenceManager.Data;
 using ConferenceManager.Models;
 using Microsoft.EntityFrameworkCore;
@@ -136,6 +137,28 @@ public class StaticSiteService(
     private static string Esc(string? s) =>
         string.IsNullOrEmpty(s) ? "" :
         s.Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;").Replace("\"", "&quot;");
+
+    // Converts #url:https://... or #url:https://...|Display Text into <a> links.
+    // Plain-text portions are HTML-encoded; URL parts are safe-embedded.
+    private static readonly Regex InlineUrlPattern =
+        new(@"#url:(https?://[^\s|]+)(?:\|([^\n#]+))?", RegexOptions.Compiled);
+
+    private static string ProcessInlineUrls(string? rawText)
+    {
+        if (string.IsNullOrEmpty(rawText)) return "";
+        var sb = new StringBuilder();
+        int lastIndex = 0;
+        foreach (Match m in InlineUrlPattern.Matches(rawText))
+        {
+            sb.Append(Esc(rawText[lastIndex..m.Index]));
+            var url  = Esc(m.Groups[1].Value.Trim());
+            var disp = m.Groups[2].Success ? Esc(m.Groups[2].Value.Trim()) : url;
+            sb.Append($"""<a href="{url}" target="_blank" rel="noopener noreferrer" style="color:var(--primary);font-weight:600;text-decoration:none">{disp}</a>""");
+            lastIndex = m.Index + m.Length;
+        }
+        sb.Append(Esc(rawText[lastIndex..]));
+        return sb.ToString();
+    }
 
     private static string FormatDateLong(DateOnly d) =>
         d.ToString("dddd d 'de' MMMM 'de' yyyy", EsAr);
@@ -533,7 +556,7 @@ public class StaticSiteService(
             if (!string.IsNullOrEmpty(c.FormularioInscripcionUrl))
                 sb.AppendLine($"""    <a href="{Esc(c.FormularioInscripcionUrl)}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:.5rem;color:var(--primary);font-weight:600;font-size:1rem">📝 Formulario de inscripción</a>""");
             if (!string.IsNullOrEmpty(c.ContactoAdicional))
-                sb.AppendLine($"""    <p style="font-size:.95rem;color:#475569;white-space:pre-line;margin-top:.5rem">{Esc(c.ContactoAdicional)}</p>""");
+                sb.AppendLine($"""    <p style="font-size:.95rem;color:#475569;white-space:pre-line;margin-top:.5rem">{ProcessInlineUrls(c.ContactoAdicional)}</p>""");
             sb.AppendLine("  </div>");
             sb.AppendLine("</section>");
         }

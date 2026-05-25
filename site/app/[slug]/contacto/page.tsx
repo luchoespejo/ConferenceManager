@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import React from 'react';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,6 +14,31 @@ interface ConferenciaContacto {
   instagram?: string;
   formularioInscripcionUrl?: string;
   contactoAdicional?: string;
+}
+
+// Converts #url:https://... or #url:https://...|Display Text into <a> links.
+// Supports multiple occurrences per string; preserves surrounding text.
+const INLINE_URL = /#url:(https?:\/\/[^\s|]+)(?:\|([^\n#]+))?/g;
+
+function renderInlineUrls(text: string, linkColor: string): React.ReactNode {
+  const parts: React.ReactNode[] = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+  INLINE_URL.lastIndex = 0;
+  while ((match = INLINE_URL.exec(text)) !== null) {
+    if (match.index > lastIndex) parts.push(text.slice(lastIndex, match.index));
+    const url = match[1].trim();
+    const display = match[2]?.trim() ?? url;
+    parts.push(
+      <a key={match.index} href={url} target="_blank" rel="noopener noreferrer"
+         style={{ color: linkColor, fontWeight: 600, textDecoration: 'none' }}>
+        {display}
+      </a>
+    );
+    lastIndex = match.index + match[0].length;
+  }
+  if (lastIndex < text.length) parts.push(text.slice(lastIndex));
+  return parts.length === 1 && typeof parts[0] === 'string' ? parts[0] : <>{parts}</>;
 }
 
 async function fetchConferencia(slug: string): Promise<ConferenciaContacto | null> {
@@ -136,7 +162,7 @@ export default async function ContactoPage({ params }: { params: Promise<{ slug:
             )}
             {conf.contactoAdicional && (
               <p style={{ fontSize: '.95rem', color: '#475569', whiteSpace: 'pre-line', marginTop: '.5rem' }}>
-                {conf.contactoAdicional}
+                {renderInlineUrls(conf.contactoAdicional, primary)}
               </p>
             )}
           </div>
