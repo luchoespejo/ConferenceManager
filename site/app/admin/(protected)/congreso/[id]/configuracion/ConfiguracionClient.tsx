@@ -142,7 +142,7 @@ export default function ConfiguracionClient({ congreso: init }: Props) {
   );
 
   return (
-    <div className="p-8 max-w-2xl">
+    <div className="p-8">
       {toast && (
         <div className={`fixed top-4 right-4 z-50 px-4 py-2 rounded-lg text-sm text-white shadow-lg ${toast.ok ? 'bg-green-600' : 'bg-red-600'}`}>
           {toast.msg}
@@ -150,7 +150,11 @@ export default function ConfiguracionClient({ congreso: init }: Props) {
       )}
 
       {/* ── FORM ─────────────────────────────────────────────────────────────── */}
-      <form onSubmit={guardar} className="flex flex-col gap-5">
+      <form onSubmit={guardar}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+
+        {/* ── Col 1: Información básica ──────────────────────────────────────── */}
+        <div className="flex flex-col gap-5">
 
         {/* ── Información básica ─────────────────────────────────────────────── */}
         <section className="bg-white border border-slate-200 rounded-xl p-5">
@@ -214,6 +218,11 @@ export default function ConfiguracionClient({ congreso: init }: Props) {
             </div>
           </div>
         </section>
+
+        </div>{/* /Col 1 */}
+
+        {/* ── Col 2: Inscripciones + Ubicación + Contacto ────────────────────── */}
+        <div className="flex flex-col gap-5">
 
         {/* ── Inscripciones ──────────────────────────────────────────────────── */}
         <section className="bg-white border border-slate-200 rounded-xl p-5">
@@ -334,12 +343,25 @@ export default function ConfiguracionClient({ congreso: init }: Props) {
             </div>
             <div>
               {lbl('Información adicional')}
-              <textarea value={contactoAdicional} onChange={e => setContactoAdicional(e.target.value)} rows={2} className={inp + ' resize-y'} />
+              <textarea value={contactoAdicional} onChange={e => setContactoAdicional(e.target.value)} rows={3} className={inp + ' resize-y'} />
+              <p className="text-xs text-slate-400 mt-1.5 leading-relaxed">
+                💡 Para agregar links usá{' '}
+                <code className="bg-slate-100 text-slate-600 px-1 py-0.5 rounded font-mono">
+                  #url:https://...
+                </code>{' '}
+                o con texto personalizado:{' '}
+                <code className="bg-slate-100 text-slate-600 px-1 py-0.5 rounded font-mono">
+                  #url:https://...|Ver formulario
+                </code>
+              </p>
             </div>
           </div>
         </section>
 
-        <div className="flex justify-end">
+        </div>{/* /Col 2 */}
+        </div>{/* /grid */}
+
+        <div className="flex justify-end mt-6">
           <button type="submit" disabled={pending}
             className="px-6 py-2.5 bg-slate-900 text-white rounded-lg text-sm font-semibold hover:bg-slate-800 disabled:opacity-60">
             {pending ? 'Guardando...' : 'Guardar configuración'}
