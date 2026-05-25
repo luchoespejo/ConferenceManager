@@ -1,9 +1,9 @@
-using ConferenceManager.Data;
+using ConferenceManager.Application.EjesTematicos.Commands;
+using ConferenceManager.Application.EjesTematicos.Queries;
 using ConferenceManager.DTOs.EjesTematicos;
-using ConferenceManager.Models;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace ConferenceManager.Controllers;
@@ -11,7 +11,7 @@ namespace ConferenceManager.Controllers;
 [ApiController]
 [Authorize]
 [Route("api/dashboard/conferencias/{conferenciaId:guid}/ejes-tematicos")]
-public class EjesTematicoController(AppDbContext db) : ControllerBase
+public class EjesTematicoController(IMediator mediator) : ControllerBase
 {
     private Guid UsuarioId =>
         Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -19,60 +19,23 @@ public class EjesTematicoController(AppDbContext db) : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetEjes(Guid conferenciaId)
     {
-        var existe = await db.Conferencias
-            .AsNoTracking()
-            .AnyAsync(c => c.Id == conferenciaId && c.UsuarioId == UsuarioId);
-
-        if (!existe) return NotFound();
-
-        var lista = await db.EjesTematicos
-            .AsNoTracking()
-            .Where(e => e.ConferenciaId == conferenciaId)
-            .Select(e => new EjeTematicoDto { Id = e.Id, Nombre = e.Nombre })
-            .ToListAsync();
-
-        return Ok(lista);
+        var result = await mediator.Send(new GetEjesTematicosQuery(conferenciaId, UsuarioId));
+        return result.Match<IActionResult>(data => Ok(data), _ => NotFound());
     }
 
     [HttpPost]
     public async Task<IActionResult> Create(Guid conferenciaId, [FromBody] CreateEjeTematicoDto dto)
     {
-        var existe = await db.Conferencias
-            .AsNoTracking()
-            .AnyAsync(c => c.Id == conferenciaId && c.UsuarioId == UsuarioId);
-
-        if (!existe) return NotFound();
-
-        var eje = new EjeTematico
-        {
-            ConferenciaId = conferenciaId,
-            Nombre = dto.Nombre
-        };
-
-        db.EjesTematicos.Add(eje);
-        await db.SaveChangesAsync();
-
-        return CreatedAtAction(nameof(GetEjes), new { conferenciaId },
-            new EjeTematicoDto { Id = eje.Id, Nombre = eje.Nombre });
+        var result = await mediator.Send(new CreateEjeTematicoCommand(conferenciaId, UsuarioId, dto.Nombre));
+        return result.Match<IActionResult>(
+            data => CreatedAtAction(nameof(GetEjes), new { conferenciaId }, data),
+            _ => NotFound());
     }
 
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid conferenciaId, Guid id)
     {
-        var existe = await db.Conferencias
-            .AsNoTracking()
-            .AnyAsync(c => c.Id == conferenciaId && c.UsuarioId == UsuarioId);
-
-        if (!existe) return NotFound();
-
-        var eje = await db.EjesTematicos
-            .FirstOrDefaultAsync(e => e.Id == id && e.ConferenciaId == conferenciaId);
-
-        if (eje is null) return NotFound();
-
-        db.EjesTematicos.Remove(eje);
-        await db.SaveChangesAsync();
-
-        return NoContent();
+        var result = await mediator.Send(new DeleteEjeTematicoCommand(id, conferenciaId, UsuarioId));
+        return result.Match<IActionResult>(_ => NoContent(), _ => NotFound());
     }
 }
