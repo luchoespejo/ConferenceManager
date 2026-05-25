@@ -1,8 +1,9 @@
+using ConferenceManager.Application.Salas.Commands;
+using ConferenceManager.Application.Salas.Queries;
 using ConferenceManager.DTOs.Salas;
-using ConferenceManager.Services;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.JsonWebTokens;
 using System.Security.Claims;
 
 namespace ConferenceManager.Controllers;
@@ -10,7 +11,7 @@ namespace ConferenceManager.Controllers;
 [ApiController]
 [Authorize]
 [Route("api/dashboard/conferencias/{conferenciaId:guid}/salas")]
-public class SalasController(ISalaService salaService) : ControllerBase
+public class SalasController(IMediator mediator) : ControllerBase
 {
     private Guid UsuarioId =>
         Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -18,82 +19,70 @@ public class SalasController(ISalaService salaService) : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetSalas(Guid conferenciaId)
     {
-        var result = await salaService.GetSalasByConferenciaAsync(conferenciaId, UsuarioId);
+        var result = await mediator.Send(new GetSalasQuery(conferenciaId, UsuarioId));
 
-        if (!result.Success)
-            return result.ErrorCode switch
+        return result.Match<IActionResult>(
+            data => Ok(data),
+            errors => errors[0].Code switch
             {
-                SalaErrorCodes.ConferenciaNotFound => NotFound(),
+                "CONFERENCIA_NOT_FOUND" => NotFound(),
                 _ => StatusCode(500, new { error = "INTERNAL_ERROR", message = "Error inesperado." })
-            };
-
-        return Ok(result.Data);
+            });
     }
 
     [HttpPost]
     public async Task<IActionResult> CreateSala(Guid conferenciaId, [FromBody] CreateSalaDto dto)
     {
-        var result = await salaService.CreateAsync(dto, conferenciaId, UsuarioId);
+        var result = await mediator.Send(new CreateSalaCommand(dto, conferenciaId, UsuarioId));
 
-        if (result.Success)
-            return CreatedAtAction(
-                nameof(GetSala),
-                new { conferenciaId, id = result.Data!.Id },
-                result.Data);
-
-        return result.ErrorCode switch
-        {
-            SalaErrorCodes.ConferenciaNotFound => NotFound(),
-            SalaErrorCodes.NombreAlreadyExists =>
-                Conflict(new { error = result.ErrorCode, message = result.ErrorMessage }),
-            SalaErrorCodes.CapacidadInvalid =>
-                BadRequest(new { error = result.ErrorCode, message = result.ErrorMessage }),
-            _ => StatusCode(500, new { error = "INTERNAL_ERROR", message = "Error inesperado." })
-        };
+        return result.Match<IActionResult>(
+            data => CreatedAtAction(nameof(GetSala), new { conferenciaId, id = data.Id }, data),
+            errors => errors[0].Code switch
+            {
+                "CONFERENCIA_NOT_FOUND" => NotFound(),
+                "NOMBRE_ALREADY_EXISTS" => Conflict(new { error = errors[0].Code, message = errors[0].Description }),
+                "CAPACIDAD_INVALID" => BadRequest(new { error = errors[0].Code, message = errors[0].Description }),
+                _ => StatusCode(500, new { error = "INTERNAL_ERROR", message = "Error inesperado." })
+            });
     }
 
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetSala(Guid conferenciaId, Guid id)
     {
-        var sala = await salaService.GetByIdAsync(id, conferenciaId, UsuarioId);
+        var result = await mediator.Send(new GetSalaByIdQuery(id, conferenciaId, UsuarioId));
 
-        if (sala is null)
-            return NotFound();
-
-        return Ok(sala);
+        return result.Match<IActionResult>(
+            data => Ok(data),
+            _ => NotFound());
     }
 
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> UpdateSala(Guid conferenciaId, Guid id, [FromBody] UpdateSalaDto dto)
     {
-        var result = await salaService.UpdateAsync(id, dto, conferenciaId, UsuarioId);
+        var result = await mediator.Send(new UpdateSalaCommand(id, dto, conferenciaId, UsuarioId));
 
-        if (result.Success)
-            return Ok(result.Data);
-
-        return result.ErrorCode switch
-        {
-            SalaErrorCodes.ConferenciaNotFound or SalaErrorCodes.SalaNotFound => NotFound(),
-            SalaErrorCodes.NombreAlreadyExists =>
-                Conflict(new { error = result.ErrorCode, message = result.ErrorMessage }),
-            _ => StatusCode(500, new { error = "INTERNAL_ERROR", message = "Error inesperado." })
-        };
+        return result.Match<IActionResult>(
+            data => Ok(data),
+            errors => errors[0].Code switch
+            {
+                "CONFERENCIA_NOT_FOUND" or "SALA_NOT_FOUND" => NotFound(),
+                "NOMBRE_ALREADY_EXISTS" => Conflict(new { error = errors[0].Code, message = errors[0].Description }),
+                _ => StatusCode(500, new { error = "INTERNAL_ERROR", message = "Error inesperado." })
+            });
     }
 
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> DeleteSala(Guid conferenciaId, Guid id)
     {
-        var result = await salaService.DeleteAsync(id, conferenciaId, UsuarioId);
+        var result = await mediator.Send(new DeleteSalaCommand(id, conferenciaId, UsuarioId));
 
-        if (result.Success)
-            return NoContent();
-
-        return result.ErrorCode switch
-        {
-            SalaErrorCodes.ConferenciaNotFound or SalaErrorCodes.SalaNotFound => NotFound(),
-            SalaErrorCodes.CannotDeleteWithSesiones =>
-                StatusCode(422, new { error = result.ErrorCode, message = result.ErrorMessage }),
-            _ => StatusCode(500, new { error = "INTERNAL_ERROR", message = "Error inesperado." })
-        };
+        return result.Match<IActionResult>(
+            _ => NoContent(),
+            errors => errors[0].Code switch
+            {
+                "CONFERENCIA_NOT_FOUND" or "SALA_NOT_FOUND" => NotFound(),
+                "CANNOT_DELETE_WITH_SESIONES" => StatusCode(422, new { error = errors[0].Code, message = errors[0].Description }),
+                _ => StatusCode(500, new { error = "INTERNAL_ERROR", message = "Error inesperado." })
+            });
     }
 }
