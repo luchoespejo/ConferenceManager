@@ -79,8 +79,7 @@ builder.Services.AddHttpClient<IStaticSiteService, StaticSiteService>();
 // ── Application Services ──────────────────────────────────────────────────────
 // CQRS Handlers
 builder.Services.AddScoped<ConferenceManager.Features.Auth.Commands.ILoginCommandHandler, ConferenceManager.Features.Auth.Commands.LoginCommandHandler>();
-builder.Services.AddScoped<ConferenceManager.Features.Files.Commands.IUploadImageCommandHandler, ConferenceManager.Features.Files.Commands.UploadImageCommandHandler>();
-builder.Services.AddScoped<ConferenceManager.Features.Files.Queries.IGetFileQueryHandler, ConferenceManager.Features.Files.Queries.GetFileQueryHandler>();
+// Files slice migrated to Application (MediatR + ErrorOr) — resolved via AddMediatR
 builder.Services.AddScoped<ConferenceManager.Features.Dashboard.Commands.IUpdateConferenciaCommandHandler, ConferenceManager.Features.Dashboard.Commands.UpdateConferenciaCommandHandler>();
 
 builder.Services.AddScoped<IJwtService, JwtService>();

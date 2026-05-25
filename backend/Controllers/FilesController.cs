@@ -1,5 +1,7 @@
-using ConferenceManager.Features.Files.Commands;
-using ConferenceManager.Features.Files.Queries;
+using ConferenceManager.Application.Files.Commands;
+using ConferenceManager.Application.Files.Queries;
+using ConferenceManager.Extensions;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -7,35 +9,25 @@ using System.Security.Claims;
 namespace ConferenceManager.Controllers;
 
 [ApiController]
-public class FilesController(
-    IUploadImageCommandHandler uploadHandler,
-    IGetFileQueryHandler getHandler
-) : ControllerBase
+public class FilesController(IMediator mediator) : ControllerBase
 {
     [HttpPost("api/dashboard/upload")]
     [Authorize]
     public async Task<IActionResult> Upload([FromBody] UploadRequest req)
     {
         var usuarioId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        var command = new UploadImageCommand(usuarioId, req.Base64, req.ContentType);
-        var result = await uploadHandler.ExecuteAsync(command);
-
-        if (!result.Success)
-            return BadRequest(new { error = result.ErrorCode, message = result.ErrorMessage });
-
-        return Ok(new { url = result.Data!.Url, id = result.Data.Id });
+        var result = await mediator.Send(new UploadImageCommand(usuarioId, req.Base64, req.ContentType));
+        return result.ToActionResult();
     }
 
     [HttpGet("api/files/{id:guid}")]
     [ResponseCache(Duration = 86400, Location = ResponseCacheLocation.Any)]
     public async Task<IActionResult> GetFile(Guid id)
     {
-        var query = new GetFileQuery(id);
-        var result = await getHandler.ExecuteAsync(query);
-
-        if (result is null) return NotFound();
-
-        return File(result.Datos, result.ContentType);
+        var result = await mediator.Send(new GetFileQuery(id));
+        return result.Match<IActionResult>(
+            file => File(file.Datos, file.ContentType),
+            _ => NotFound());
     }
 }
 

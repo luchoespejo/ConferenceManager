@@ -1,29 +1,31 @@
-using ConferenceManager.Data;
+using ConferenceManager.Application.Common.Interfaces;
 using ConferenceManager.Models;
-using ConferenceManager.Services;
+using ErrorOr;
+using MediatR;
 
-namespace ConferenceManager.Features.Files.Commands;
+namespace ConferenceManager.Application.Files.Commands;
 
-public class UploadImageCommandHandler(AppDbContext context) : IUploadImageCommandHandler
+public class UploadImageCommandHandler(IAppDbContext context)
+    : IRequestHandler<UploadImageCommand, ErrorOr<UploadImageResult>>
 {
     private static readonly HashSet<string> AllowedTypes =
         ["image/jpeg", "image/png", "image/webp", "image/gif", "image/x-icon", "image/vnd.microsoft.icon"];
     private const int MaxBytes = 512 * 1024;
 
-    public async Task<ServiceResult<UploadImageResult>> ExecuteAsync(UploadImageCommand command)
+    public async Task<ErrorOr<UploadImageResult>> Handle(UploadImageCommand command, CancellationToken cancellationToken)
     {
         var base64 = command.Base64;
         var contentType = command.ContentType ?? "image/jpeg";
 
         if (string.IsNullOrWhiteSpace(base64))
-            return ServiceResult<UploadImageResult>.Fail("MISSING_DATA", "Base64 data requerido.");
+            return Error.Validation("MISSING_DATA", "Base64 data requerido.");
 
         // Strip data URI prefix
         if (base64.StartsWith("data:"))
         {
             var comma = base64.IndexOf(',');
             if (comma < 0)
-                return ServiceResult<UploadImageResult>.Fail("INVALID_FORMAT", "Formato de data URI inválido.");
+                return Error.Validation("INVALID_FORMAT", "Formato de data URI inválido.");
 
             var meta = base64[5..comma];
             var semicolon = meta.IndexOf(';');
@@ -33,10 +35,7 @@ public class UploadImageCommandHandler(AppDbContext context) : IUploadImageComma
         }
 
         if (!AllowedTypes.Contains(contentType))
-            return ServiceResult<UploadImageResult>.Fail(
-                "INVALID_TYPE",
-                "Tipo de imagen no permitido. Usar JPG, PNG, WebP, GIF o ICO."
-            );
+            return Error.Validation("INVALID_TYPE", "Tipo de imagen no permitido. Usar JPG, PNG, WebP, GIF o ICO.");
 
         byte[] bytes;
         try
@@ -45,14 +44,13 @@ public class UploadImageCommandHandler(AppDbContext context) : IUploadImageComma
         }
         catch
         {
-            return ServiceResult<UploadImageResult>.Fail("INVALID_BASE64", "Base64 inválido.");
+            return Error.Validation("INVALID_BASE64", "Base64 inválido.");
         }
 
         if (bytes.Length > MaxBytes)
-            return ServiceResult<UploadImageResult>.Fail(
+            return Error.Validation(
                 "FILE_TOO_LARGE",
-                $"La imagen supera el límite de 500 KB. Tamaño recibido: {bytes.Length / 1024} KB."
-            );
+                $"La imagen supera el límite de 500 KB. Tamaño recibido: {bytes.Length / 1024} KB.");
 
         var imagen = new ImagenAlmacenada
         {
@@ -62,9 +60,8 @@ public class UploadImageCommandHandler(AppDbContext context) : IUploadImageComma
         };
 
         context.ImagenesAlmacenadas.Add(imagen);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(cancellationToken);
 
-        var url = $"/api/files/{imagen.Id}";
-        return ServiceResult<UploadImageResult>.Ok(new UploadImageResult(url, imagen.Id));
+        return new UploadImageResult($"/api/files/{imagen.Id}", imagen.Id);
     }
 }
