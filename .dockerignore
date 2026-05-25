@@ -1,0 +1,19 @@
+# Exclude frontend — not needed for API build
+site/
+# Exclude test projects
+backend.tests/
+tests/
+# Exclude tooling/IDE
+.git/
+.claude/
+.specify/
+.gitignore
+.dockerignore
+*.md
+# Exclude build artifacts
+**/bin/
+**/obj/
+# Exclude secrets
+.env*
+.vs/
+.vscode/
