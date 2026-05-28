@@ -140,11 +140,12 @@ public class StaticSiteService(
 
     // Inline tag → hyperlink processor.
     // Supported tags (usable in contactoAdicional and similar plain-text fields):
-    //   #url:https://...|Display   → generic link
-    //   #mail:email@...|Display    → mailto link
-    //   #ig:@usuario|Display       → https://instagram.com/usuario
+    //   [[#url:https://...|Display]]   → generic link
+    //   [[#mail:email@...|Display]]    → mailto link
+    //   [[#ig:@usuario|Display]]       → https://instagram.com/usuario
+    // Display text after | is optional; falls back to the raw value.
     private static readonly Regex InlineLinkPattern = new(
-        @"#(url|mail|ig):((?:https?://|@|)[^\s|]+)(?:\|([^\n#]+))?",
+        @"\[\[#(url|mail|ig):([^\]|]+)(?:\|([^\]]+))?\]\]",
         RegexOptions.Compiled);
 
     private static string ProcessInlineUrls(string? rawText)
@@ -565,7 +566,10 @@ public class StaticSiteService(
             if (!string.IsNullOrEmpty(c.EmailContacto))
                 sb.AppendLine($"""    <a href="mailto:{Esc(c.EmailContacto)}" style="display:inline-flex;align-items:center;gap:.5rem;color:var(--primary);font-weight:600;font-size:1rem">✉ {Esc(c.EmailContacto)}</a>""");
             if (!string.IsNullOrEmpty(c.Instagram))
-                sb.AppendLine($"""    <a href="https://instagram.com/{Esc(c.Instagram)}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:.5rem;color:var(--primary);font-weight:600;font-size:1rem">📷 @{Esc(c.Instagram)}</a>""");
+            {
+                var ig = c.Instagram.TrimStart('@');
+                sb.AppendLine($"""    <a href="https://instagram.com/{Esc(ig)}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:.5rem;color:var(--primary);font-weight:600;font-size:1rem">📷 @{Esc(ig)}</a>""");
+            }
             if (!string.IsNullOrEmpty(c.FormularioInscripcionUrl))
                 sb.AppendLine($"""    <a href="{Esc(c.FormularioInscripcionUrl)}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:.5rem;color:var(--primary);font-weight:600;font-size:1rem">📝 Formulario de inscripción</a>""");
             if (!string.IsNullOrEmpty(c.ContactoAdicional))
