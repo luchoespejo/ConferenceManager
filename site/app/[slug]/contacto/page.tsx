@@ -17,11 +17,11 @@ interface ConferenciaContacto {
 }
 
 // Converts inline link tags to <a> elements. Supports:
-//   #url:https://...|Texto       → plain hyperlink
-//   #mail:email@...|Texto        → mailto: link
-//   #ig:@usuario|Texto           → instagram.com profile link
+//   [[#url:https://...|Texto]]    → plain hyperlink
+//   [[#mail:email@...|Texto]]     → mailto: link
+//   [[#ig:@usuario|Texto]]        → instagram.com profile link
 // Display text after | is optional; falls back to the raw value.
-const INLINE_LINK = /#(url|mail|ig):((?:https?:\/\/|@|)[^\s|#]+)(?:\|([^\n#]+))?/g;
+const INLINE_LINK = /\[\[#(url|mail|ig):([^\]|]+)(?:\|([^\]]+))?\]\]/g;
 
 function renderInlineUrls(text: string, linkColor: string): React.ReactNode {
   const parts: React.ReactNode[] = [];

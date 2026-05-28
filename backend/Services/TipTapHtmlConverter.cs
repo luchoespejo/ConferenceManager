@@ -11,16 +11,16 @@ namespace ConferenceManager.Services;
 public static class TipTapHtmlConverter
 {
     // ── Inline link tags ─────────────────────────────────────────────────────
-    // #url:https://...|Display   → hyperlink
-    // #mail:email@...|Display    → mailto: link
-    // #ig:@usuario|Display       → instagram.com link
-    // |Display is optional; falls back to the raw value.
-    // The value part may be wrapped in inline formatting tags (e.g. <strong>@user</strong>)
-    // because the user bolded it in the editor. The regex handles optional opening/closing
-    // HTML tags around the value, and optional trailing whitespace before the closing tag.
+    // Syntax: [[#url:https://...|Display]]  [[#mail:email@...|Display]]  [[#ig:@user|Display]]
+    // Display text after | is optional; falls back to the raw value.
+    // Value/display may contain inline HTML tags (e.g. [[#ig:<strong>@user</strong>]])
+    // when the user bolded text in the editor — StripHtml() removes them before use.
     private static readonly Regex InlineLinkRe = new(
-        @"#(url|mail|ig):(?:<[^>]+>)*((?:https?://|@|)[^\s|#<>""]+)\s*(?:</[^>]+>)*(?:\|([^<>""#\n]+))?",
+        @"\[\[#(url|mail|ig):([^\]|]+)(?:\|([^\]]+))?\]\]",
         RegexOptions.Compiled);
+
+    private static readonly Regex HtmlTagRe = new(@"<[^>]+>", RegexOptions.Compiled);
+    private static string StripHtml(string s) => HtmlTagRe.Replace(s, "").Trim();
 
     /// <summary>
     /// Process inline link tags in a plain-text string (TipTap text node).
@@ -37,8 +37,8 @@ public static class TipTapHtmlConverter
         {
             sb.Append(Esc(rawText[lastIndex..m.Index]));
             var tag   = m.Groups[1].Value;
-            var value = m.Groups[2].Value.Trim();
-            var disp  = m.Groups[3].Success ? m.Groups[3].Value.Trim() : value;
+            var value = StripHtml(m.Groups[2].Value);
+            var disp  = m.Groups[3].Success ? StripHtml(m.Groups[3].Value) : value;
             var href  = tag switch
             {
                 "mail" => $"mailto:{value}",
@@ -61,8 +61,8 @@ public static class TipTapHtmlConverter
         return InlineLinkRe.Replace(html, m =>
         {
             var tag   = m.Groups[1].Value;
-            var value = m.Groups[2].Value.Trim();
-            var disp  = m.Groups[3].Success ? Esc(m.Groups[3].Value.Trim()) : Esc(value);
+            var value = StripHtml(m.Groups[2].Value);
+            var disp  = m.Groups[3].Success ? Esc(StripHtml(m.Groups[3].Value)) : Esc(value);
             var href  = tag switch
             {
                 "mail" => $"mailto:{value}",

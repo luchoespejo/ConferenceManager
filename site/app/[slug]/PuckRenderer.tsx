@@ -49,10 +49,11 @@ interface PuckData {
 //
 // globals.css: .puck-richtext a { color: inherit; text-decoration: underline; }
 
-// Value may be wrapped in inline HTML tags (e.g. <strong>@user</strong>) when
-// the user bolded it in the editor. Regex skips optional opening/closing tags
-// around the value and optional trailing whitespace before the closing tag.
-const IL_RE = /#(url|mail|ig):(?:<[^>]+>)*((?:https?:\/\/|@|)[^\s|#<>"]+)\s*(?:<\/[^>]+>)*(?:\|([^<>"#\n]+))?/g;
+// Syntax: [[#url:https://...|Display]]  [[#mail:email@...|Display]]  [[#ig:@user|Display]]
+// Value/display may contain inline HTML tags when the user bolded text in the editor.
+// stripHtml() removes them before building the href/anchor text.
+const IL_RE = /\[\[#(url|mail|ig):([^\]|]+)(?:\|([^\]]+))?\]\]/g;
+const stripHtml = (s: string) => s.replace(/<[^>]+>/g, '').trim();
 
 type TipTapMark = { type: string; attrs?: Record<string, unknown> };
 type TipTapNode = { type: string; text?: string; marks?: TipTapMark[]; content?: TipTapNode[] };
@@ -74,7 +75,7 @@ function textToHtml(raw: string): string {
   while ((m = re.exec(raw)) !== null) {
     found = true;
     if (m.index > last) parts.push(htmlEsc(raw.slice(last, m.index)));
-    const tag = m[1], val = m[2].trim(), disp = m[3]?.trim() ?? val;
+    const tag = m[1], val = stripHtml(m[2]), disp = m[3] ? stripHtml(m[3]) : val;
     parts.push(`<a href="${htmlEsc(ilHref(tag, val))}" target="_blank" rel="noopener noreferrer">${htmlEsc(disp)}</a>`);
     last = m.index + m[0].length;
   }
@@ -122,7 +123,7 @@ function contenidoToHtml(value: unknown): string {
   if (typeof value === 'string') {
     // HTML string (from getHTML()) — replace inline tags in-place without re-escaping HTML
     return value.replace(IL_RE, (_, tag, raw, display) => {
-      const v = raw.trim(), d = htmlEsc(display?.trim() ?? v);
+      const v = stripHtml(raw), d = htmlEsc(display ? stripHtml(display) : v);
       return `<a href="${htmlEsc(ilHref(tag, v))}" target="_blank" rel="noopener noreferrer">${d}</a>`;
     });
   }
