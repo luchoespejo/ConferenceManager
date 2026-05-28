@@ -769,7 +769,7 @@ public static class PuckHtmlRenderer
             sb.AppendLine($"""    <a href="{Esc(c.FormularioInscripcionUrl)}" target="_blank" rel="noopener noreferrer" style="color:#1e40af;font-weight:600;font-size:1rem">📝 Formulario de inscripción</a>""");
 
         if (!string.IsNullOrEmpty(c.ContactoAdicional))
-            sb.AppendLine($"""    <p style="font-size:.95rem;color:#475569;white-space:pre-line;margin:.5rem 0 0">{Esc(c.ContactoAdicional)}</p>""");
+            sb.AppendLine($"""    <p style="font-size:.95rem;color:#475569;white-space:pre-line;margin:.5rem 0 0">{TipTapHtmlConverter.ProcessTextInlineLinks(c.ContactoAdicional)}</p>""");
 
         sb.AppendLine("  </div>");
         sb.AppendLine("</div>");

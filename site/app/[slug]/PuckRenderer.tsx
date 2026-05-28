@@ -34,9 +34,51 @@ export interface ConferenciaPublicData {
   fechasImportantes: FechaImportante[];
 }
 
+type PuckBlock = { type: string; props: Record<string, unknown> };
+
 interface PuckData {
-  content: Array<{ type: string; props: Record<string, unknown> }>;
+  content: PuckBlock[];
   root: { props: Record<string, unknown> };
+  zones?: Record<string, PuckBlock[]>;
+}
+
+// ── Inline link pre-processing ────────────────────────────────────────────────
+// Applied to Parrafo blocks before Puck renders them.
+// Converts #url:, #mail:, #ig: tags to <a> elements inside the stored HTML string.
+// globals.css already has: .puck-richtext a { color: inherit; text-decoration: underline; }
+const INLINE_LINK_RE = /#(url|mail|ig):((?:https?:\/\/|@|)[^\s|#<>"]+)(?:\|([^<>"#\n]+))?/g;
+
+function esc(s: string) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function applyInlineLinks(html: string): string {
+  return html.replace(INLINE_LINK_RE, (_, tag, value, display) => {
+    const v = value.trim();
+    const d = esc(display?.trim() ?? v);
+    const href =
+      tag === 'mail' ? `mailto:${v}` :
+      tag === 'ig'   ? `https://instagram.com/${v.replace(/^@/, '')}` :
+      v;
+    return `<a href="${href}" target="_blank" rel="noopener noreferrer">${d}</a>`;
+  });
+}
+
+function preprocessPuckData(data: PuckData): PuckData {
+  const processBlock = (block: PuckBlock): PuckBlock => {
+    if (block.type === 'Parrafo' && typeof block.props.contenido === 'string') {
+      return { ...block, props: { ...block.props, contenido: applyInlineLinks(block.props.contenido) } };
+    }
+    return block;
+  };
+  const processedZones = data.zones
+    ? Object.fromEntries(Object.entries(data.zones).map(([k, v]) => [k, v.map(processBlock)]))
+    : undefined;
+  return {
+    ...data,
+    content: data.content.map(processBlock),
+    ...(processedZones ? { zones: processedZones } : {}),
+  };
 }
 
 interface Props {
@@ -278,5 +320,6 @@ function createPublicConfig(conf: ConferenciaPublicData): Config {
 
 export default function PuckRenderer({ puckData, conf }: Props) {
   const publicConfig = createPublicConfig(conf);
-  return <Render config={publicConfig} data={puckData} />;
+  const processedData = preprocessPuckData(puckData);
+  return <Render config={publicConfig} data={processedData} />;
 }

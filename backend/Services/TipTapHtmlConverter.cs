@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace ConferenceManager.Services;
 
@@ -9,11 +10,71 @@ namespace ConferenceManager.Services;
 /// </summary>
 public static class TipTapHtmlConverter
 {
+    // ── Inline link tags ─────────────────────────────────────────────────────
+    // #url:https://...|Display   → hyperlink
+    // #mail:email@...|Display    → mailto: link
+    // #ig:@usuario|Display       → instagram.com link
+    // |Display is optional; falls back to the raw value.
+    private static readonly Regex InlineLinkRe = new(
+        @"#(url|mail|ig):((?:https?://|@|)[^\s|#<>""]+)(?:\|([^<>""#\n]+))?",
+        RegexOptions.Compiled);
+
+    /// <summary>
+    /// Process inline link tags in a plain-text string (TipTap text node).
+    /// Surrounding text is HTML-escaped; link tags become &lt;a&gt; elements.
+    /// </summary>
+    public static string ProcessTextInlineLinks(string rawText)
+    {
+        var matches = InlineLinkRe.Matches(rawText);
+        if (matches.Count == 0) return Esc(rawText);
+
+        var sb = new StringBuilder();
+        int lastIndex = 0;
+        foreach (Match m in matches)
+        {
+            sb.Append(Esc(rawText[lastIndex..m.Index]));
+            var tag   = m.Groups[1].Value;
+            var value = m.Groups[2].Value.Trim();
+            var disp  = m.Groups[3].Success ? m.Groups[3].Value.Trim() : value;
+            var href  = tag switch
+            {
+                "mail" => $"mailto:{value}",
+                "ig"   => $"https://instagram.com/{value.TrimStart('@')}",
+                _      => value
+            };
+            sb.Append($"""<a href="{Esc(href)}" target="_blank" rel="noopener noreferrer">{Esc(disp)}</a>""");
+            lastIndex = m.Index + m.Length;
+        }
+        sb.Append(Esc(rawText[lastIndex..]));
+        return sb.ToString();
+    }
+
+    /// <summary>
+    /// Process inline link tags inside an already-HTML string (e.g. defaultProps HTML).
+    /// Does NOT re-escape surrounding context — assumes it is already valid HTML.
+    /// </summary>
+    public static string ProcessHtmlInlineLinks(string html)
+    {
+        return InlineLinkRe.Replace(html, m =>
+        {
+            var tag   = m.Groups[1].Value;
+            var value = m.Groups[2].Value.Trim();
+            var disp  = m.Groups[3].Success ? Esc(m.Groups[3].Value.Trim()) : Esc(value);
+            var href  = tag switch
+            {
+                "mail" => $"mailto:{value}",
+                "ig"   => $"https://instagram.com/{value.TrimStart('@')}",
+                _      => value
+            };
+            return $"""<a href="{Esc(href)}" target="_blank" rel="noopener noreferrer">{disp}</a>""";
+        });
+    }
+
     public static string ToHtml(JsonElement element)
     {
         return element.ValueKind switch
         {
-            JsonValueKind.String => element.GetString() ?? "",
+            JsonValueKind.String => ProcessHtmlInlineLinks(element.GetString() ?? ""),
             JsonValueKind.Object => RenderNode(element),
             _ => ""
         };
@@ -26,7 +87,9 @@ public static class TipTapHtmlConverter
 
         if (type == "text")
         {
-            var text = node.TryGetProperty("text", out var textEl) ? Esc(textEl.GetString() ?? "") : "";
+            // ProcessTextInlineLinks handles both Esc() and inline link replacement
+            var rawText = node.TryGetProperty("text", out var textEl) ? textEl.GetString() ?? "" : "";
+            var text = ProcessTextInlineLinks(rawText);
 
             if (node.TryGetProperty("marks", out var marks))
             {
