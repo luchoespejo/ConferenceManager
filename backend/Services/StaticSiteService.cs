@@ -224,7 +224,7 @@ public class StaticSiteService(
               --shadow: 0 1px 3px rgba(0,0,0,.08);
             }
             *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-            body { font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+            body { font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; background: var(--surface); color: var(--text); line-height: 1.6; }
             a { color: var(--primary); text-decoration: none; }
             a:hover { text-decoration: underline; }
             .nav { background: var(--secondary); padding: .875rem 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
@@ -292,7 +292,7 @@ public class StaticSiteService(
                 --border: #e2e8f0;
               }
               body {
-                background-color: #f1f5f9 !important;
+                background-color: #ffffff !important;
                 color: #0f172a !important;
               }
             }
