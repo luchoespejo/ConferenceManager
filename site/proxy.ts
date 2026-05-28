@@ -22,7 +22,7 @@ export function proxy(req: NextRequest) {
   const host = req.headers.get('host') ?? '';
   const hostname = host.split(':')[0]; // strip port (localhost:3000 → localhost)
   const slug = hostname.split('.')[0];
-  if (['www', 'tuplataforma', 'localhost', 'conference-manager-irl1'].includes(slug)) {
+  if (['www', 'tuplataforma', 'localhost', 'conference-manager-irl1', 'devflux'].includes(slug)) {
     return NextResponse.next();
   }
 
