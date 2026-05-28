@@ -102,7 +102,7 @@ const GOOGLE_FONTS = [
 // ── Helpers ──────────────────────────────────────────────────────────────────
 // Converts a stored value to rem. Values >4 are legacy px (divide by 16).
 // Values ≤4 are already in rem (use directly). Zero means "auto".
-function toRem(v: number, fallback = '1rem'): string {
+export function toRem(v: number, fallback = '1rem'): string {
   if (!v) return fallback;
   return v > 4 ? `${v / 16}rem` : `${v}rem`;
 }
@@ -110,7 +110,7 @@ function toRem(v: number, fallback = '1rem'): string {
 // Maps a fontSize prop to one of the fs-* CSS classes defined in globals.css.
 // Handles both new string values ("fs-2xl") and legacy numeric values (1.5, 24).
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function getFontSizeClass(fontSize: any, fallback: string): string {
+export function getFontSizeClass(fontSize: any, fallback: string): string {
   if (!fontSize) return fallback;
   if (typeof fontSize === 'string' && fontSize.startsWith('fs-')) return fontSize;
   const num = typeof fontSize === 'number' ? fontSize : parseFloat(String(fontSize));
@@ -125,7 +125,7 @@ function getFontSizeClass(fontSize: any, fallback: string): string {
   if (rem <= 2.75)   return 'fs-3xl';
   return 'fs-4xl';
 }
-function toPaddingRem(v: number, h: number): string {
+export function toPaddingRem(v: number, h: number): string {
   return `${toRem(v, '0rem')} ${toRem(h, '0rem')}`;
 }
 function toGapRem(v: number): string {

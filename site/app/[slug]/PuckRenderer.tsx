@@ -1,7 +1,7 @@
 'use client';
 
 import { Render, type Config } from '@puckeditor/core';
-import { puckConfig } from '@/lib/puck-config';
+import { puckConfig, toRem, toPaddingRem, getFontSizeClass } from '@/lib/puck-config';
 
 // ── Tipos mínimos del conf que PuckRenderer necesita ─────────────────────────
 
@@ -42,89 +42,95 @@ interface PuckData {
   zones?: Record<string, PuckBlock[]>;
 }
 
-// ── Inline link pre-processing ────────────────────────────────────────────────
-// Puck v0.21 stores richtext as TipTap JSON { type:"doc", content:[...] }.
-// RichTextRender calls generateHTML(json) → <a> links need to exist as TipTap
-// link marks BEFORE that conversion, or they are rendered as literal text.
+// ── Inline link → HTML converter ──────────────────────────────────────────────
+// We bypass Puck's lazy RichTextRender entirely for Parrafo blocks and render
+// our own HTML via dangerouslySetInnerHTML. This avoids dependency on TipTap's
+// generateJSON/generateHTML preserving our injected <a> tags.
 //
-// For HTML strings (defaultProps / legacy) we do a direct string replace.
 // globals.css: .puck-richtext a { color: inherit; text-decoration: underline; }
 
-const INLINE_LINK_RE = /#(url|mail|ig):((?:https?:\/\/|@|)[^\s|#<>"]+)(?:\|([^<>"#\n]+))?/g;
+const IL_RE = /#(url|mail|ig):((?:https?:\/\/|@|)[^\s|#<>"]+)(?:\|([^<>"#\n]+))?/g;
 
 type TipTapMark = { type: string; attrs?: Record<string, unknown> };
-type TipTapNode = { type: string; text?: string; marks?: TipTapMark[]; content?: TipTapNode[]; attrs?: Record<string, unknown> };
+type TipTapNode = { type: string; text?: string; marks?: TipTapMark[]; content?: TipTapNode[] };
 
-/** Build an href from a parsed inline link tag. */
-function inlineLinkHref(tag: string, value: string): string {
+const htmlEsc = (s: string) =>
+  s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+function ilHref(tag: string, value: string): string {
   if (tag === 'mail') return `mailto:${value}`;
   if (tag === 'ig')   return `https://instagram.com/${value.replace(/^@/, '')}`;
   return value;
 }
 
-/**
- * Split a single TipTap text node that contains inline link tags into
- * multiple nodes: plain text nodes + text nodes with a "link" mark.
- * Returns the original node unchanged if no tags are found.
- */
-function splitTextNode(node: TipTapNode): TipTapNode[] {
-  if (!node.text) return [node];
-  const text = node.text;
-  const existingMarks = node.marks ?? [];
-  const parts: TipTapNode[] = [];
-  let lastIndex = 0;
-  let found = false;
-  const re = new RegExp(INLINE_LINK_RE.source, 'g');
-  let m: RegExpExecArray | null;
-  while ((m = re.exec(text)) !== null) {
+/** Convert a text string, replacing inline link tags with <a> HTML. */
+function textToHtml(raw: string): string {
+  const re = new RegExp(IL_RE.source, 'g');
+  const parts: string[] = [];
+  let last = 0, found = false, m: RegExpExecArray | null;
+  while ((m = re.exec(raw)) !== null) {
     found = true;
-    if (m.index > lastIndex) {
-      parts.push({ type: 'text', text: text.slice(lastIndex, m.index), ...(existingMarks.length ? { marks: existingMarks } : {}) });
+    if (m.index > last) parts.push(htmlEsc(raw.slice(last, m.index)));
+    const tag = m[1], val = m[2].trim(), disp = m[3]?.trim() ?? val;
+    parts.push(`<a href="${htmlEsc(ilHref(tag, val))}" target="_blank" rel="noopener noreferrer">${htmlEsc(disp)}</a>`);
+    last = m.index + m[0].length;
+  }
+  if (!found) return htmlEsc(raw);
+  if (last < raw.length) parts.push(htmlEsc(raw.slice(last)));
+  return parts.join('');
+}
+
+/** Convert a TipTap node tree to HTML, processing inline link tags in text. */
+function tipTapToHtml(node: TipTapNode): string {
+  if (node.type === 'text') {
+    let html = textToHtml(node.text ?? '');
+    for (const m of node.marks ?? []) {
+      if (m.type === 'bold')           html = `<strong>${html}</strong>`;
+      else if (m.type === 'italic')    html = `<em>${html}</em>`;
+      else if (m.type === 'underline') html = `<u>${html}</u>`;
+      else if (m.type === 'strike')    html = `<s>${html}</s>`;
+      else if (m.type === 'link' && m.attrs?.href)
+        html = `<a href="${htmlEsc(String(m.attrs.href))}" target="_blank" rel="noopener noreferrer">${html}</a>`;
     }
-    const tag = m[1], value = m[2].trim(), display = m[3]?.trim() ?? value;
-    parts.push({
-      type: 'text',
-      text: display,
-      marks: [{ type: 'link', attrs: { href: inlineLinkHref(tag, value), target: '_blank', rel: 'noopener noreferrer' } }, ...existingMarks],
-    });
-    lastIndex = m.index + m[0].length;
+    return html;
   }
-  if (!found) return [node];
-  if (lastIndex < text.length) parts.push({ type: 'text', text: text.slice(lastIndex), ...(existingMarks.length ? { marks: existingMarks } : {}) });
-  return parts;
+  const inner = (node.content ?? []).map(tipTapToHtml).join('');
+  switch (node.type) {
+    case 'doc':           return inner;
+    case 'paragraph':     return `<p>${inner || '<br>'}</p>`;
+    case 'hardBreak':     return '<br>';
+    case 'horizontalRule':return '<hr>';
+    case 'bulletList':    return `<ul>${inner}</ul>`;
+    case 'orderedList':   return `<ol>${inner}</ol>`;
+    case 'listItem':      return `<li>${inner}</li>`;
+    case 'blockquote':    return `<blockquote>${inner}</blockquote>`;
+    default:              return inner;
+  }
 }
 
-/** Recursively walk a TipTap JSON node, expanding text nodes with link tags. */
-function walkTipTap(node: TipTapNode): TipTapNode {
-  if (!node.content?.length) return node;
-  const newContent: TipTapNode[] = [];
-  for (const child of node.content) {
-    if (child.type === 'text') newContent.push(...splitTextNode(child));
-    else newContent.push(walkTipTap(child));
-  }
-  return { ...node, content: newContent };
-}
-
-/** Apply inline link processing regardless of stored format (JSON or HTML string). */
-function processContenido(value: unknown): unknown {
-  // TipTap JSON  { type: "doc", ... }
+/**
+ * Convert any Puck richtext stored value to an HTML string with inline links.
+ * Handles: TipTap JSON { type:"doc" }, HTML string, plain text string.
+ */
+function contenidoToHtml(value: unknown): string {
   if (typeof value === 'object' && value !== null && (value as TipTapNode).type === 'doc') {
-    return walkTipTap(value as TipTapNode);
+    return tipTapToHtml(value as TipTapNode);
   }
-  // HTML / plain-text string (defaultProps or legacy)
   if (typeof value === 'string') {
-    return value.replace(INLINE_LINK_RE, (_, tag, raw, display) => {
-      const v = raw.trim(), d = (display?.trim() ?? v).replace(/</g,'&lt;').replace(/>/g,'&gt;');
-      return `<a href="${inlineLinkHref(tag, v)}" target="_blank" rel="noopener noreferrer">${d}</a>`;
+    // HTML string (from getHTML()) — replace inline tags in-place without re-escaping HTML
+    return value.replace(IL_RE, (_, tag, raw, display) => {
+      const v = raw.trim(), d = htmlEsc(display?.trim() ?? v);
+      return `<a href="${htmlEsc(ilHref(tag, v))}" target="_blank" rel="noopener noreferrer">${d}</a>`;
     });
   }
-  return value;
+  return '';
 }
 
+/** Add _html prop to Parrafo blocks so the render override can use it. */
 function preprocessPuckData(data: PuckData): PuckData {
   const processBlock = (block: PuckBlock): PuckBlock =>
     block.type === 'Parrafo'
-      ? { ...block, props: { ...block.props, contenido: processContenido(block.props.contenido) } }
+      ? { ...block, props: { ...block.props, _html: contenidoToHtml(block.props.contenido) } }
       : block;
   const processedZones = data.zones
     ? Object.fromEntries(Object.entries(data.zones).map(([k, v]) => [k, v.map(processBlock)]))
@@ -362,6 +368,30 @@ function createPublicConfig(conf: ConferenciaPublicData): Config {
               </a>
             </div>
           ) : null,
+      } as Config['components'][string],
+
+      // Parrafo → bypass Puck's RichTextRender, use our own HTML with inline links
+      Parrafo: {
+        ...(puckConfig.components.Parrafo as object),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        render: ({ _html, contenido, color, bgColor, fontSize, maxWidth, paddingV, paddingH }: any) => (
+          <div style={{ background: bgColor, padding: toPaddingRem(paddingV, paddingH) }}>
+            {_html ? (
+              <div
+                style={{ color, lineHeight: 1.7, maxWidth: maxWidth || 'none' }}
+                className={`puck-richtext ${getFontSizeClass(fontSize, 'fs-base')}`}
+                dangerouslySetInnerHTML={{ __html: _html }}
+              />
+            ) : (
+              <div
+                style={{ color, lineHeight: 1.7, maxWidth: maxWidth || 'none' }}
+                className={`puck-richtext ${getFontSizeClass(fontSize, 'fs-base')}`}
+              >
+                {contenido}
+              </div>
+            )}
+          </div>
+        ),
       } as Config['components'][string],
     },
   };
