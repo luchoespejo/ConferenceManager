@@ -16,21 +16,29 @@ interface ConferenciaContacto {
   contactoAdicional?: string;
 }
 
-// Converts #url:https://... or #url:https://...|Display Text into <a> links.
-// Supports multiple occurrences per string; preserves surrounding text.
-const INLINE_URL = /#url:(https?:\/\/[^\s|]+)(?:\|([^\n#]+))?/g;
+// Converts inline link tags to <a> elements. Supports:
+//   #url:https://...|Texto       → plain hyperlink
+//   #mail:email@...|Texto        → mailto: link
+//   #ig:@usuario|Texto           → instagram.com profile link
+// Display text after | is optional; falls back to the raw value.
+const INLINE_LINK = /#(url|mail|ig):((?:https?:\/\/|@|)[^\s|#]+)(?:\|([^\n#]+))?/g;
 
 function renderInlineUrls(text: string, linkColor: string): React.ReactNode {
   const parts: React.ReactNode[] = [];
   let lastIndex = 0;
   let match: RegExpExecArray | null;
-  INLINE_URL.lastIndex = 0;
-  while ((match = INLINE_URL.exec(text)) !== null) {
+  INLINE_LINK.lastIndex = 0;
+  while ((match = INLINE_LINK.exec(text)) !== null) {
     if (match.index > lastIndex) parts.push(text.slice(lastIndex, match.index));
-    const url = match[1].trim();
-    const display = match[2]?.trim() ?? url;
+    const tag     = match[1];
+    const value   = match[2].trim();
+    const display = match[3]?.trim() ?? value;
+    const href =
+      tag === 'mail' ? `mailto:${value}` :
+      tag === 'ig'   ? `https://instagram.com/${value.replace(/^@/, '')}` :
+      value;
     parts.push(
-      <a key={match.index} href={url} target="_blank" rel="noopener noreferrer"
+      <a key={match.index} href={href} target="_blank" rel="noopener noreferrer"
          style={{ color: linkColor, fontWeight: 600, textDecoration: 'none' }}>
         {display}
       </a>

@@ -138,22 +138,35 @@ public class StaticSiteService(
         string.IsNullOrEmpty(s) ? "" :
         s.Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;").Replace("\"", "&quot;");
 
-    // Converts #url:https://... or #url:https://...|Display Text into <a> links.
-    // Plain-text portions are HTML-encoded; URL parts are safe-embedded.
-    private static readonly Regex InlineUrlPattern =
-        new(@"#url:(https?://[^\s|]+)(?:\|([^\n#]+))?", RegexOptions.Compiled);
+    // Inline tag → hyperlink processor.
+    // Supported tags (usable in contactoAdicional and similar plain-text fields):
+    //   #url:https://...|Display   → generic link
+    //   #mail:email@...|Display    → mailto link
+    //   #ig:@usuario|Display       → https://instagram.com/usuario
+    private static readonly Regex InlineLinkPattern = new(
+        @"#(url|mail|ig):((?:https?://|@|)[^\s|]+)(?:\|([^\n#]+))?",
+        RegexOptions.Compiled);
 
     private static string ProcessInlineUrls(string? rawText)
     {
         if (string.IsNullOrEmpty(rawText)) return "";
         var sb = new StringBuilder();
         int lastIndex = 0;
-        foreach (Match m in InlineUrlPattern.Matches(rawText))
+        foreach (Match m in InlineLinkPattern.Matches(rawText))
         {
             sb.Append(Esc(rawText[lastIndex..m.Index]));
-            var url  = Esc(m.Groups[1].Value.Trim());
-            var disp = m.Groups[2].Success ? Esc(m.Groups[2].Value.Trim()) : url;
-            sb.Append($"""<a href="{url}" target="_blank" rel="noopener noreferrer" style="color:var(--primary);font-weight:600;text-decoration:none">{disp}</a>""");
+            var tag   = m.Groups[1].Value;
+            var value = m.Groups[2].Value.Trim();
+            var disp  = m.Groups[3].Success ? m.Groups[3].Value.Trim() : value;
+
+            var href = tag switch
+            {
+                "mail" => $"mailto:{value}",
+                "ig"   => $"https://instagram.com/{value.TrimStart('@')}",
+                _      => value  // #url:
+            };
+
+            sb.Append($"""<a href="{Esc(href)}" target="_blank" rel="noopener noreferrer" style="color:var(--primary);font-weight:600;text-decoration:none">{Esc(disp)}</a>""");
             lastIndex = m.Index + m.Length;
         }
         sb.Append(Esc(rawText[lastIndex..]));

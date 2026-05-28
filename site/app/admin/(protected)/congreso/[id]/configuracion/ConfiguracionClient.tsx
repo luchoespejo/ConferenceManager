@@ -345,14 +345,14 @@ export default function ConfiguracionClient({ congreso: init }: Props) {
               {lbl('Información adicional')}
               <textarea value={contactoAdicional} onChange={e => setContactoAdicional(e.target.value)} rows={3} className={inp + ' resize-y'} />
               <p className="text-xs text-slate-400 mt-1.5 leading-relaxed">
-                💡 Para agregar links usá{' '}
-                <code className="bg-slate-100 text-slate-600 px-1 py-0.5 rounded font-mono">
-                  #url:https://...
-                </code>{' '}
-                o con texto personalizado:{' '}
-                <code className="bg-slate-100 text-slate-600 px-1 py-0.5 rounded font-mono">
-                  #url:https://...|Ver formulario
-                </code>
+                💡 Tags de links:{' '}
+                <code className="bg-slate-100 text-slate-600 px-1 py-0.5 rounded font-mono">#url:https://...</code>{' '}
+                · <code className="bg-slate-100 text-slate-600 px-1 py-0.5 rounded font-mono">#mail:email@...</code>{' '}
+                · <code className="bg-slate-100 text-slate-600 px-1 py-0.5 rounded font-mono">#ig:@usuario</code>
+                {' — '}texto personalizado con{' '}
+                <code className="bg-slate-100 text-slate-600 px-1 py-0.5 rounded font-mono">|Texto</code>
+                {' '}al final. Ej:{' '}
+                <code className="bg-slate-100 text-slate-600 px-1 py-0.5 rounded font-mono">#url:https://forms.gle/abc|Inscribite aquí</code>
               </p>
             </div>
           </div>
