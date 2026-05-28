@@ -128,10 +128,16 @@ function contenidoToHtml(value: unknown): string {
 
 /** Add _html prop to Parrafo blocks so the render override can use it. */
 function preprocessPuckData(data: PuckData): PuckData {
-  const processBlock = (block: PuckBlock): PuckBlock =>
-    block.type === 'Parrafo'
-      ? { ...block, props: { ...block.props, _html: contenidoToHtml(block.props.contenido) } }
-      : block;
+  const processBlock = (block: PuckBlock): PuckBlock => {
+    if (block.type !== 'Parrafo') return block;
+    const raw = block.props.contenido;
+    const html = contenidoToHtml(raw);
+    console.log('[PuckRenderer] Parrafo block found');
+    console.log('[PuckRenderer] contenido type:', typeof raw);
+    console.log('[PuckRenderer] contenido raw:', raw);
+    console.log('[PuckRenderer] _html out:', html);
+    return { ...block, props: { ...block.props, _html: html } };
+  };
   const processedZones = data.zones
     ? Object.fromEntries(Object.entries(data.zones).map(([k, v]) => [k, v.map(processBlock)]))
     : undefined;
