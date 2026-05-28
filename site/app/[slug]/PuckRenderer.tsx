@@ -49,7 +49,10 @@ interface PuckData {
 //
 // globals.css: .puck-richtext a { color: inherit; text-decoration: underline; }
 
-const IL_RE = /#(url|mail|ig):((?:https?:\/\/|@|)[^\s|#<>"]+)(?:\|([^<>"#\n]+))?/g;
+// Value may be wrapped in inline HTML tags (e.g. <strong>@user</strong>) when
+// the user bolded it in the editor. Regex skips optional opening/closing tags
+// around the value and optional trailing whitespace before the closing tag.
+const IL_RE = /#(url|mail|ig):(?:<[^>]+>)*((?:https?:\/\/|@|)[^\s|#<>"]+)\s*(?:<\/[^>]+>)*(?:\|([^<>"#\n]+))?/g;
 
 type TipTapMark = { type: string; attrs?: Record<string, unknown> };
 type TipTapNode = { type: string; text?: string; marks?: TipTapMark[]; content?: TipTapNode[] };

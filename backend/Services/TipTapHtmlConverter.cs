@@ -15,8 +15,11 @@ public static class TipTapHtmlConverter
     // #mail:email@...|Display    → mailto: link
     // #ig:@usuario|Display       → instagram.com link
     // |Display is optional; falls back to the raw value.
+    // The value part may be wrapped in inline formatting tags (e.g. <strong>@user</strong>)
+    // because the user bolded it in the editor. The regex handles optional opening/closing
+    // HTML tags around the value, and optional trailing whitespace before the closing tag.
     private static readonly Regex InlineLinkRe = new(
-        @"#(url|mail|ig):((?:https?://|@|)[^\s|#<>""]+)(?:\|([^<>""#\n]+))?",
+        @"#(url|mail|ig):(?:<[^>]+>)*((?:https?://|@|)[^\s|#<>""]+)\s*(?:</[^>]+>)*(?:\|([^<>""#\n]+))?",
         RegexOptions.Compiled);
 
     /// <summary>
