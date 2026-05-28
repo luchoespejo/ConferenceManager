@@ -55,14 +55,40 @@ Servicios clave a conocer:
 | `QrService` | Genera QR de sesiones. |
 | `ResendEmailService` | Envío de mails (links mágicos, etc.). |
 
+## Instancias Vercel y flujo de despliegue
+
+Hay **dos instancias Vercel independientes**:
+
+| Instancia | URL | Qué sirve |
+|-----------|-----|-----------|
+| `conference-manager-irl1` | `*.vercel.app` (admin) | Next.js completo: panel admin (`/admin/...`) + rutas dinámicas `/[slug]/` que hablan con el backend |
+| `conference-manager-ten` | `conference-manager-ten.vercel.app` | **Solo HTML estático** del repo `conference-sites` — sin backend, sin Next.js runtime |
+
+### Flujo "Desplegar sitio" (el que importa para el público)
+
+```
+Admin (irl1) → click "Desplegar"
+  → Backend API → StaticSiteService
+    → PuckHtmlRenderer.RenderMainContent()   ← genera HTML de la maqueta Puck
+    → GithubPublishService                   ← push a github.com/luchoespejo/conference-sites/
+      → Vercel auto-deploy detecta el push
+        → conference-manager-ten.vercel.app/{slug}  ← URL pública final
+```
+
+**Este es el camino real del público.** `PuckHtmlRenderer` (C#) es el renderer que importa para este flujo.
+
+### Flujo dinámico (secundario, irl1)
+
+`conference-manager-irl1/{slug}` → Next.js → fetch `/api/public/{slug}` → renderiza con `PuckRenderer.tsx`. Solo accesible vía la URL del admin Vercel, no es la URL pública de los congresos.
+
 ## Mini-sitio: dos rutas de publicación
 
 El home del congreso se arma con el **maquetador Puck**. El layout se guarda como JSON en `Conferencia.LayoutJson` (y/o `ConferenciaLayout`). Ese mismo layout se renderiza por **dos caminos independientes**:
 
-1. **Sitio live (Next.js en Vercel)** — `site/app/[slug]/...`. Render React de Puck en runtime, habla con el backend. HTML/CSS controlado por `site/app/layout.tsx` + `site/app/globals.css`.
-2. **Export estático (repo `conference-sites`)** — `StaticSiteService` + `PuckHtmlRenderer` (C#) generan HTML plano servido sin backend. CSS generado en `StaticSiteService.GenerateCss()`, HTML en los templates `Generate*Html` del mismo archivo.
+1. **Export estático — camino principal** (`conference-manager-ten.vercel.app/{slug}`) — `StaticSiteService` + `PuckHtmlRenderer` (C#) generan HTML plano, push a `conference-sites`, Vercel sirve estático. CSS generado en `StaticSiteService.GenerateCss()`.
+2. **Sitio dinámico — camino secundario** (`conference-manager-irl1/{slug}`) — Next.js `site/app/[slug]/...` + `PuckRenderer.tsx` renderiza en runtime con React/Puck, habla con el backend.
 
-> **Regla clave:** cualquier cambio visual del mini-sitio que deba verse en ambos lados hay que aplicarlo **en los dos**: backend (`StaticSiteService` / `PuckHtmlRenderer`) **y** Next.js (`globals.css` / `layout.tsx`). Tocar solo uno deja el otro desactualizado.
+> **Regla clave:** cualquier cambio visual del mini-sitio que deba verse en ambos lados hay que aplicarlo **en los dos**: backend (`StaticSiteService` / `PuckHtmlRenderer`) **y** Next.js (`globals.css` / `PuckRenderer.tsx`). Tocar solo uno deja el otro desactualizado.
 
 ### Imágenes en el sitio
 
