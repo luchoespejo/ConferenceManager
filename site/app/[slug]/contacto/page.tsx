@@ -150,12 +150,12 @@ export default async function ContactoPage({ params }: { params: Promise<{ slug:
             )}
             {conf.instagram && (
               <a
-                href={`https://instagram.com/${conf.instagram}`}
+                href={`https://instagram.com/${conf.instagram.replace(/^@/, '')}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{ display: 'inline-flex', alignItems: 'center', gap: '.5rem', color: primary, fontWeight: 600, fontSize: '1rem', textDecoration: 'none' }}
               >
-                📷 @{conf.instagram}
+                📷 @{conf.instagram.replace(/^@/, '')}
               </a>
             )}
             {conf.formularioInscripcionUrl && (

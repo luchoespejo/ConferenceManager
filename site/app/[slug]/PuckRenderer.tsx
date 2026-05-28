@@ -283,9 +283,9 @@ function createPublicConfig(conf: ConferenciaPublicData): Config {
                   </a>
                 )}
                 {conf.instagram && (
-                  <a href={`https://instagram.com/${conf.instagram}`} target="_blank" rel="noopener noreferrer"
+                  <a href={`https://instagram.com/${conf.instagram.replace(/^@/, '')}`} target="_blank" rel="noopener noreferrer"
                     style={{ color: '#fff', fontWeight: 700, fontSize: '1rem', textDecoration: 'none' }}>
-                    @{conf.instagram}
+                    @{conf.instagram.replace(/^@/, '')}
                   </a>
                 )}
                 {conf.formularioInscripcionUrl && (
