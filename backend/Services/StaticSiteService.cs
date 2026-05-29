@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.IO.Compression;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using ConferenceManager.Data;
 using ConferenceManager.Models;
@@ -22,7 +23,8 @@ public class StaticSiteService(
         bool TieneSesiones,
         bool TieneExpositores,
         bool MostrarInscripciones,
-        bool MostrarContacto
+        bool MostrarContacto,
+        bool MostrarInformacion
     );
 
     /// <summary>
@@ -36,9 +38,11 @@ public class StaticSiteService(
         if (nav.TieneExpositores)
             links.Append($"""<a href="{prefix}expositores.html">Expositores</a>""");
         if (nav.MostrarInscripciones)
-            links.Append($"""<a href="{prefix}inscripciones.html" style="font-weight:700">Inscripciones</a>""");
+            links.Append($"""<a href="{prefix}inscripciones.html">Inscripciones</a>""");
         if (nav.MostrarContacto)
             links.Append($"""<a href="{prefix}contacto.html">Contacto</a>""");
+        if (nav.MostrarInformacion)
+            links.Append($"""<a href="{prefix}informacion.html">Información</a>""");
 
         return $"""
             <nav class="nav">
@@ -95,7 +99,8 @@ public class StaticSiteService(
             TieneSesiones:        sesiones.Count > 0,
             TieneExpositores:     expositores.Count > 0,
             MostrarInscripciones: conferencia.MostrarInscripciones,
-            MostrarContacto:      hasContacto
+            MostrarContacto:      hasContacto,
+            MostrarInformacion:   conferencia.MostrarInformacion
         );
 
         using var ms = new MemoryStream();
@@ -119,6 +124,9 @@ public class StaticSiteService(
 
             if (nav.MostrarInscripciones)
                 AddTextEntry(zip, "inscripciones.html", GenerateInscripcionesHtml(conferencia, nav));
+
+            if (nav.MostrarInformacion)
+                AddTextEntry(zip, "informacion.html", GenerateInformacionHtml(conferencia, nav));
 
             foreach (var sesion in sesiones)
                 AddTextEntry(zip, $"s/{sesion.Id}/index.html", GenerateSesionHtml(conferencia, sesion, nav));
@@ -553,6 +561,12 @@ public class StaticSiteService(
                 sb.AppendLine($"""  <p style="font-size:.95rem;color:#475569;margin-bottom:.75rem">📍 {Esc(c.VenueDireccion)}</p>""");
             if (!string.IsNullOrEmpty(c.VenueLinkMaps))
                 sb.AppendLine($"""  <a href="{Esc(c.VenueLinkMaps)}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:.4rem;background:var(--primary);color:#fff;font-weight:600;padding:8px 18px;border-radius:8px;text-decoration:none;font-size:.9rem;margin-bottom:1.25rem">🗺 Abrir en Google Maps</a>""");
+            var mapQuery = Uri.EscapeDataString(c.VenueDireccion ?? c.VenueNombre ?? "");
+            if (!string.IsNullOrEmpty(mapQuery))
+            {
+                var iframeSrc = $"https://maps.google.com/maps?q={mapQuery}&output=embed&hl=es";
+                sb.AppendLine($"""  <div style="border-radius:12px;overflow:hidden;border:1px solid #e2e8f0;margin-top:.75rem"><iframe src="{iframeSrc}" width="100%" height="320" style="border:0;display:block" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Mapa {Esc(c.VenueNombre ?? c.Nombre)}"></iframe></div>""");
+            }
             sb.AppendLine("</section>");
         }
 
@@ -600,15 +614,72 @@ public class StaticSiteService(
             """;
     }
 
+    // ── Aranceles JSON → HTML table ───────────────────────────────────────────
+
+    private record ArancelFila(string Categoria, string Monto);
+    private record ArancelesData(List<ArancelFila> Filas, string? Nota = null);
+
+    private static string RenderAranceles(string? json)
+    {
+        if (string.IsNullOrWhiteSpace(json)) return "";
+        try
+        {
+            var opts = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            List<ArancelFila>? filas = null;
+            string? nota = null;
+
+            // Try array format: [{categoria, monto}]
+            if (json.TrimStart().StartsWith('['))
+            {
+                filas = JsonSerializer.Deserialize<List<ArancelFila>>(json, opts);
+            }
+            else
+            {
+                // Try object format: {filas:[...], nota:"..."}
+                var obj = JsonSerializer.Deserialize<ArancelesData>(json, opts);
+                filas = obj?.Filas;
+                nota  = obj?.Nota;
+            }
+
+            if (filas is null || filas.Count == 0) return $"""<p style="color:#374151;white-space:pre-line;margin-bottom:1.5rem;font-size:.9375rem;line-height:1.7">{Esc(json)}</p>""";
+
+            var rows = new StringBuilder();
+            foreach (var f in filas)
+                rows.Append($"""<tr><td style="padding:.6rem 1rem;border-bottom:1px solid #e2e8f0">{Esc(f.Categoria)}</td><td style="padding:.6rem 1rem;border-bottom:1px solid #e2e8f0;text-align:right">{Esc(f.Monto)}</td></tr>""");
+
+            var tableHtml = $"""
+                <div style="margin-bottom:1.5rem;overflow-x:auto">
+                  <table style="width:100%;border-collapse:collapse;font-size:.9375rem">
+                    <thead>
+                      <tr style="background:#f1f5f9">
+                        <th style="padding:.6rem 1rem;text-align:left;font-weight:600;color:#1e293b">Categoría</th>
+                        <th style="padding:.6rem 1rem;text-align:right;font-weight:600;color:#1e293b">Monto</th>
+                      </tr>
+                    </thead>
+                    <tbody>{rows}</tbody>
+                  </table>
+                </div>
+                """;
+
+            return !string.IsNullOrWhiteSpace(nota)
+                ? tableHtml + $"""<p style="font-size:.875rem;color:#475569;white-space:pre-line;margin-top:.5rem">{ProcessInlineUrls(nota)}</p>"""
+                : tableHtml;
+        }
+        catch
+        {
+            return $"""<p style="color:#374151;white-space:pre-line;margin-bottom:1.5rem;font-size:.9375rem;line-height:1.7">{Esc(json)}</p>""";
+        }
+    }
+
     private static string GenerateInscripcionesHtml(Conferencia c, NavConfig nav)
     {
         var sb = new StringBuilder();
         if (!string.IsNullOrEmpty(c.ArancelesTexto))
-            sb.AppendLine($"""<p style="color:#374151;white-space:pre-line;margin-bottom:1.5rem;font-size:.9375rem;line-height:1.7">{Esc(c.ArancelesTexto)}</p>""");
+            sb.AppendLine(RenderAranceles(c.ArancelesTexto));
         if (!string.IsNullOrEmpty(c.FormularioInscripcionUrl))
             sb.AppendLine($"""<a href="{Esc(c.FormularioInscripcionUrl)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary">📝 Formulario de inscripción</a>""");
         if (!string.IsNullOrEmpty(c.InformacionPago))
-            sb.AppendLine($"""<div style="margin-top:1.5rem;padding:1.25rem;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px"><h3 style="font-size:1rem;font-weight:600;margin-bottom:.5rem">Información de pago</h3><p style="font-size:.9rem;color:#475569;white-space:pre-line">{Esc(c.InformacionPago)}</p></div>""");
+            sb.AppendLine($"""<div style="margin-top:1.5rem;padding:1.25rem;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px"><h3 style="font-size:1rem;font-weight:600;margin-bottom:.5rem">Información de pago</h3><div style="font-size:.9rem;color:#475569">{TipTapHtmlConverter.ProcessHtmlInlineLinks(c.InformacionPago)}</div></div>""");
 
         var navHtml = BuildNav(c, nav);
         return $$"""
@@ -626,6 +697,35 @@ public class StaticSiteService(
               <div class="container" style="max-width:700px">
                 <h2 class="section-title">Inscripciones</h2>
                 {{sb}}
+              </div>
+              <footer class="footer">{{Esc(c.Nombre)}}</footer>
+            </body>
+            </html>
+            """;
+    }
+
+    private static string GenerateInformacionHtml(Conferencia c, NavConfig nav)
+    {
+        var contentHtml = !string.IsNullOrWhiteSpace(c.InformacionAdicional)
+            ? TipTapHtmlConverter.ProcessHtmlInlineLinks(c.InformacionAdicional)
+            : "";
+
+        var navHtml = BuildNav(c, nav);
+        return $$"""
+            <!DOCTYPE html>
+            <html lang="es">
+            <head>
+              <meta charset="UTF-8" />
+              <meta name="viewport" content="width=device-width, initial-scale=1" />
+              <meta name="color-scheme" content="light" />
+              <title>Información — {{Esc(c.Nombre)}}</title>
+              <link rel="stylesheet" href="assets/style.css" />
+            </head>
+            <body>
+              {{navHtml}}
+              <div class="container" style="max-width:760px">
+                <h2 class="section-title">Información</h2>
+                <div class="puck-richtext" style="line-height:1.7;color:#1e293b">{{contentHtml}}</div>
               </div>
               <footer class="footer">{{Esc(c.Nombre)}}</footer>
             </body>

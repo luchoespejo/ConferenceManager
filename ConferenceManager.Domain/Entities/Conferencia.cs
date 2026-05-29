@@ -44,6 +44,10 @@ public class Conferencia
     public bool MostrarContacto { get; set; } = true;
     public bool MostrarInscripciones { get; set; } = false;
 
+    // Información adicional (richtext HTML)
+    public string? InformacionAdicional { get; set; }
+    public bool MostrarInformacion { get; set; } = false;
+
     public Usuario Usuario { get; set; } = null!;
 
     // US-11: navigation properties

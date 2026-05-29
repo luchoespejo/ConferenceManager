@@ -10,8 +10,10 @@ interface Congreso {
   venueNombre?: string | null; venueDireccion?: string | null; venueLinkMaps?: string | null;
   emailContacto?: string | null; instagram?: string | null;
   formularioInscripcionUrl?: string | null; arancelesTexto?: string | null; informacionPago?: string | null; contactoAdicional?: string | null;
+  informacionAdicional?: string | null;
   mostrarFechas: boolean; mostrarDescripcion: boolean; mostrarOrganizadores: boolean;
   mostrarContacto: boolean; mostrarInscripciones: boolean;
+  mostrarInformacion: boolean;
   logoUrl?: string | null; bannerUrl?: string | null;
 }
 

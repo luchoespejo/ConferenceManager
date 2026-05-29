@@ -27,6 +27,8 @@ export interface UpdateCongresoData {
   mostrarOrganizadores?: boolean;
   mostrarContacto?: boolean;
   mostrarInscripciones?: boolean;
+  informacionAdicional?: string;
+  mostrarInformacion?: boolean;
   logoUrl?: string;
   bannerUrl?: string;
 }

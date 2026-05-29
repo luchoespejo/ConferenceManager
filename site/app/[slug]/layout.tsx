@@ -11,6 +11,7 @@ interface ConferenciaBasica {
   colorPrimario?: string;
   mostrarInscripciones?: boolean;
   mostrarContacto?: boolean;
+  mostrarInformacion?: boolean;
   tieneSesiones?: boolean;
   tieneExpositores?: boolean;
   venueNombre?: string;
@@ -69,12 +70,13 @@ export default async function SlugLayout({
             <Link href={`/${slug}/expositores`} className="site-nav-link">Expositores</Link>
           )}
           {conf.mostrarInscripciones && (
-            <Link href={`/${slug}/inscripciones`} className="site-nav-link" style={{ fontWeight: 700 }}>
-              Inscripciones
-            </Link>
+            <Link href={`/${slug}/inscripciones`} className="site-nav-link">Inscripciones</Link>
           )}
           {(conf.mostrarContacto || conf.venueNombre || conf.venueDireccion || conf.emailContacto || conf.instagram) && (
             <Link href={`/${slug}/contacto`} className="site-nav-link">Contacto</Link>
+          )}
+          {conf.mostrarInformacion && (
+            <Link href={`/${slug}/informacion`} className="site-nav-link">Información</Link>
           )}
         </div>
       </nav>

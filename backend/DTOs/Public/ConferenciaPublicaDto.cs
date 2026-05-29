@@ -70,6 +70,10 @@ public class ConferenciaPublicaDto
     public bool MostrarContacto { get; set; }
     public bool MostrarInscripciones { get; set; }
     public bool TieneSesiones { get; set; }
+
+    // Información adicional (richtext HTML)
+    public string? InformacionAdicional { get; set; }
+    public bool MostrarInformacion { get; set; }
     public bool TieneExpositores { get; set; }
     public string? LayoutJson { get; set; }
 

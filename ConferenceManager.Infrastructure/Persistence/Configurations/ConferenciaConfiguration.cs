@@ -93,6 +93,14 @@ public class ConferenciaConfiguration : IEntityTypeConfiguration<Conferencia>
         builder.Property(c => c.ContactoAdicional)
             .HasColumnType("text");
 
+        // Información adicional (richtext HTML)
+        builder.Property(c => c.InformacionAdicional)
+            .HasColumnType("text");
+
+        builder.Property(c => c.MostrarInformacion)
+            .IsRequired()
+            .HasDefaultValue(false);
+
         // US-11: section visibility flags with explicit defaults
         builder.Property(c => c.MostrarFechas)
             .IsRequired()
