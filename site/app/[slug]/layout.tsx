@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
-import Link from 'next/link';
 import AvisosUrgentes from './AvisosUrgentes';
+import SlugNav from '@/components/SlugNav';
 
 export const dynamic = 'force-dynamic';
 
@@ -51,35 +51,26 @@ export default async function SlugLayout({
       : `${backend}${conf.logoUrl}`
     : null;
 
+  const mostrarContacto =
+    conf.mostrarContacto ||
+    !!conf.venueNombre ||
+    !!conf.venueDireccion ||
+    !!conf.emailContacto ||
+    !!conf.instagram;
+
   return (
     <>
-      <nav className="site-nav" style={{ background: primary }}>
-        <Link href={`/${slug}`} className="site-nav-brand">
-          {logoSrc ? (
-            <img src={logoSrc} alt={conf.nombre} style={{ height: '36px', width: 'auto', objectFit: 'contain' }} />
-          ) : (
-            <span>Inicio</span>
-          )}
-        </Link>
-        <div className="site-nav-spacer" />
-        <div className="site-nav-links">
-          {conf.tieneSesiones && (
-            <Link href={`/${slug}/programa`} className="site-nav-link">Programa</Link>
-          )}
-          {conf.tieneExpositores && (
-            <Link href={`/${slug}/expositores`} className="site-nav-link">Expositores</Link>
-          )}
-          {conf.mostrarInscripciones && (
-            <Link href={`/${slug}/inscripciones`} className="site-nav-link">Inscripciones</Link>
-          )}
-          {(conf.mostrarContacto || conf.venueNombre || conf.venueDireccion || conf.emailContacto || conf.instagram) && (
-            <Link href={`/${slug}/contacto`} className="site-nav-link">Contacto</Link>
-          )}
-          {conf.mostrarInformacion && (
-            <Link href={`/${slug}/informacion`} className="site-nav-link">Información</Link>
-          )}
-        </div>
-      </nav>
+      <SlugNav
+        slug={slug}
+        primary={primary}
+        logoSrc={logoSrc}
+        nombre={conf.nombre}
+        tieneSesiones={conf.tieneSesiones}
+        tieneExpositores={conf.tieneExpositores}
+        mostrarInscripciones={conf.mostrarInscripciones}
+        mostrarContacto={mostrarContacto}
+        mostrarInformacion={conf.mostrarInformacion}
+      />
       <AvisosUrgentes slug={slug} />
       {children}
     </>

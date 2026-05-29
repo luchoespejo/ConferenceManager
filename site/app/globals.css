@@ -137,9 +137,40 @@ body {
 .ProseMirror a { color: #2563eb; text-decoration: underline; }
 .ProseMirror:focus { outline: none; }
 
-@media (max-width: 540px) {
+/* Hamburger button — hidden on desktop */
+.site-nav-burger {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.35rem;
+  color: #fff;
+  line-height: 0;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+@media (max-width: 640px) {
   .site-nav { padding: 0.625rem 1rem; gap: 0.5rem; flex-wrap: wrap; }
   .site-nav-spacer { display: none; }
-  .site-nav-links { width: 100%; gap: 0.625rem; padding-bottom: 0.25rem; flex-wrap: wrap; }
+  .site-nav-burger { display: flex; align-items: center; }
+  /* Links hidden by default on mobile */
+  .site-nav-links {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    gap: 0;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(255,255,255,.2);
+  }
+  /* Toggle open */
+  .site-nav-links--open {
+    display: flex;
+  }
+  .site-nav-link {
+    padding: 0.55rem 0.25rem;
+    font-size: .9rem;
+    min-height: unset;
+  }
   .site-nav-brand span { font-size: .95rem; }
 }

@@ -39,14 +39,17 @@ public class StaticSiteService(
             links.Append($"""<a href="{prefix}expositores.html">Expositores</a>""");
         if (nav.MostrarInscripciones)
             links.Append($"""<a href="{prefix}inscripciones.html">Inscripciones</a>""");
-        if (nav.MostrarContacto)
-            links.Append($"""<a href="{prefix}contacto.html">Contacto</a>""");
         if (nav.MostrarInformacion)
             links.Append($"""<a href="{prefix}informacion.html">Información</a>""");
+        if (nav.MostrarContacto)
+            links.Append($"""<a href="{prefix}contacto.html">Contacto</a>""");
+
+        var burgerSvg = """<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>""";
 
         return $"""
             <nav class="nav">
               <a href="{prefix}index.html" class="nav-brand">Inicio</a>
+              <button class="nav-burger" onclick="this.closest('nav').querySelector('.nav-links').classList.toggle('open')" aria-label="Menú">{burgerSvg}</button>
               <div class="nav-links">{links}</div>
             </nav>
             """;
@@ -235,12 +238,20 @@ public class StaticSiteService(
             body { font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; background: var(--surface); color: var(--text); line-height: 1.6; }
             a { color: var(--primary); text-decoration: none; }
             a:hover { text-decoration: underline; }
-            .nav { background: var(--secondary); padding: .875rem 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
-            .nav-brand { color: #fff; font-weight: 700; font-size: 1.05rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60%; }
+            .nav { background: var(--secondary); padding: .875rem 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+            .nav-brand { color: #fff; font-weight: 700; font-size: 1.05rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70%; }
             .nav-brand:hover { text-decoration: none; opacity: .85; }
+            .nav-burger { display: none; background: none; border: none; cursor: pointer; padding: .35rem; color: #fff; line-height: 0; flex-shrink: 0; }
             .nav-links { display: flex; gap: .375rem; flex-shrink: 0; }
-            .nav-links a { color: rgba(255,255,255,.8); font-size: .875rem; padding: .3rem .7rem; border-radius: 5px; transition: background .15s; }
+            .nav-links a { color: rgba(255,255,255,.8); font-size: .875rem; padding: .3rem .7rem; border-radius: 5px; transition: background .15s; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; }
             .nav-links a:hover { background: rgba(255,255,255,.12); text-decoration: none; color: #fff; }
+            @media (max-width: 640px) {
+              .nav { padding: .75rem 1rem; }
+              .nav-burger { display: flex; align-items: center; }
+              .nav-links { display: none; width: 100%; flex-direction: column; gap: 0; padding-top: .5rem; border-top: 1px solid rgba(255,255,255,.2); }
+              .nav-links.open { display: flex; }
+              .nav-links a { padding: .6rem .5rem; font-size: .9rem; }
+            }
             .hero { background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: #fff; padding: 3.5rem 1.5rem; text-align: center; }
             .hero-logo { max-height: 64px; max-width: 200px; display: block; margin: 0 auto 1.25rem; object-fit: contain; }
             .hero h1 { font-size: clamp(1.75rem, 5vw, 2.75rem); font-weight: 800; letter-spacing: -.025em; margin-bottom: .5rem; }
