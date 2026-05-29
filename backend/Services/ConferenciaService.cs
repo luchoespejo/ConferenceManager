@@ -166,11 +166,13 @@ public class ConferenciaService(AppDbContext context) : IConferenciaService
         conferencia.ArancelesTexto = dto.ArancelesTexto;
         conferencia.InformacionPago = dto.InformacionPago;
         conferencia.ContactoAdicional = dto.ContactoAdicional;
+        conferencia.InformacionAdicional = dto.InformacionAdicional;
         if (dto.MostrarFechas.HasValue) conferencia.MostrarFechas = dto.MostrarFechas.Value;
         if (dto.MostrarDescripcion.HasValue) conferencia.MostrarDescripcion = dto.MostrarDescripcion.Value;
         if (dto.MostrarOrganizadores.HasValue) conferencia.MostrarOrganizadores = dto.MostrarOrganizadores.Value;
         if (dto.MostrarContacto.HasValue) conferencia.MostrarContacto = dto.MostrarContacto.Value;
         if (dto.MostrarInscripciones.HasValue) conferencia.MostrarInscripciones = dto.MostrarInscripciones.Value;
+        if (dto.MostrarInformacion.HasValue) conferencia.MostrarInformacion = dto.MostrarInformacion.Value;
 
         await context.SaveChangesAsync();
 
@@ -337,6 +339,8 @@ public class ConferenciaService(AppDbContext context) : IConferenciaService
         MostrarOrganizadores = c.MostrarOrganizadores,
         MostrarContacto = c.MostrarContacto,
         MostrarInscripciones = c.MostrarInscripciones,
+        InformacionAdicional = c.InformacionAdicional,
+        MostrarInformacion = c.MostrarInformacion,
         CreadoEn = c.CreatedAt
     };
 }

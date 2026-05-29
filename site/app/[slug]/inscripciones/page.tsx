@@ -111,7 +111,11 @@ export default async function InscripcionesPage({ params }: { params: Promise<{ 
           <h2 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '1rem', color: pageColor, borderBottom: `3px solid ${primary}`, paddingBottom: '.5rem' }}>
             Formas de pago
           </h2>
-          <p style={{ whiteSpace: 'pre-line', color: pageColor, opacity: .85, lineHeight: 1.7 }}>{conf.informacionPago}</p>
+          {/* Render as HTML (richtext) if content looks like HTML, else as plain text */}
+          {conf.informacionPago.trimStart().startsWith('<')
+            ? <div style={{ color: pageColor, opacity: .85, lineHeight: 1.7 }} className="puck-richtext" dangerouslySetInnerHTML={{ __html: conf.informacionPago }} />
+            : <p style={{ whiteSpace: 'pre-line', color: pageColor, opacity: .85, lineHeight: 1.7 }}>{conf.informacionPago}</p>
+          }
         </section>
       )}
 

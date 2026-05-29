@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import ImageUpload from '../../../_components/ImageUpload';
+import RichTextEditor from '@/components/admin/RichTextEditor';
 import { updateCongreso, type UpdateCongresoData } from './actions';
 
 interface ArancelFila { id: string; categoria: string; monto: string; }
@@ -16,8 +17,10 @@ interface Congreso {
   emailContacto?: string | null; instagram?: string | null;
   formularioInscripcionUrl?: string | null; arancelesTexto?: string | null;
   informacionPago?: string | null; contactoAdicional?: string | null;
+  informacionAdicional?: string | null;
   mostrarFechas: boolean; mostrarDescripcion: boolean; mostrarOrganizadores: boolean;
   mostrarContacto: boolean; mostrarInscripciones: boolean;
+  mostrarInformacion: boolean;
   logoUrl?: string | null; bannerUrl?: string | null;
 }
 
@@ -73,6 +76,10 @@ export default function ConfiguracionClient({ congreso: init }: Props) {
   const [instagram, setInstagram] = useState(init.instagram ?? '');
   const [contactoAdicional, setContactoAdicional] = useState(init.contactoAdicional ?? '');
 
+  // Información adicional
+  const [mostrarInformacion, setMostrarInformacion] = useState(init.mostrarInformacion ?? false);
+  const [informacionAdicional, setInformacionAdicional] = useState(init.informacionAdicional ?? '');
+
   const notify = (msg: string, ok = true) => {
     setToast({ msg, ok });
     setTimeout(() => setToast(null), 4000);
@@ -111,6 +118,9 @@ export default function ConfiguracionClient({ congreso: init }: Props) {
       ...(emailContacto ? { emailContacto } : {}),
       ...(instagram ? { instagram } : {}),
       ...(contactoAdicional ? { contactoAdicional } : {}),
+      // Información adicional
+      mostrarInformacion,
+      ...(informacionAdicional ? { informacionAdicional } : {}),
       // Preservar flags no expuestos en la UI
       mostrarFechas: init.mostrarFechas,
       mostrarDescripcion: init.mostrarDescripcion,
@@ -219,6 +229,27 @@ export default function ConfiguracionClient({ congreso: init }: Props) {
           </div>
         </section>
 
+        {/* ── Información adicional ───────────────────────────────────────────── */}
+        <section className="bg-white border border-slate-200 rounded-xl p-5">
+          <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+            <h2 className="font-semibold text-slate-800">Información</h2>
+            <Toggle value={mostrarInformacion} onChange={setMostrarInformacion} label="Mostrar tab" />
+          </div>
+          {mostrarInformacion && (
+            <div className="flex flex-col gap-3">
+              <div>
+                {lbl('Contenido')}
+                <RichTextEditor
+                  value={informacionAdicional}
+                  onChange={setInformacionAdicional}
+                  placeholder="Escribí aquí la información adicional del congreso..."
+                />
+                <p className="text-xs text-slate-400 mt-1">Soporta negrita, listas y links. Podés escribir <code>[[#url:https://...]]</code>, <code>[[#mail:email@...]]</code> para links especiales.</p>
+              </div>
+            </div>
+          )}
+        </section>
+
         </div>{/* /Col 1 */}
 
         {/* ── Col 2: Inscripciones + Ubicación + Contacto ────────────────────── */}
@@ -295,7 +326,12 @@ export default function ConfiguracionClient({ congreso: init }: Props) {
 
             <div>
               {lbl('Información de pago')}
-              <textarea value={infoPago} onChange={e => setInfoPago(e.target.value)} rows={2} placeholder="CBU, alias, transferencia..." className={inp + ' resize-y'} />
+              <RichTextEditor
+                value={infoPago}
+                onChange={setInfoPago}
+                placeholder="CBU, alias, transferencia..."
+              />
+              <p className="text-xs text-slate-400 mt-1">Soporta negrita, listas y links. Podés escribir <code>[[#url:https://...]]</code>, <code>[[#mail:email@...]]</code> para links especiales.</p>
             </div>
           </div>
         </section>

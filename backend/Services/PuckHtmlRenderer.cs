@@ -265,10 +265,7 @@ public static class PuckHtmlRenderer
         var contenidoHtml = "";
         if (p.ValueKind != JsonValueKind.Undefined && p.TryGetProperty("contenido", out var contenidoEl))
         {
-            Console.WriteLine($"[PuckHtmlRenderer] Parrafo contenido type: {contenidoEl.ValueKind}");
-            Console.WriteLine($"[PuckHtmlRenderer] Parrafo contenido raw: {contenidoEl}");
             contenidoHtml = TipTapHtmlConverter.ToHtml(contenidoEl);
-            Console.WriteLine($"[PuckHtmlRenderer] Parrafo contenidoHtml out: {contenidoHtml}");
         }
 
         var wrapStyle  = $"background:{Esc(bgColor)};padding:{RemVal(paddingV)} {RemVal(paddingH)}";

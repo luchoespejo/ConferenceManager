@@ -136,10 +136,6 @@ function preprocessPuckData(data: PuckData): PuckData {
     if (block.type !== 'Parrafo') return block;
     const raw = block.props.contenido;
     const html = contenidoToHtml(raw);
-    console.log('[PuckRenderer] Parrafo block found');
-    console.log('[PuckRenderer] contenido type:', typeof raw);
-    console.log('[PuckRenderer] contenido raw:', raw);
-    console.log('[PuckRenderer] _html out:', html);
     return { ...block, props: { ...block.props, _html: html } };
   };
   const processedZones = data.zones
