@@ -349,8 +349,10 @@ public class StaticSiteService(
                 /* Puck richtext */
                 .puck-richtext h1,.puck-richtext h2,.puck-richtext h3,
                 .puck-richtext h4,.puck-richtext h5,.puck-richtext h6 { font-size: inherit; font-weight: 700; margin: .5em 0 .25em; }
-                .puck-richtext p { margin: .5em 0; }
-                .puck-richtext ul, .puck-richtext ol { padding-left: 1.5em; margin: .5em 0; }
+                .puck-richtext p { margin: .5em 0 .85em; }
+                .puck-richtext ul { list-style: disc; padding-left: 1.5em; margin: .5em 0 .85em 1em; }
+                .puck-richtext ol { list-style: decimal; padding-left: 1.5em; margin: .5em 0 .85em 1em; }
+                .puck-richtext li { margin-bottom: .3em; }
                 .puck-richtext strong { font-weight: 700; }
                 .puck-richtext em { font-style: italic; }
                 .puck-richtext a { color: var(--primary); text-decoration: underline; }
