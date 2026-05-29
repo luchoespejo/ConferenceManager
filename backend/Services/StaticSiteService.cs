@@ -583,7 +583,7 @@ public class StaticSiteService(
         }
 
         var hasContactInfo = !string.IsNullOrEmpty(c.EmailContacto) || !string.IsNullOrEmpty(c.Instagram) ||
-                             !string.IsNullOrEmpty(c.FormularioInscripcionUrl) || !string.IsNullOrEmpty(c.ContactoAdicional);
+                             !string.IsNullOrEmpty(c.ContactoAdicional);
         if (hasContactInfo)
         {
             sb.AppendLine("""<section>""");
@@ -596,8 +596,7 @@ public class StaticSiteService(
                 var ig = c.Instagram.TrimStart('@');
                 sb.AppendLine($"""    <a href="https://instagram.com/{Esc(ig)}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:.5rem;color:var(--primary);font-weight:600;font-size:1rem">📷 @{Esc(ig)}</a>""");
             }
-            if (!string.IsNullOrEmpty(c.FormularioInscripcionUrl))
-                sb.AppendLine($"""    <a href="{Esc(c.FormularioInscripcionUrl)}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:.5rem;color:var(--primary);font-weight:600;font-size:1rem">📝 Formulario de inscripción</a>""");
+            // formularioInscripcionUrl intentionally omitted — shown only in inscripciones.html
             if (!string.IsNullOrEmpty(c.ContactoAdicional))
                 sb.AppendLine($"""    <p style="font-size:.95rem;color:#475569;white-space:pre-line;margin-top:.5rem">{ProcessInlineUrls(c.ContactoAdicional)}</p>""");
             sb.AppendLine("  </div>");

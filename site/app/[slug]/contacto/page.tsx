@@ -12,7 +12,6 @@ interface ConferenciaContacto {
   venueLinkMaps?: string;
   emailContacto?: string;
   instagram?: string;
-  formularioInscripcionUrl?: string;
   contactoAdicional?: string;
 }
 
@@ -68,7 +67,7 @@ export default async function ContactoPage({ params }: { params: Promise<{ slug:
   const primary = conf.colorPrimario ?? '#1a1a2e';
 
   const hasVenue = conf.venueNombre || conf.venueDireccion;
-  const hasContacto = conf.emailContacto || conf.instagram || conf.formularioInscripcionUrl || conf.contactoAdicional;
+  const hasContacto = conf.emailContacto || conf.instagram || conf.contactoAdicional;
 
   const mapQuery = conf.venueDireccion
     ? encodeURIComponent(conf.venueDireccion)
@@ -142,16 +141,7 @@ export default async function ContactoPage({ params }: { params: Promise<{ slug:
                 📷 @{conf.instagram.replace(/^@/, '')}
               </a>
             )}
-            {conf.formularioInscripcionUrl && (
-              <a
-                href={conf.formularioInscripcionUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ display: 'inline-flex', alignItems: 'center', gap: '.5rem', color: primary, fontWeight: 600, fontSize: '1rem', textDecoration: 'none' }}
-              >
-                📝 Formulario de inscripción
-              </a>
-            )}
+            {/* formularioInscripcionUrl shown only in Inscripciones, not here */}
             {conf.contactoAdicional && (
               <p style={{ fontSize: '.95rem', color: '#475569', whiteSpace: 'pre-line', marginTop: '.5rem' }}>
                 {renderInlineUrls(conf.contactoAdicional, primary)}
