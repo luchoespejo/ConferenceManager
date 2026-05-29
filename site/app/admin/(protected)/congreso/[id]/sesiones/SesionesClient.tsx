@@ -75,7 +75,15 @@ export default function SesionesClient({ congresoId, initialSesiones, salas, exp
           notify('Sesión creada');
         }
         cancelar(); router.refresh();
-      } catch { notify('Error al guardar', false); }
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : 'Error al guardar';
+        const isDateRange = msg.includes('INVALID_DATE_RANGE');
+        notify(isDateRange
+          ? 'La fecha de la sesión está fuera del rango del congreso. Revisá las fechas en Configuración.'
+          : msg.includes('INVALID_TIME') ? 'La hora de inicio debe ser anterior a la hora de fin.'
+          : 'Error al guardar la sesión.',
+          false);
+      }
     });
   };
 
