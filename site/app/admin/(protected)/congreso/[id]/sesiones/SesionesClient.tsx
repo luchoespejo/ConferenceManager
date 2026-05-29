@@ -57,7 +57,9 @@ export default function SesionesClient({ congresoId, initialSesiones, salas, exp
     e.preventDefault();
     const data: SesionPayload = {
       titulo: form.titulo, salaId: form.salaId, expositorId: form.expositorId,
-      fecha: form.fecha, horaInicio: form.horaInicio, horaFin: form.horaFin,
+      fecha: form.fecha,
+      horaInicio: form.horaInicio.length === 5 ? form.horaInicio + ':00' : form.horaInicio,
+      horaFin: form.horaFin.length === 5 ? form.horaFin + ':00' : form.horaFin,
       ...(form.descripcion ? { descripcion: form.descripcion } : {}),
       ...(form.track ? { track: form.track } : {}),
       ...(form.encuestaUrl ? { encuestaUrl: form.encuestaUrl } : {}),
