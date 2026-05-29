@@ -19,7 +19,7 @@ const CONGRESO_TABS = [
   { key: 'maquetas',      label: 'Maquetas',      emoji: '🧱' },
   { key: 'configuracion', label: 'Configuración',  emoji: '⚙️' },
   { key: 'salas',         label: 'Salas',          emoji: '🚪' },
-  { key: 'expositores',   label: 'Expositores',    emoji: '🎤' },
+  { key: 'expositores',   label: 'Expositores',    emoji: '👤' },
   { key: 'sesiones',      label: 'Sesiones',       emoji: '📅' },
   { key: 'participantes', label: 'Participantes',  emoji: '👥' },
   { key: 'avisos',        label: 'Avisos',         emoji: '🔔' },

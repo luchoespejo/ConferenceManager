@@ -395,7 +395,7 @@ public class StaticSiteService(
         if (nav.TieneSesiones)
             ctaHtml.Append("""<a href="programa.html" class="btn btn-primary">📋 Ver Programa</a>""");
         if (nav.TieneExpositores)
-            ctaHtml.Append("""<a href="expositores.html" class="btn btn-outline">🎤 Ver Expositores</a>""");
+            ctaHtml.Append("""<a href="expositores.html" class="btn btn-outline">Ver Expositores</a>""");
 
         var navHtml = BuildNav(c, nav);
 
@@ -457,7 +457,7 @@ public class StaticSiteService(
                           <div class="session-title">
                             <a href="s/{s.Id}/index.html">{Esc(s.Titulo)}</a>{trackBadge}
                           </div>
-                          <div class="session-meta">📍 {Esc(s.Sala?.Nombre)} &nbsp;·&nbsp; 🎤 {Esc(s.Expositor?.Nombre)}</div>
+                          <div class="session-meta">📍 {Esc(s.Sala?.Nombre)} &nbsp;·&nbsp; {Esc(s.Expositor?.Nombre)}</div>
                         </div>
                       </div>
                     """);
@@ -510,7 +510,7 @@ public class StaticSiteService(
                 {
                     var src = await EmbedImageAsync(e.FotoUrl);
                     photoHtml = string.IsNullOrEmpty(src)
-                        ? """<div class="speaker-photo-placeholder">🎤</div>"""
+                        ? """<div class="speaker-photo-placeholder">👤</div>"""
                         : $"""<img src="{Esc(src)}" alt="{Esc(e.Nombre)}" class="speaker-photo" />""";
                 }
                 else
@@ -789,7 +789,7 @@ public class StaticSiteService(
                       <span class="meta-item">📅 {{FormatDateLong(s.Fecha)}}</span>
                       <span class="meta-item">⏰ {{s.HoraInicio.ToString("HH:mm")}} – {{s.HoraFin.ToString("HH:mm")}}</span>
                       <span class="meta-item">📍 {{Esc(s.Sala?.Nombre)}}</span>
-                      <span class="meta-item">🎤 {{Esc(s.Expositor?.Nombre)}}</span>
+                      <span class="meta-item">{{Esc(s.Expositor?.Nombre)}}</span>
                     </div>
                     {{descHtml}}
                     {{qrHtml}}
