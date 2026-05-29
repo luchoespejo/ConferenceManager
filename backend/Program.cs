@@ -145,6 +145,18 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// Global exception handler — returns error detail in all environments to aid debugging
+app.UseExceptionHandler(errApp => errApp.Run(async ctx =>
+{
+    var feature = ctx.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>();
+    var ex = feature?.Error;
+    ctx.Response.StatusCode = 500;
+    ctx.Response.ContentType = "application/json";
+    var msg = ex?.Message ?? "Internal server error";
+    var inner = ex?.InnerException?.Message;
+    await ctx.Response.WriteAsJsonAsync(new { error = msg, inner });
+}));
+
 app.Use(async (context, next) =>
 {
     context.Response.Headers.Add("Access-Control-Allow-Origin", "*");
