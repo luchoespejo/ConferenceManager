@@ -99,22 +99,6 @@ export default async function ContactoPage({ params }: { params: Promise<{ slug:
               📍 {conf.venueDireccion}
             </p>
           )}
-          {conf.venueLinkMaps && (
-            <a
-              href={conf.venueLinkMaps}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: '.4rem',
-                background: primary, color: '#fff', fontWeight: 600,
-                padding: '8px 18px', borderRadius: '8px', textDecoration: 'none',
-                fontSize: '.9rem', marginBottom: '1.25rem'
-              }}
-            >
-              🗺 Abrir en Google Maps
-            </a>
-          )}
-
           {/* Embed Google Maps */}
           {mapEmbedUrl && (
             <div style={{ borderRadius: '12px', overflow: 'hidden', border: '1px solid #e2e8f0', marginTop: '.75rem' }}>

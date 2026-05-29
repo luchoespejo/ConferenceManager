@@ -570,8 +570,6 @@ public class StaticSiteService(
                 sb.AppendLine($"""  <p style="font-size:1.05rem;font-weight:600;color:#1e293b;margin-bottom:.35rem">{Esc(c.VenueNombre)}</p>""");
             if (!string.IsNullOrEmpty(c.VenueDireccion))
                 sb.AppendLine($"""  <p style="font-size:.95rem;color:#475569;margin-bottom:.75rem">📍 {Esc(c.VenueDireccion)}</p>""");
-            if (!string.IsNullOrEmpty(c.VenueLinkMaps))
-                sb.AppendLine($"""  <a href="{Esc(c.VenueLinkMaps)}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:.4rem;background:var(--primary);color:#fff;font-weight:600;padding:8px 18px;border-radius:8px;text-decoration:none;font-size:.9rem;margin-bottom:1.25rem">🗺 Abrir en Google Maps</a>""");
             var mapQuery = Uri.EscapeDataString(c.VenueDireccion ?? c.VenueNombre ?? "");
             if (!string.IsNullOrEmpty(mapQuery))
             {
