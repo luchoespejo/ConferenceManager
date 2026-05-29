@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Puck, usePuck } from '@puckeditor/core';
 import '@puckeditor/core/dist/index.css';
@@ -38,6 +38,19 @@ export default function MaquetadorClient({ congresoId, layoutId, templateNombre,
   const [savedOk, setSavedOk] = useState(false);
   const [previewing, setPreviewing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [navOpen, setNavOpen] = useState(false);
+  const navRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!navOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (navRef.current && !navRef.current.contains(e.target as Node)) {
+        setNavOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [navOpen]);
   const [showNameModal, setShowNameModal] = useState(false);
   const [pendingData, setPendingData] = useState<unknown>(null);
   const [pendingNombre, setPendingNombre] = useState('');
@@ -115,25 +128,86 @@ export default function MaquetadorClient({ congresoId, layoutId, templateNombre,
   }
 
   // SaveBtn vive dentro del árbol de Puck para poder usar usePuck()
+  const NAV_SECTIONS = [
+    { key: 'maquetas',      label: 'Maquetas',      emoji: '🧱' },
+    { key: 'configuracion', label: 'Configuración',  emoji: '⚙️' },
+    { key: 'sesiones',      label: 'Sesiones',       emoji: '📅' },
+    { key: 'expositores',   label: 'Expositores',    emoji: '🎤' },
+    { key: 'participantes', label: 'Participantes',  emoji: '👥' },
+    { key: 'salas',         label: 'Salas',          emoji: '🚪' },
+    { key: 'avisos',        label: 'Avisos',         emoji: '🔔' },
+    { key: 'acciones',      label: 'Acciones',       emoji: '⚡' },
+  ];
+
   function SaveBtn() {
     const { appState } = usePuck();
     return (
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <button
-          onClick={() => router.push(`/admin/congreso/${congresoId}/maquetas`)}
-          style={{
-            padding: '5px 12px',
-            background: 'transparent',
-            color: '#64748b',
-            border: '1px solid #e2e8f0',
-            borderRadius: 6,
-            fontSize: 12,
-            fontWeight: 500,
-            cursor: 'pointer',
-          }}
-        >
-          ← Maquetas
-        </button>
+        {/* Nav dropdown */}
+        <div ref={navRef} style={{ position: 'relative' }}>
+          <button
+            onClick={() => setNavOpen(o => !o)}
+            style={{
+              padding: '5px 10px',
+              background: 'transparent',
+              color: '#64748b',
+              border: '1px solid #e2e8f0',
+              borderRadius: 6,
+              fontSize: 12,
+              fontWeight: 500,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+            }}
+          >
+            ← Ir a
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor">
+              <path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+            </svg>
+          </button>
+          {navOpen && (
+            <div
+              style={{
+                position: 'absolute',
+                top: 'calc(100% + 4px)',
+                left: 0,
+                background: '#fff',
+                border: '1px solid #e2e8f0',
+                borderRadius: 8,
+                boxShadow: '0 4px 16px rgba(0,0,0,.1)',
+                minWidth: 160,
+                zIndex: 1000,
+                overflow: 'hidden',
+              }}
+            >
+              {NAV_SECTIONS.map(({ key, label, emoji }) => (
+                <button
+                  key={key}
+                  onClick={() => { setNavOpen(false); router.push(`/admin/congreso/${congresoId}/${key}`); }}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    width: '100%',
+                    padding: '8px 14px',
+                    background: 'transparent',
+                    border: 'none',
+                    fontSize: 13,
+                    color: '#374151',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                  }}
+                  onMouseEnter={e => (e.currentTarget.style.background = '#f8fafc')}
+                  onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                >
+                  <span>{emoji}</span>
+                  {label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
         <button
           onClick={() => handlePreview(appState.data)}
           disabled={previewing || saving}
