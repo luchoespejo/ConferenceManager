@@ -81,7 +81,7 @@ export default async function ContactoPage({ params }: { params: Promise<{ slug:
     : null;
 
   return (
-    <div style={{ minHeight: '60vh', padding: '3rem 1.5rem', maxWidth: '760px', margin: '0 auto' }}>
+    <div className="subpage-content">
 
       {/* Ubicación */}
       {hasVenue && (

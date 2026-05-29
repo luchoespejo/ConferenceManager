@@ -30,11 +30,9 @@ export default async function Programa({ params }: { params: Promise<{ slug: str
   const sesiones = await fetchSesiones(slug);
 
   return (
-    <div style={{ background: '#f8fafc', minHeight: '100vh', padding: '3rem 1.5rem' }}>
-      <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-        <h1 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '2rem' }}>Programa</h1>
-        <ProgramaFilters sesiones={sesiones} slug={slug} />
-      </div>
+    <div className="subpage-content">
+      <h1 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '2rem' }}>Programa</h1>
+      <ProgramaFilters sesiones={sesiones} slug={slug} />
     </div>
   );
 }

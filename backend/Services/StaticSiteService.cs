@@ -100,7 +100,7 @@ public class StaticSiteService(
 
         var nav = new NavConfig(
             TieneSesiones:        sesiones.Count > 0,
-            TieneExpositores:     expositores.Count > 0,
+            TieneExpositores:     false, // disabled from static deploy for now
             MostrarInscripciones: conferencia.MostrarInscripciones,
             MostrarContacto:      hasContacto,
             MostrarInformacion:   conferencia.MostrarInformacion
@@ -300,6 +300,7 @@ public class StaticSiteService(
               .session-time { min-width: auto; }
               .detail-card { padding: 1.25rem; }
               .hero { padding: 2.5rem 1rem; }
+              .container { padding: 2rem 1rem; }
             }
             @media (prefers-color-scheme: dark) {
               :root {
@@ -481,7 +482,7 @@ public class StaticSiteService(
             </head>
             <body>
               {{navHtml}}
-              <div class="container">
+              <div class="container" style="max-width:760px">
                 <h2 class="section-title">Programa del Evento</h2>
                 {{content}}
               </div>
@@ -705,7 +706,7 @@ public class StaticSiteService(
             </head>
             <body>
               {{navHtml}}
-              <div class="container" style="max-width:700px">
+              <div class="container" style="max-width:760px">
                 <h2 class="section-title">Inscripciones</h2>
                 {{sb}}
               </div>

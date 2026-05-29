@@ -30,7 +30,7 @@ export default async function InformacionPage({ params }: { params: Promise<{ sl
   const primary = conf.colorPrimario ?? '#1a1a2e';
 
   return (
-    <div style={{ minHeight: '60vh', padding: '3rem 1.5rem', maxWidth: '760px', margin: '0 auto' }}>
+    <div className="subpage-content">
       <h1 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '2rem', color: primary }}>
         Información
       </h1>
