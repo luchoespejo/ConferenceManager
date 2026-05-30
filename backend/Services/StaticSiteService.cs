@@ -290,6 +290,18 @@ public class StaticSiteService(
             img { max-width: 100%; height: auto; }
             body { font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; background: var(--surface); color: var(--text); line-height: 1.6; }
             .puck-richtext { word-break: break-word; overflow-wrap: anywhere; }
+            .puck-richtext h1,.puck-richtext h2,.puck-richtext h3,
+            .puck-richtext h4,.puck-richtext h5,.puck-richtext h6 { font-size: inherit; font-weight: 700; margin: .5em 0 .25em; }
+            .puck-richtext p  { margin: 0 0 .85em; }
+            .puck-richtext p:last-child { margin-bottom: 0; }
+            .puck-richtext ul { list-style: disc; padding-left: 1.5em; margin: 0 0 .85em 1em; }
+            .puck-richtext ol { list-style: decimal; padding-left: 1.5em; margin: 0 0 .85em 1em; }
+            .puck-richtext li { margin-bottom: .3em; }
+            .puck-richtext strong { font-weight: 700; }
+            .puck-richtext em { font-style: italic; }
+            .puck-richtext u  { text-decoration: underline; }
+            .puck-richtext a  { color: var(--primary); text-decoration: underline; }
+            .puck-richtext blockquote { border-left: 3px solid #e5e7eb; margin: 0; padding-left: 1rem; color: #64748b; }
             .ql-align-center  { text-align: center; }
             .ql-align-right   { text-align: right; }
             .ql-align-justify { text-align: justify; }
