@@ -40,5 +40,10 @@ public class ConferenciaDetalleDto
     public string? InformacionAdicional { get; set; }
     public bool MostrarInformacion { get; set; }
 
+    // Programa section
+    public bool MostrarPrograma { get; set; }
+    public string? ProgramaUrl { get; set; }
+    public string? ProgramaAdicional { get; set; }
+
     public DateTime CreadoEn { get; set; }
 }

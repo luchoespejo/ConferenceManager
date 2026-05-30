@@ -12,7 +12,7 @@ interface ConferenciaBasica {
   mostrarInscripciones?: boolean;
   mostrarContacto?: boolean;
   mostrarInformacion?: boolean;
-  tieneSesiones?: boolean;
+  mostrarPrograma?: boolean;
   tieneExpositores?: boolean;
   venueNombre?: string;
   venueDireccion?: string;
@@ -65,7 +65,7 @@ export default async function SlugLayout({
         primary={primary}
         logoSrc={logoSrc}
         nombre={conf.nombre}
-        tieneSesiones={conf.tieneSesiones}
+        mostrarPrograma={conf.mostrarPrograma}
         tieneExpositores={conf.tieneExpositores}
         mostrarInscripciones={conf.mostrarInscripciones}
         mostrarContacto={mostrarContacto}

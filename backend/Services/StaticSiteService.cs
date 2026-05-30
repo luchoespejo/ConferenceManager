@@ -20,7 +20,7 @@ public class StaticSiteService(
     // ── Nav config — mirrors layout.tsx logic exactly ─────────────────────────
 
     private readonly record struct NavConfig(
-        bool TieneSesiones,
+        bool MostrarPrograma,
         bool TieneExpositores,
         bool MostrarInscripciones,
         bool MostrarContacto,
@@ -33,7 +33,7 @@ public class StaticSiteService(
     private static string BuildNav(Conferencia c, NavConfig nav, string prefix = "")
     {
         var links = new StringBuilder();
-        if (nav.TieneSesiones)
+        if (nav.MostrarPrograma)
             links.Append($"""<a href="{prefix}programa.html">Programa</a>""");
         if (nav.TieneExpositores)
             links.Append($"""<a href="{prefix}expositores.html">Expositores</a>""");
@@ -99,7 +99,7 @@ public class StaticSiteService(
             !string.IsNullOrEmpty(conferencia.Instagram);
 
         var nav = new NavConfig(
-            TieneSesiones:        sesiones.Count > 0,
+            MostrarPrograma:      conferencia.MostrarPrograma,
             TieneExpositores:     false, // disabled from static deploy for now
             MostrarInscripciones: conferencia.MostrarInscripciones,
             MostrarContacto:      hasContacto,
@@ -116,8 +116,27 @@ public class StaticSiteService(
                 : await GenerateHomeHtmlAsync(conferencia, nav);
             AddTextEntry(zip, "index.html", indexHtml);
 
-            if (nav.TieneSesiones)
-                AddTextEntry(zip, "programa.html", GenerateProgramaHtml(conferencia, sesiones, nav));
+            if (nav.MostrarPrograma)
+            {
+                // If ProgramaUrl points to an internal file, embed it as assets/programa.pdf
+                var programaAssetUrl = conferencia.ProgramaUrl;
+                if (!string.IsNullOrEmpty(conferencia.ProgramaUrl) &&
+                    conferencia.ProgramaUrl.StartsWith("/api/files/", StringComparison.OrdinalIgnoreCase))
+                {
+                    try
+                    {
+                        var absoluteUrl = $"{config["App:BaseUrl"]}{conferencia.ProgramaUrl}";
+                        var pdfBytes = await httpClient.GetByteArrayAsync(absoluteUrl);
+                        AddBinaryEntry(zip, "assets/programa.pdf", pdfBytes);
+                        programaAssetUrl = "assets/programa.pdf";
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogWarning(ex, "Could not embed programa PDF: {Url}", conferencia.ProgramaUrl);
+                    }
+                }
+                AddTextEntry(zip, "programa.html", GenerateProgramaHtml(conferencia, programaAssetUrl, nav));
+            }
 
             if (nav.TieneExpositores)
                 AddTextEntry(zip, "expositores.html", await GenerateExpositoresHtmlAsync(conferencia, expositores, nav));
@@ -131,6 +150,7 @@ public class StaticSiteService(
             if (nav.MostrarInformacion)
                 AddTextEntry(zip, "informacion.html", GenerateInformacionHtml(conferencia, nav));
 
+            // Session detail pages still generated for direct links
             foreach (var sesion in sesiones)
                 AddTextEntry(zip, $"s/{sesion.Id}/index.html", GenerateSesionHtml(conferencia, sesion, nav));
         }
@@ -143,6 +163,13 @@ public class StaticSiteService(
         var entry = zip.CreateEntry(path, CompressionLevel.Optimal);
         using var writer = new StreamWriter(entry.Open(), Encoding.UTF8);
         writer.Write(content);
+    }
+
+    private static void AddBinaryEntry(ZipArchive zip, string path, byte[] data)
+    {
+        var entry = zip.CreateEntry(path, CompressionLevel.Optimal);
+        using var stream = entry.Open();
+        stream.Write(data);
     }
 
     private static string Esc(string? s) =>
@@ -393,8 +420,8 @@ public class StaticSiteService(
             : "";
 
         var ctaHtml = new StringBuilder();
-        if (nav.TieneSesiones)
-            ctaHtml.Append("""<a href="programa.html" class="btn btn-primary">📋 Ver Programa</a>""");
+        if (nav.MostrarPrograma)
+            ctaHtml.Append("""<a href="programa.html" class="btn btn-primary">📄 Ver Programa</a>""");
         if (nav.TieneExpositores)
             ctaHtml.Append("""<a href="expositores.html" class="btn btn-outline">Ver Expositores</a>""");
 
@@ -431,42 +458,29 @@ public class StaticSiteService(
             """;
     }
 
-    private string GenerateProgramaHtml(Conferencia c, List<Sesion> sesiones, NavConfig nav)
+    private static string GenerateProgramaHtml(Conferencia c, string? programaAssetUrl, NavConfig nav)
     {
-        string content;
-        if (sesiones.Count == 0)
+        var sb = new StringBuilder();
+
+        if (!string.IsNullOrEmpty(programaAssetUrl))
         {
-            content = "<p style=\"color:var(--muted)\">No hay sesiones registradas.</p>";
+            sb.AppendLine($"""
+              <div style="margin-bottom:1.75rem">
+                <a href="{Esc(programaAssetUrl)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+                  📄 Ver Programa
+                </a>
+              </div>
+              """);
         }
-        else
+
+        if (!string.IsNullOrWhiteSpace(c.ProgramaAdicional))
         {
-            var sb = new StringBuilder();
-            foreach (var day in sesiones.GroupBy(s => s.Fecha).OrderBy(g => g.Key))
-            {
-                sb.AppendLine($"""<div class="day-section">""");
-                sb.AppendLine($"""  <div class="day-heading">{Esc(FormatDateLong(day.Key))}</div>""");
+            sb.AppendLine($"""<div class="puck-richtext" style="line-height:1.7;color:#1e293b">{TipTapHtmlConverter.ProcessHtmlInlineLinks(c.ProgramaAdicional)}</div>""");
+        }
 
-                foreach (var s in day.OrderBy(s => s.HoraInicio))
-                {
-                    var trackBadge = s.Track is not null
-                        ? $"""<span class="track-badge">{Esc(s.Track)}</span>"""
-                        : "";
-                    sb.AppendLine($"""
-                      <div class="session-card">
-                        <div class="session-time">{s.HoraInicio.ToString("HH:mm")} – {s.HoraFin.ToString("HH:mm")}</div>
-                        <div class="session-body">
-                          <div class="session-title">
-                            <a href="s/{s.Id}/index.html">{Esc(s.Titulo)}</a>{trackBadge}
-                          </div>
-                          <div class="session-meta">📍 {Esc(s.Sala?.Nombre)} &nbsp;·&nbsp; {Esc(s.Expositor?.Nombre)}</div>
-                        </div>
-                      </div>
-                    """);
-                }
-
-                sb.AppendLine("</div>");
-            }
-            content = sb.ToString();
+        if (string.IsNullOrEmpty(programaAssetUrl) && string.IsNullOrWhiteSpace(c.ProgramaAdicional))
+        {
+            sb.AppendLine("""<p style="color:var(--muted)">El programa estará disponible próximamente.</p>""");
         }
 
         var navHtml = BuildNav(c, nav);
@@ -479,12 +493,21 @@ public class StaticSiteService(
               <meta name="color-scheme" content="light" />
               <title>Programa — {{Esc(c.Nombre)}}</title>
               <link rel="stylesheet" href="assets/style.css" />
+              <style>
+                .puck-richtext p { margin: .5em 0 .85em; }
+                .puck-richtext ul { list-style: disc; padding-left: 1.5em; margin: .5em 0 .85em 1em; }
+                .puck-richtext ol { list-style: decimal; padding-left: 1.5em; margin: .5em 0 .85em 1em; }
+                .puck-richtext li { margin-bottom: .3em; }
+                .puck-richtext strong { font-weight: 700; }
+                .puck-richtext em { font-style: italic; }
+                .puck-richtext a { color: var(--primary); text-decoration: underline; }
+              </style>
             </head>
             <body>
               {{navHtml}}
               <div class="container" style="max-width:760px">
                 <h2 class="section-title">Programa del Evento</h2>
-                {{content}}
+                {{sb}}
               </div>
               <footer class="footer">{{Esc(c.Nombre)}}</footer>
             </body>

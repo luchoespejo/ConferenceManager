@@ -173,6 +173,10 @@ public class ConferenciaService(AppDbContext context) : IConferenciaService
         if (dto.MostrarContacto.HasValue) conferencia.MostrarContacto = dto.MostrarContacto.Value;
         if (dto.MostrarInscripciones.HasValue) conferencia.MostrarInscripciones = dto.MostrarInscripciones.Value;
         if (dto.MostrarInformacion.HasValue) conferencia.MostrarInformacion = dto.MostrarInformacion.Value;
+        if (dto.MostrarPrograma.HasValue) conferencia.MostrarPrograma = dto.MostrarPrograma.Value;
+        // Clearable: null clears the field
+        conferencia.ProgramaUrl = dto.ProgramaUrl;
+        conferencia.ProgramaAdicional = dto.ProgramaAdicional;
 
         await context.SaveChangesAsync();
 
@@ -341,6 +345,9 @@ public class ConferenciaService(AppDbContext context) : IConferenciaService
         MostrarInscripciones = c.MostrarInscripciones,
         InformacionAdicional = c.InformacionAdicional,
         MostrarInformacion = c.MostrarInformacion,
+        MostrarPrograma = c.MostrarPrograma,
+        ProgramaUrl = c.ProgramaUrl,
+        ProgramaAdicional = c.ProgramaAdicional,
         CreadoEn = c.CreatedAt
     };
 }

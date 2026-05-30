@@ -77,6 +77,11 @@ public class ConferenciaPublicaDto
     public bool TieneExpositores { get; set; }
     public string? LayoutJson { get; set; }
 
+    // Programa section
+    public bool MostrarPrograma { get; set; }
+    public string? ProgramaUrl { get; set; }
+    public string? ProgramaAdicional { get; set; }
+
     public List<OrganizadorPublicoDto> Organizadores { get; set; } = [];
     public List<FechaImportantePublicaDto> FechasImportantes { get; set; } = [];
     public List<EjeTematicoPublicoDto> EjesTematicos { get; set; } = [];

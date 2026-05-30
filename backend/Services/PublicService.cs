@@ -72,6 +72,9 @@ public class PublicService(AppDbContext context) : IPublicService
             MostrarInformacion = conferencia.MostrarInformacion,
             TieneSesiones = tieneSesiones,
             TieneExpositores = tieneExpositores,
+            MostrarPrograma = conferencia.MostrarPrograma,
+            ProgramaUrl = conferencia.ProgramaUrl,
+            ProgramaAdicional = conferencia.ProgramaAdicional,
             Organizadores = conferencia.Organizadores.Select(o => new OrganizadorPublicoDto
             {
                 Id = o.Id,

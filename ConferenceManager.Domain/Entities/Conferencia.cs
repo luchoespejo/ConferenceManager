@@ -48,6 +48,11 @@ public class Conferencia
     public string? InformacionAdicional { get; set; }
     public bool MostrarInformacion { get; set; } = false;
 
+    // Programa section
+    public bool MostrarPrograma { get; set; } = false;
+    public string? ProgramaUrl { get; set; }        // /api/files/{id} or external URL
+    public string? ProgramaAdicional { get; set; }  // richtext HTML
+
     public Usuario Usuario { get; set; } = null!;
 
     // US-11: navigation properties

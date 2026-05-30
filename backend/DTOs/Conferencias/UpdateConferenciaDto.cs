@@ -54,4 +54,9 @@ public class UpdateConferenciaDto
     // Información adicional (richtext HTML)
     public string? InformacionAdicional { get; set; }
     public bool? MostrarInformacion { get; set; }
+
+    // Programa section
+    public bool? MostrarPrograma { get; set; }
+    public string? ProgramaUrl { get; set; }
+    public string? ProgramaAdicional { get; set; }
 }

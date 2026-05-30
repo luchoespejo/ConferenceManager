@@ -8,7 +8,7 @@ interface SlugNavProps {
   primary: string;
   logoSrc: string | null;
   nombre: string;
-  tieneSesiones?: boolean;
+  mostrarPrograma?: boolean;
   tieneExpositores?: boolean;
   mostrarInscripciones?: boolean;
   mostrarContacto?: boolean;
@@ -20,7 +20,7 @@ export default function SlugNav({
   primary,
   logoSrc,
   nombre,
-  tieneSesiones,
+  mostrarPrograma,
   tieneExpositores,
   mostrarInscripciones,
   mostrarContacto,
@@ -64,7 +64,7 @@ export default function SlugNav({
 
       {/* Links — always visible on desktop, toggled on mobile */}
       <div className={`site-nav-links${open ? ' site-nav-links--open' : ''}`}>
-        {tieneSesiones && (
+        {mostrarPrograma && (
           <Link href={`/${slug}/programa`} className="site-nav-link" onClick={() => setOpen(false)}>Programa</Link>
         )}
         {tieneExpositores && (

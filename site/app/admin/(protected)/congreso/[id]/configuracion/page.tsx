@@ -14,6 +14,7 @@ interface Congreso {
   mostrarFechas: boolean; mostrarDescripcion: boolean; mostrarOrganizadores: boolean;
   mostrarContacto: boolean; mostrarInscripciones: boolean;
   mostrarInformacion: boolean;
+  mostrarPrograma: boolean; programaUrl?: string | null; programaAdicional?: string | null;
   logoUrl?: string | null; bannerUrl?: string | null;
 }
 

@@ -21,6 +21,7 @@ interface Congreso {
   mostrarFechas: boolean; mostrarDescripcion: boolean; mostrarOrganizadores: boolean;
   mostrarContacto: boolean; mostrarInscripciones: boolean;
   mostrarInformacion: boolean;
+  mostrarPrograma: boolean; programaUrl?: string | null; programaAdicional?: string | null;
   logoUrl?: string | null; bannerUrl?: string | null;
 }
 
@@ -80,9 +81,48 @@ export default function ConfiguracionClient({ congreso: init }: Props) {
   const [mostrarInformacion, setMostrarInformacion] = useState(init.mostrarInformacion ?? false);
   const [informacionAdicional, setInformacionAdicional] = useState(init.informacionAdicional ?? '');
 
+  // Programa
+  const [mostrarPrograma, setMostrarPrograma] = useState(init.mostrarPrograma ?? false);
+  const [programaUrl, setProgramaUrl] = useState(init.programaUrl ?? '');
+  const [programaAdicional, setProgramaAdicional] = useState(init.programaAdicional ?? '');
+  const [uploadingPdf, setUploadingPdf] = useState(false);
+  const [pdfError, setPdfError] = useState<string | null>(null);
+
   const notify = (msg: string, ok = true) => {
     setToast({ msg, ok });
     setTimeout(() => setToast(null), 4000);
+  };
+
+  // PDF upload handler
+  const handlePdfUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 1 * 1024 * 1024) {
+      setPdfError('El PDF debe ser menor a 1 MB');
+      return;
+    }
+    setPdfError(null);
+    setUploadingPdf(true);
+    try {
+      const reader = new FileReader();
+      reader.onload = async (ev) => {
+        const base64Full = ev.target?.result as string;
+        const [, base64] = base64Full.split(',');
+        const res = await fetch('/api/admin/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ base64, contentType: 'application/pdf' }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message ?? 'Error al subir PDF');
+        setProgramaUrl(data.url);
+        setUploadingPdf(false);
+      };
+      reader.readAsDataURL(file);
+    } catch (err) {
+      setPdfError(err instanceof Error ? err.message : 'Error al subir');
+      setUploadingPdf(false);
+    }
   };
 
   // Aranceles helpers
@@ -121,6 +161,10 @@ export default function ConfiguracionClient({ congreso: init }: Props) {
       // Información adicional
       mostrarInformacion,
       ...(informacionAdicional ? { informacionAdicional } : {}),
+      // Programa
+      mostrarPrograma,
+      programaUrl: programaUrl || undefined,
+      programaAdicional: programaAdicional || undefined,
       // Preservar flags no expuestos en la UI
       mostrarFechas: init.mostrarFechas,
       mostrarDescripcion: init.mostrarDescripcion,
@@ -245,6 +289,59 @@ export default function ConfiguracionClient({ congreso: init }: Props) {
                   placeholder="Escribí aquí la información adicional del congreso..."
                 />
                 <p className="text-xs text-slate-400 mt-1">Soporta negrita, listas y links. Podés escribir <code>[[#url:https://...]]</code>, <code>[[#mail:email@...]]</code> para links especiales.</p>
+              </div>
+            </div>
+          )}
+        </section>
+
+        {/* ── Programa ────────────────────────────────────────────────────────── */}
+        <section className="bg-white border border-slate-200 rounded-xl p-5">
+          <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+            <h2 className="font-semibold text-slate-800">Programa</h2>
+            <Toggle value={mostrarPrograma} onChange={setMostrarPrograma} label="Mostrar tab" />
+          </div>
+          {mostrarPrograma && (
+            <div className="flex flex-col gap-4">
+              {/* PDF upload or external link */}
+              <div>
+                {lbl('PDF del programa o link externo')}
+                <div className="flex gap-2">
+                  <input
+                    type="url"
+                    value={programaUrl}
+                    onChange={e => setProgramaUrl(e.target.value)}
+                    placeholder="https://... o subí un PDF abajo"
+                    className={inp + ' flex-1'}
+                  />
+                  {programaUrl && (
+                    <button
+                      type="button"
+                      onClick={() => setProgramaUrl('')}
+                      className="px-2 py-1 text-xs text-red-500 border border-red-200 rounded-lg hover:bg-red-50"
+                    >✕</button>
+                  )}
+                </div>
+                <label className={`mt-2 flex items-center gap-2 px-3 py-2 border border-dashed border-slate-300 rounded-lg cursor-pointer text-sm text-slate-500 hover:border-slate-400 hover:bg-slate-50 transition-colors ${uploadingPdf ? 'opacity-60 pointer-events-none' : ''}`}>
+                  <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                  </svg>
+                  {uploadingPdf ? 'Subiendo PDF...' : 'Subir PDF (máx. 1 MB)'}
+                  <input type="file" accept="application/pdf,.pdf" onChange={handlePdfUpload} className="hidden" />
+                </label>
+                {pdfError && <p className="text-xs text-red-600 mt-1">{pdfError}</p>}
+                {programaUrl && programaUrl.startsWith('/api/files/') && (
+                  <p className="text-xs text-green-700 mt-1">✓ PDF subido — se empaquetará en el sitio estático</p>
+                )}
+              </div>
+
+              {/* Rich text */}
+              <div>
+                {lbl('Información adicional (opcional)')}
+                <RichTextEditor
+                  value={programaAdicional}
+                  onChange={setProgramaAdicional}
+                  placeholder="Texto complementario al programa..."
+                />
               </div>
             </div>
           )}

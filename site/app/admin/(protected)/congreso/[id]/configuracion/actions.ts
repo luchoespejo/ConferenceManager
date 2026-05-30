@@ -31,6 +31,9 @@ export interface UpdateCongresoData {
   mostrarInformacion?: boolean;
   logoUrl?: string;
   bannerUrl?: string;
+  mostrarPrograma?: boolean;
+  programaUrl?: string;
+  programaAdicional?: string;
 }
 
 export async function updateCongreso(congresoId: string, data: UpdateCongresoData) {
