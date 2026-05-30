@@ -204,7 +204,7 @@ export default function ConfiguracionClient({ congreso: init }: Props) {
       )}
 
       {/* ── FORM ─────────────────────────────────────────────────────────────── */}
-      <form onSubmit={guardar}>
+      <form onSubmit={guardar} noValidate>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
 
         {/* ── Col 1: Información básica ──────────────────────────────────────── */}
