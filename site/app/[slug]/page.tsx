@@ -59,7 +59,7 @@ interface Conferencia {
   mostrarOrganizadores: boolean;
   mostrarContacto: boolean;
   mostrarInscripciones: boolean;
-  tieneSesiones: boolean;
+  mostrarPrograma: boolean;
   tieneExpositores: boolean;
   layoutJson?: string | null;
   organizadores: Organizador[];
@@ -109,7 +109,7 @@ export default async function ConferenciaHome({ params }: { params: Promise<{ sl
           instagram: conf.instagram,
           formularioInscripcionUrl: conf.formularioInscripcionUrl,
           contactoAdicional: conf.contactoAdicional,
-          tieneSesiones: conf.tieneSesiones,
+          mostrarPrograma: conf.mostrarPrograma,
           tieneExpositores: conf.tieneExpositores,
           organizadores: conf.organizadores,
           fechasImportantes: conf.fechasImportantes.map(f => ({
@@ -162,7 +162,7 @@ export default async function ConferenciaHome({ params }: { params: Promise<{ sl
   const btnSolid = { ...btnBase, background: esDecorativo ? primary : '#fff', color: esDecorativo ? '#fff' : primary, border: '2px solid transparent' };
   const btnOutline = { ...btnBase, background: 'transparent', border: `2px solid ${esDecorativo ? primary : 'rgba(255,255,255,.85)'}`, color: esDecorativo ? primary : '#fff' };
 
-  const heroBtns = conf.tieneSesiones ? (
+  const heroBtns = conf.mostrarPrograma ? (
     <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap', marginTop: '1.5rem' }}>
       <Link href={`/${slug}/programa`} style={btnSolid}>Ver Programa</Link>
     </div>

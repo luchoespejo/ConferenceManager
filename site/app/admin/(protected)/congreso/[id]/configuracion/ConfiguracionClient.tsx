@@ -161,10 +161,10 @@ export default function ConfiguracionClient({ congreso: init }: Props) {
       // Información adicional
       mostrarInformacion,
       ...(informacionAdicional ? { informacionAdicional } : {}),
-      // Programa
+      // Programa — always send so backend doesn't clear them on partial save
       mostrarPrograma,
-      programaUrl: programaUrl || undefined,
-      programaAdicional: programaAdicional || undefined,
+      programaUrl: programaUrl || '',
+      programaAdicional: programaAdicional || '',
       // Preservar flags no expuestos en la UI
       mostrarFechas: init.mostrarFechas,
       mostrarDescripcion: init.mostrarDescripcion,

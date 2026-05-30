@@ -28,7 +28,7 @@ export interface ConferenciaPublicData {
   instagram?: string;
   formularioInscripcionUrl?: string;
   contactoAdicional?: string;
-  tieneSesiones: boolean;
+  mostrarPrograma: boolean;
   tieneExpositores: boolean;
   organizadores: Organizador[];
   fechasImportantes: FechaImportante[];
@@ -333,7 +333,7 @@ function createPublicConfig(conf: ConferenciaPublicData): Config {
         ...(puckConfig.components.Agenda as object),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         render: ({ titulo }: any) =>
-          conf.tieneSesiones ? (
+          conf.mostrarPrograma ? (
             <div style={{ padding: '3rem 1.5rem', textAlign: 'center' }}>
               {titulo && (
                 <h2 style={{ fontWeight: 700, fontSize: '1.5rem', margin: '0 0 1rem' }}>{titulo}</h2>

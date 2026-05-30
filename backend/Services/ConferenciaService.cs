@@ -174,9 +174,8 @@ public class ConferenciaService(AppDbContext context) : IConferenciaService
         if (dto.MostrarInscripciones.HasValue) conferencia.MostrarInscripciones = dto.MostrarInscripciones.Value;
         if (dto.MostrarInformacion.HasValue) conferencia.MostrarInformacion = dto.MostrarInformacion.Value;
         if (dto.MostrarPrograma.HasValue) conferencia.MostrarPrograma = dto.MostrarPrograma.Value;
-        // Clearable: null clears the field
-        conferencia.ProgramaUrl = dto.ProgramaUrl;
-        conferencia.ProgramaAdicional = dto.ProgramaAdicional;
+        conferencia.ProgramaUrl = string.IsNullOrWhiteSpace(dto.ProgramaUrl) ? null : dto.ProgramaUrl;
+        conferencia.ProgramaAdicional = string.IsNullOrWhiteSpace(dto.ProgramaAdicional) ? null : dto.ProgramaAdicional;
 
         await context.SaveChangesAsync();
 
