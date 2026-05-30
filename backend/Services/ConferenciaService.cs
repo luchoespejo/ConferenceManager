@@ -176,6 +176,7 @@ public class ConferenciaService(AppDbContext context) : IConferenciaService
         if (dto.MostrarPrograma.HasValue) conferencia.MostrarPrograma = dto.MostrarPrograma.Value;
         conferencia.ProgramaUrl = string.IsNullOrWhiteSpace(dto.ProgramaUrl) ? null : dto.ProgramaUrl;
         conferencia.ProgramaAdicional = string.IsNullOrWhiteSpace(dto.ProgramaAdicional) ? null : dto.ProgramaAdicional;
+        conferencia.InscripcionesInfoAdicional = string.IsNullOrWhiteSpace(dto.InscripcionesInfoAdicional) ? null : dto.InscripcionesInfoAdicional;
 
         await context.SaveChangesAsync();
 
@@ -347,6 +348,7 @@ public class ConferenciaService(AppDbContext context) : IConferenciaService
         MostrarPrograma = c.MostrarPrograma,
         ProgramaUrl = c.ProgramaUrl,
         ProgramaAdicional = c.ProgramaAdicional,
+        InscripcionesInfoAdicional = c.InscripcionesInfoAdicional,
         CreadoEn = c.CreatedAt
     };
 }

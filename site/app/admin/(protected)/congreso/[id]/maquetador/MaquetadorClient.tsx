@@ -161,7 +161,7 @@ export default function MaquetadorClient({ congresoId, layoutId, templateNombre,
               gap: 4,
             }}
           >
-            ← Ir a
+            ← Volver
             <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor">
               <path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
             </svg>

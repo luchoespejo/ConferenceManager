@@ -15,6 +15,7 @@ interface Conferencia {
   arancelesTexto?: string;
   informacionPago?: string;
   formularioInscripcionUrl?: string;
+  inscripcionesInfoAdicional?: string;
   seccionConfigs?: SeccionConfig[];
 }
 
@@ -106,21 +107,19 @@ export default async function InscripcionesPage({ params }: { params: Promise<{ 
         </section>
       )}
 
-      {conf.informacionPago && (
-        <section style={{ marginBottom: '2.5rem' }}>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '1rem', color: pageColor, borderBottom: `3px solid ${primary}`, paddingBottom: '.5rem' }}>
-            Formas de pago
-          </h2>
-          {/* Render as HTML (richtext) if content looks like HTML, else as plain text */}
-          {conf.informacionPago.trimStart().startsWith('<')
-            ? <div style={{ color: pageColor, opacity: .85, lineHeight: 1.7 }} className="puck-richtext" dangerouslySetInnerHTML={{ __html: conf.informacionPago }} />
-            : <p style={{ whiteSpace: 'pre-line', color: pageColor, opacity: .85, lineHeight: 1.7 }}>{conf.informacionPago}</p>
+      {/* 2. Información adicional */}
+      {conf.inscripcionesInfoAdicional && (
+        <section style={{ marginBottom: '2rem' }}>
+          {conf.inscripcionesInfoAdicional.trimStart().startsWith('<')
+            ? <div style={{ color: pageColor, lineHeight: 1.7 }} className="puck-richtext" dangerouslySetInnerHTML={{ __html: conf.inscripcionesInfoAdicional }} />
+            : <p style={{ whiteSpace: 'pre-line', color: pageColor, lineHeight: 1.7 }}>{conf.inscripcionesInfoAdicional}</p>
           }
         </section>
       )}
 
+      {/* 3. Formulario de inscripción */}
       {conf.formularioInscripcionUrl && (
-        <div style={{ textAlign: 'center', marginTop: '3rem' }}>
+        <div style={{ marginBottom: '2rem' }}>
           <a
             href={conf.formularioInscripcionUrl}
             target="_blank"
@@ -136,9 +135,22 @@ export default async function InscripcionesPage({ params }: { params: Promise<{ 
               fontSize: '1.1rem'
             }}
           >
-            Formulario de inscripción →
+            📝 Formulario de inscripción
           </a>
         </div>
+      )}
+
+      {/* 4. Información de pago */}
+      {conf.informacionPago && (
+        <section style={{ padding: '1.25rem', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
+          <h2 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '.75rem', color: pageColor }}>
+            Información de pago
+          </h2>
+          {conf.informacionPago.trimStart().startsWith('<')
+            ? <div style={{ color: pageColor, opacity: .85, lineHeight: 1.7, fontSize: '.9rem' }} className="puck-richtext" dangerouslySetInnerHTML={{ __html: conf.informacionPago }} />
+            : <p style={{ whiteSpace: 'pre-line', color: pageColor, opacity: .85, lineHeight: 1.7, fontSize: '.9rem' }}>{conf.informacionPago}</p>
+          }
+        </section>
       )}
     </div>
     </div>

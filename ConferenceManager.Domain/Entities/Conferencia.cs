@@ -53,6 +53,9 @@ public class Conferencia
     public string? ProgramaUrl { get; set; }        // /api/files/{id} or external URL
     public string? ProgramaAdicional { get; set; }  // richtext HTML
 
+    // Inscripciones — additional info richtext (shows between aranceles table and form button)
+    public string? InscripcionesInfoAdicional { get; set; }
+
     public Usuario Usuario { get; set; } = null!;
 
     // US-11: navigation properties

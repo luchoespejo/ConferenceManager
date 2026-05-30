@@ -59,4 +59,7 @@ public class UpdateConferenciaDto
     public bool? MostrarPrograma { get; set; }
     public string? ProgramaUrl { get; set; }
     public string? ProgramaAdicional { get; set; }
+
+    // Inscripciones
+    public string? InscripcionesInfoAdicional { get; set; }
 }

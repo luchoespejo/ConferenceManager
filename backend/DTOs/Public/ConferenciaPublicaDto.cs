@@ -82,6 +82,9 @@ public class ConferenciaPublicaDto
     public string? ProgramaUrl { get; set; }
     public string? ProgramaAdicional { get; set; }
 
+    // Inscripciones
+    public string? InscripcionesInfoAdicional { get; set; }
+
     public List<OrganizadorPublicoDto> Organizadores { get; set; } = [];
     public List<FechaImportantePublicaDto> FechasImportantes { get; set; } = [];
     public List<EjeTematicoPublicoDto> EjesTematicos { get; set; } = [];
