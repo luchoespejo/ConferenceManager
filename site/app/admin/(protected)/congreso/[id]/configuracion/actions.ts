@@ -10,6 +10,7 @@ export interface UpdateCongresoData {
   fechaFin: string;
   colorPrimario?: string;
   colorSecundario?: string;
+  tipografia?: string;
   descripcion?: string;
   subtitulo?: string;
   lema?: string;

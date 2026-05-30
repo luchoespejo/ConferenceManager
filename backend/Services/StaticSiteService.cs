@@ -267,12 +267,34 @@ public class StaticSiteService(
         }
     }
 
+    // ── Google Fonts catalogue — name → (url-slug, weights, fallback-stack) ──
+    private static readonly Dictionary<string, (string Slug, string Weights, string Fallback)> FontMap = new()
+    {
+        { "Inter",           ("Inter",           ":wght@400;500;600;700",              "system-ui, sans-serif") },
+        { "Lato",            ("Lato",            ":ital,wght@0,400;0,700;1,400",       "system-ui, sans-serif") },
+        { "Roboto",          ("Roboto",          ":wght@400;500;700",                  "system-ui, sans-serif") },
+        { "Open Sans",       ("Open+Sans",       ":wght@400;600;700",                  "system-ui, sans-serif") },
+        { "Montserrat",      ("Montserrat",      ":wght@400;500;600;700",              "system-ui, sans-serif") },
+        { "Raleway",         ("Raleway",         ":wght@400;500;600;700",              "system-ui, sans-serif") },
+        { "Merriweather",    ("Merriweather",    ":ital,wght@0,400;0,700;1,400",       "Georgia, serif")        },
+        { "Playfair Display",("Playfair+Display",":ital,wght@0,400;0,700;1,400",       "Georgia, serif")        },
+        { "Source Serif 4",  ("Source+Serif+4",  ":ital,opsz,wght@0,8..60,400;0,8..60,700;1,8..60,400", "Georgia, serif") },
+    };
+
     private static string GenerateCss(Conferencia c)
     {
         var primary = string.IsNullOrEmpty(c.ColorPrimario) ? "#2563eb" : c.ColorPrimario;
         var secondary = string.IsNullOrEmpty(c.ColorSecundario) ? "#0f172a" : c.ColorSecundario;
 
-        return $$"""
+        var fontImport = "";
+        var fontFamily = "system-ui, -apple-system, 'Segoe UI', sans-serif";
+        if (!string.IsNullOrWhiteSpace(c.Tipografia) && FontMap.TryGetValue(c.Tipografia, out var font))
+        {
+            fontImport = $"@import url('https://fonts.googleapis.com/css2?family={font.Slug}{font.Weights}&display=swap');\n";
+            fontFamily = $"'{c.Tipografia}', {font.Fallback}";
+        }
+
+        return fontImport + $$"""
             :root {
               color-scheme: light;
               --primary: {{primary}};
@@ -288,7 +310,7 @@ public class StaticSiteService(
             *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
             html, body { max-width: 100%; overflow-x: hidden; }
             img { max-width: 100%; height: auto; }
-            body { font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; background: var(--surface); color: var(--text); line-height: 1.6; }
+            body { font-family: {{fontFamily}}; background: var(--surface); color: var(--text); line-height: 1.6; }
             .puck-richtext { word-break: break-word; overflow-wrap: anywhere; }
             .puck-richtext h1,.puck-richtext h2,.puck-richtext h3,
             .puck-richtext h4,.puck-richtext h5,.puck-richtext h6 { font-size: inherit; font-weight: 700; margin: .5em 0 .25em; }

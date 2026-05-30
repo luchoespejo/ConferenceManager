@@ -11,7 +11,7 @@ interface ArancelFila { id: string; categoria: string; monto: string; }
 interface Congreso {
   id: string; nombre: string; slug: string; estado: string;
   fechaInicio: string; fechaFin: string;
-  colorPrimario?: string | null; colorSecundario?: string | null;
+  colorPrimario?: string | null; colorSecundario?: string | null; tipografia?: string | null;
   descripcion?: string | null; subtitulo?: string | null; lema?: string | null;
   venueNombre?: string | null; venueDireccion?: string | null; venueLinkMaps?: string | null;
   emailContacto?: string | null; instagram?: string | null;
@@ -53,6 +53,7 @@ export default function ConfiguracionClient({ congreso: init }: Props) {
   const [nombre, setNombre] = useState(init.nombre);
   const [colorPrimario, setColorPrimario] = useState(init.colorPrimario ?? '#1a1a2e');
   const [colorSecundario, setColorSecundario] = useState(init.colorSecundario ?? '#16213e');
+  const [tipografia, setTipografia] = useState(init.tipografia ?? '');
   const [fechaInicio, setFechaInicio] = useState(init.fechaInicio);
   const [fechaFin, setFechaFin] = useState(init.fechaFin);
   const [descripcion, setDescripcion] = useState(init.descripcion ?? '');
@@ -142,6 +143,7 @@ export default function ConfiguracionClient({ congreso: init }: Props) {
     const data: UpdateCongresoData = {
       nombre, fechaInicio, fechaFin,
       colorPrimario, colorSecundario,
+      tipografia: tipografia || undefined,
       ...(descripcion ? { descripcion } : {}),
       ...(subtitulo ? { subtitulo } : {}),
       ...(lema ? { lema } : {}),
@@ -275,6 +277,26 @@ export default function ConfiguracionClient({ congreso: init }: Props) {
                     className={inp + ' font-mono'} placeholder="#16213e" />
                 </div>
               </div>
+            </div>
+            <div>
+              {lbl('Tipografía de subpáginas (inscripciones, información, programa, contacto)')}
+              <select
+                value={tipografia}
+                onChange={e => setTipografia(e.target.value)}
+                className={inp}
+              >
+                <option value="">Sistema (por defecto)</option>
+                <option value="Inter">Inter — sans-serif moderna</option>
+                <option value="Lato">Lato — sans-serif elegante</option>
+                <option value="Roboto">Roboto — sans-serif Google</option>
+                <option value="Open Sans">Open Sans — sans-serif legible</option>
+                <option value="Montserrat">Montserrat — sans-serif geométrica</option>
+                <option value="Raleway">Raleway — sans-serif fina</option>
+                <option value="Merriweather">Merriweather — serif clásica</option>
+                <option value="Playfair Display">Playfair Display — serif editorial</option>
+                <option value="Source Serif 4">Source Serif 4 — serif académica</option>
+              </select>
+              <p className="text-xs text-slate-400 mt-1">Solo aplica a las subpáginas del sitio, no al inicio (que tiene su propia configuración en el maquetador).</p>
             </div>
             <div>
               {lbl('Logo del evento (aparece en la barra de navegación del sitio)')}
