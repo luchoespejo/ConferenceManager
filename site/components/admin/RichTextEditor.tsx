@@ -138,6 +138,7 @@ function ToolSelect({
 // ── Options ────────────────────────────────────────────────────────────────
 
 const FONT_SIZES = [
+  { label: 'XS',   value: '0.6875rem' },
   { label: 'S',    value: '0.8125rem' },
   { label: 'M',    value: '1rem'      },
   { label: 'L',    value: '1.125rem'  },
@@ -146,6 +147,8 @@ const FONT_SIZES = [
 ];
 
 const LINE_HEIGHTS = [
+  { label: '0.8',  value: '0.8'   },
+  { label: '0.9',  value: '0.9'   },
   { label: '1.0',  value: '1.0'   },
   { label: '1.25', value: '1.25'  },
   { label: '1.5',  value: '1.5'   },
