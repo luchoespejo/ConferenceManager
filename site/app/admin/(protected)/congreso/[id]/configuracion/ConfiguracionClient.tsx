@@ -307,7 +307,7 @@ export default function ConfiguracionClient({ congreso: init }: Props) {
                 {lbl('PDF del programa o link externo')}
                 <div className="flex gap-2">
                   <input
-                    type="url"
+                    type="text"
                     value={programaUrl}
                     onChange={e => setProgramaUrl(e.target.value)}
                     placeholder="https://... o subí un PDF abajo"
@@ -330,7 +330,18 @@ export default function ConfiguracionClient({ congreso: init }: Props) {
                 </label>
                 {pdfError && <p className="text-xs text-red-600 mt-1">{pdfError}</p>}
                 {programaUrl && programaUrl.startsWith('/api/files/') && (
-                  <p className="text-xs text-green-700 mt-1">✓ PDF subido — se empaquetará en el sitio estático</p>
+                  <p className="text-xs text-green-700 mt-1 flex items-center gap-2">
+                    ✓ PDF subido
+                    <a
+                      href={`${process.env.NEXT_PUBLIC_API_URL ?? ''}${programaUrl}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline text-blue-600 hover:text-blue-800"
+                    >
+                      Ver PDF ↗
+                    </a>
+                    — se empaquetará en el sitio estático al desplegar
+                  </p>
                 )}
               </div>
 
