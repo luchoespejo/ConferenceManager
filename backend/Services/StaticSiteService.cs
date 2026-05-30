@@ -268,16 +268,13 @@ public class StaticSiteService(
             .nav { background: var(--secondary); padding: .875rem 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
             .nav-brand { color: #fff; font-weight: 700; font-size: 1.05rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70%; }
             .nav-brand:hover { text-decoration: none; opacity: .85; }
-            .nav-burger { display: none; background: none; border: none; cursor: pointer; padding: .35rem; color: #fff; line-height: 0; flex-shrink: 0; }
-            .nav-links { display: flex; gap: .375rem; flex-shrink: 0; }
-            .nav-links a { color: rgba(255,255,255,.8); font-size: .875rem; padding: .3rem .7rem; border-radius: 5px; transition: background .15s; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; }
-            .nav-links a:hover { background: rgba(255,255,255,.12); text-decoration: none; color: #fff; }
+            .nav-burger { display: flex; align-items: center; background: none; border: none; cursor: pointer; padding: .35rem; color: #fff; line-height: 0; flex-shrink: 0; margin-left: auto; }
+            .nav-links { display: none; width: 100%; flex-direction: column; gap: 0; padding-top: .5rem; border-top: 1px solid rgba(255,255,255,.2); }
+            .nav-links.open { display: flex; }
+            .nav-links a { color: rgba(255,255,255,.85); font-size: .9rem; padding: .55rem .5rem; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; border-radius: 4px; }
+            .nav-links a:hover { background: rgba(255,255,255,.1); text-decoration: none; color: #fff; }
             @media (max-width: 640px) {
               .nav { padding: .75rem 1rem; }
-              .nav-burger { display: flex; align-items: center; }
-              .nav-links { display: none; width: 100%; flex-direction: column; gap: 0; padding-top: .5rem; border-top: 1px solid rgba(255,255,255,.2); }
-              .nav-links.open { display: flex; }
-              .nav-links a { padding: .6rem .5rem; font-size: .9rem; }
             }
             .hero { background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: #fff; padding: 3.5rem 1.5rem; text-align: center; }
             .hero-logo { max-height: 64px; max-width: 200px; display: block; margin: 0 auto 1.25rem; object-fit: contain; }
@@ -391,7 +388,7 @@ public class StaticSiteService(
             <body>
               {{navHtml}}
               <main>{{mainContent}}</main>
-              <footer class="footer">{{Esc(c.Nombre)}}</footer>
+              <footer class="footer">© 2026 @EspejoBassett · Derechos reservados</footer>
             </body>
             </html>
             """;
@@ -421,7 +418,7 @@ public class StaticSiteService(
 
         var ctaHtml = new StringBuilder();
         if (nav.MostrarPrograma)
-            ctaHtml.Append("""<a href="programa.html" class="btn btn-primary">📄 Ver Programa</a>""");
+            ctaHtml.Append("""<a href="programa.html" class="btn btn-primary">⬇️ Descargar Programa</a>""");
         if (nav.TieneExpositores)
             ctaHtml.Append("""<a href="expositores.html" class="btn btn-outline">Ver Expositores</a>""");
 
@@ -452,7 +449,7 @@ public class StaticSiteService(
               <div class="container">
                 <div class="cta-row">{{ctaHtml}}</div>
               </div>
-              <footer class="footer">{{Esc(c.Nombre)}}</footer>
+              <footer class="footer">© 2026 @EspejoBassett · Derechos reservados</footer>
             </body>
             </html>
             """;
@@ -467,7 +464,7 @@ public class StaticSiteService(
             sb.AppendLine($"""
               <div style="margin-bottom:1.75rem">
                 <a href="{Esc(programaAssetUrl)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
-                  📄 Ver Programa
+                  ⬇️ Descargar
                 </a>
               </div>
               """);
@@ -509,7 +506,7 @@ public class StaticSiteService(
                 <h2 class="section-title">Programa del Evento</h2>
                 {{sb}}
               </div>
-              <footer class="footer">{{Esc(c.Nombre)}}</footer>
+              <footer class="footer">© 2026 @EspejoBassett · Derechos reservados</footer>
             </body>
             </html>
             """;
@@ -578,7 +575,7 @@ public class StaticSiteService(
                 <h2 class="section-title">Expositores</h2>
                 {{content}}
               </div>
-              <footer class="footer">{{Esc(c.Nombre)}}</footer>
+              <footer class="footer">© 2026 @EspejoBassett · Derechos reservados</footer>
             </body>
             </html>
             """;
@@ -642,7 +639,7 @@ public class StaticSiteService(
               <div class="container" style="max-width:760px">
                 {{sb}}
               </div>
-              <footer class="footer">{{Esc(c.Nombre)}}</footer>
+              <footer class="footer">© 2026 @EspejoBassett · Derechos reservados</footer>
             </body>
             </html>
             """;
@@ -708,12 +705,22 @@ public class StaticSiteService(
     private static string GenerateInscripcionesHtml(Conferencia c, NavConfig nav)
     {
         var sb = new StringBuilder();
+
+        // 1. Tabla de aranceles
         if (!string.IsNullOrEmpty(c.ArancelesTexto))
             sb.AppendLine(RenderAranceles(c.ArancelesTexto));
+
+        // 2. Información adicional (richtext)
+        if (!string.IsNullOrWhiteSpace(c.InscripcionesInfoAdicional))
+            sb.AppendLine($"""<div class="puck-richtext" style="margin-bottom:1.75rem;line-height:1.7;color:#1e293b">{TipTapHtmlConverter.ProcessHtmlInlineLinks(c.InscripcionesInfoAdicional)}</div>""");
+
+        // 3. Formulario de inscripción
         if (!string.IsNullOrEmpty(c.FormularioInscripcionUrl))
-            sb.AppendLine($"""<a href="{Esc(c.FormularioInscripcionUrl)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary">📝 Formulario de inscripción</a>""");
+            sb.AppendLine($"""<div style="margin-bottom:1.75rem"><a href="{Esc(c.FormularioInscripcionUrl)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary">📝 Formulario de inscripción</a></div>""");
+
+        // 4. Información de pago
         if (!string.IsNullOrEmpty(c.InformacionPago))
-            sb.AppendLine($"""<div style="margin-top:1.5rem;padding:1.25rem;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px"><h3 style="font-size:1rem;font-weight:600;margin-bottom:.5rem">Información de pago</h3><div style="font-size:.9rem;color:#475569">{TipTapHtmlConverter.ProcessHtmlInlineLinks(c.InformacionPago)}</div></div>""");
+            sb.AppendLine($"""<div style="margin-top:.5rem;padding:1.25rem;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px"><h3 style="font-size:1rem;font-weight:600;margin-bottom:.75rem">Información de pago</h3><div class="puck-richtext" style="font-size:.9rem;color:#475569">{TipTapHtmlConverter.ProcessHtmlInlineLinks(c.InformacionPago)}</div></div>""");
 
         var navHtml = BuildNav(c, nav);
         return $$"""
@@ -732,7 +739,7 @@ public class StaticSiteService(
                 <h2 class="section-title">Inscripciones</h2>
                 {{sb}}
               </div>
-              <footer class="footer">{{Esc(c.Nombre)}}</footer>
+              <footer class="footer">© 2026 @EspejoBassett · Derechos reservados</footer>
             </body>
             </html>
             """;
@@ -761,7 +768,7 @@ public class StaticSiteService(
                 <h2 class="section-title">Información</h2>
                 <div class="puck-richtext" style="line-height:1.7;color:#1e293b">{{contentHtml}}</div>
               </div>
-              <footer class="footer">{{Esc(c.Nombre)}}</footer>
+              <footer class="footer">© 2026 @EspejoBassett · Derechos reservados</footer>
             </body>
             </html>
             """;
@@ -820,7 +827,7 @@ public class StaticSiteService(
                   </div>
                 </div>
               </div>
-              <footer class="footer">{{Esc(c.Nombre)}}</footer>
+              <footer class="footer">© 2026 @EspejoBassett · Derechos reservados</footer>
             </body>
             </html>
             """;

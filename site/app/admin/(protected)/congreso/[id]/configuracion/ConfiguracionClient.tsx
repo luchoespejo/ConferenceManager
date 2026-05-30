@@ -22,6 +22,7 @@ interface Congreso {
   mostrarContacto: boolean; mostrarInscripciones: boolean;
   mostrarInformacion: boolean;
   mostrarPrograma: boolean; programaUrl?: string | null; programaAdicional?: string | null;
+  inscripcionesInfoAdicional?: string | null;
   logoUrl?: string | null; bannerUrl?: string | null;
 }
 
@@ -64,6 +65,7 @@ export default function ConfiguracionClient({ congreso: init }: Props) {
   const [formularioUrl, setFormularioUrl] = useState(init.formularioInscripcionUrl ?? '');
   const [aranceles, setAranceles] = useState<ArancelFila[]>(parseAranceles(init.arancelesTexto));
   const [infoPago, setInfoPago] = useState(init.informacionPago ?? '');
+  const [inscripcionesInfoAdicional, setInscripcionesInfoAdicional] = useState(init.inscripcionesInfoAdicional ?? '');
 
   // Ubicación
   const [mostrarUbicacion, setMostrarUbicacion] = useState(!!(init.venueNombre || init.venueDireccion || init.venueLinkMaps));
@@ -149,6 +151,7 @@ export default function ConfiguracionClient({ congreso: init }: Props) {
       ...(formularioUrl ? { formularioInscripcionUrl: formularioUrl } : {}),
       ...(arancelesJson ? { arancelesTexto: arancelesJson } : {}),
       ...(infoPago ? { informacionPago: infoPago } : {}),
+      inscripcionesInfoAdicional: inscripcionesInfoAdicional || '',
       // Ubicación
       venueNombre: mostrarUbicacion ? venueNombre : '',
       venueDireccion: mostrarUbicacion ? venueDireccion : '',
@@ -430,6 +433,16 @@ export default function ConfiguracionClient({ congreso: init }: Props) {
               >
                 + Agregar fila
               </button>
+            </div>
+
+            <div>
+              {lbl('Información adicional')}
+              <RichTextEditor
+                value={inscripcionesInfoAdicional}
+                onChange={setInscripcionesInfoAdicional}
+                placeholder="Texto adicional que aparece entre los aranceles y el formulario..."
+              />
+              <p className="text-xs text-slate-400 mt-1">Se muestra entre la tabla de aranceles y el botón de formulario. Si está vacío, no aparece.</p>
             </div>
 
             <div>

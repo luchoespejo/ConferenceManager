@@ -15,6 +15,7 @@ interface Congreso {
   mostrarContacto: boolean; mostrarInscripciones: boolean;
   mostrarInformacion: boolean;
   mostrarPrograma: boolean; programaUrl?: string | null; programaAdicional?: string | null;
+  inscripcionesInfoAdicional?: string | null;
   logoUrl?: string | null; bannerUrl?: string | null;
 }
 

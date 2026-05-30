@@ -73,6 +73,16 @@ export default async function SlugLayout({
       />
       <AvisosUrgentes slug={slug} />
       {children}
+      <footer style={{
+        textAlign: 'center',
+        padding: '2.5rem 1rem 2rem',
+        color: '#64748b',
+        fontSize: '.8125rem',
+        borderTop: '1px solid #e2e8f0',
+        marginTop: '3rem',
+      }}>
+        © 2026 @EspejoBassett · Derechos reservados
+      </footer>
     </>
   );
 }

@@ -57,7 +57,7 @@ export default async function ProgramaPage({ params }: { params: Promise<{ slug:
               textDecoration: 'none',
             }}
           >
-            📄 Ver Programa
+            ⬇️ Descargar
           </a>
         </div>
       )}

@@ -45,5 +45,8 @@ public class ConferenciaDetalleDto
     public string? ProgramaUrl { get; set; }
     public string? ProgramaAdicional { get; set; }
 
+    // Inscripciones
+    public string? InscripcionesInfoAdicional { get; set; }
+
     public DateTime CreadoEn { get; set; }
 }
