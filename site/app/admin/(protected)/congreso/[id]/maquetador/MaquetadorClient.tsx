@@ -138,24 +138,7 @@ const [showNameModal, setShowNameModal] = useState(false);
         >
           ← Volver
         </button>
-        <button
-          onClick={() => handlePreview(appState.data)}
-          disabled={previewing || saving}
-          title="Copia el estado actual al sitio público y abre una vista previa en nueva pestaña"
-          style={{
-            padding: '5px 12px',
-            background: 'transparent',
-            color: '#0369a1',
-            border: '1px solid #bae6fd',
-            borderRadius: 6,
-            fontSize: 12,
-            fontWeight: 500,
-            cursor: (previewing || saving) ? 'not-allowed' : 'pointer',
-            opacity: (previewing || saving) ? 0.6 : 1,
-          }}
-        >
-          {previewing ? '⏳ Abriendo...' : '👁 Vista previa'}
-        </button>
+        {/* Vista previa temporalmente oculta */}
         <button
           onClick={() => handleSaveRequest(appState.data)}
           disabled={saving}

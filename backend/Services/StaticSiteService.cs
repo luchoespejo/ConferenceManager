@@ -392,7 +392,7 @@ public class StaticSiteService(
             <body>
               {{navHtml}}
               <main>{{mainContent}}</main>
-              <footer class="footer">© 2026 @EspejoBassett · Derechos reservados</footer>
+              <footer class="footer">©2026 @Espejo-Bassett. Derechos reservados</footer>
             </body>
             </html>
             """;
@@ -453,7 +453,7 @@ public class StaticSiteService(
               <div class="container">
                 <div class="cta-row">{{ctaHtml}}</div>
               </div>
-              <footer class="footer">© 2026 @EspejoBassett · Derechos reservados</footer>
+              <footer class="footer">©2026 @Espejo-Bassett. Derechos reservados</footer>
             </body>
             </html>
             """;
@@ -510,7 +510,7 @@ public class StaticSiteService(
                 <h2 class="section-title">Programa del Evento</h2>
                 {{sb}}
               </div>
-              <footer class="footer">© 2026 @EspejoBassett · Derechos reservados</footer>
+              <footer class="footer">©2026 @Espejo-Bassett. Derechos reservados</footer>
             </body>
             </html>
             """;
@@ -579,7 +579,7 @@ public class StaticSiteService(
                 <h2 class="section-title">Expositores</h2>
                 {{content}}
               </div>
-              <footer class="footer">© 2026 @EspejoBassett · Derechos reservados</footer>
+              <footer class="footer">©2026 @Espejo-Bassett. Derechos reservados</footer>
             </body>
             </html>
             """;
@@ -643,7 +643,7 @@ public class StaticSiteService(
               <div class="container" style="max-width:760px">
                 {{sb}}
               </div>
-              <footer class="footer">© 2026 @EspejoBassett · Derechos reservados</footer>
+              <footer class="footer">©2026 @Espejo-Bassett. Derechos reservados</footer>
             </body>
             </html>
             """;
@@ -743,7 +743,7 @@ public class StaticSiteService(
                 <h2 class="section-title">Inscripciones</h2>
                 {{sb}}
               </div>
-              <footer class="footer">© 2026 @EspejoBassett · Derechos reservados</footer>
+              <footer class="footer">©2026 @Espejo-Bassett. Derechos reservados</footer>
             </body>
             </html>
             """;
@@ -772,7 +772,7 @@ public class StaticSiteService(
                 <h2 class="section-title">Información</h2>
                 <div class="puck-richtext" style="line-height:1.7;color:#1e293b">{{contentHtml}}</div>
               </div>
-              <footer class="footer">© 2026 @EspejoBassett · Derechos reservados</footer>
+              <footer class="footer">©2026 @Espejo-Bassett. Derechos reservados</footer>
             </body>
             </html>
             """;
@@ -831,7 +831,7 @@ public class StaticSiteService(
                   </div>
                 </div>
               </div>
-              <footer class="footer">© 2026 @EspejoBassett · Derechos reservados</footer>
+              <footer class="footer">©2026 @Espejo-Bassett. Derechos reservados</footer>
             </body>
             </html>
             """;
