@@ -4,5 +4,5 @@ public record StaticSiteZip(byte[] Data, string Slug);
 
 public interface IStaticSiteService
 {
-    Task<StaticSiteZip?> GenerateZipAsync(Guid conferenciaId, Guid usuarioId);
+    Task<StaticSiteZip?> GenerateZipAsync(Guid conferenciaId, Guid usuarioId, Guid? layoutId = null);
 }

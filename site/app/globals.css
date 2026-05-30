@@ -131,6 +131,23 @@ body {
 .ProseMirror a { color: #2563eb; text-decoration: underline; }
 .ProseMirror:focus { outline: none; }
 
+/* Quill output classes — outside .ql-editor context (canvas preview, public site) */
+.ql-align-center  { text-align: center; }
+.ql-align-right   { text-align: right; }
+.ql-align-justify { text-align: justify; }
+.ql-size-small { font-size: .75em; }
+.ql-size-large { font-size: 1.5em; }
+.ql-size-huge  { font-size: 2.5em; }
+
+/* Quill rich text editor — admin integration ────────────────────────────── */
+.richtext-quill-wrap .ql-container { font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: .875rem; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; min-height: 90px; }
+.richtext-quill-wrap .ql-toolbar { border-top-left-radius: 8px; border-top-right-radius: 8px; background: #f8fafc; border-color: #cbd5e1; }
+.richtext-quill-wrap .ql-container { border-color: #cbd5e1; }
+.richtext-quill-wrap .ql-editor { min-height: 90px; color: #1e293b; line-height: 1.65; }
+.richtext-quill-wrap .ql-editor.ql-blank::before { color: #94a3b8; font-style: normal; }
+.richtext-quill-wrap .ql-snow .ql-stroke { stroke: #475569; }
+.richtext-quill-wrap .ql-snow .ql-fill { fill: #475569; }
+
 /* Hamburger button */
 .site-nav-burger {
   display: flex;

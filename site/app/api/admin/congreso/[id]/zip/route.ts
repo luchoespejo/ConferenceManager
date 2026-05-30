@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 const BACKEND = process.env.BACKEND_URL ?? 'http://localhost:5000';
 
 export async function GET(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
@@ -15,8 +15,11 @@ export async function GET(
     return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
   }
 
+  const layoutId = req.nextUrl.searchParams.get('layoutId');
+  const qs = layoutId ? `?layoutId=${layoutId}` : '';
+
   const res = await fetch(
-    `${BACKEND}/api/dashboard/conferencias/${id}/layouts/descargar-zip`,
+    `${BACKEND}/api/dashboard/conferencias/${id}/layouts/descargar-zip${qs}`,
     { headers: { Authorization: `Bearer ${token}` } }
   );
 
