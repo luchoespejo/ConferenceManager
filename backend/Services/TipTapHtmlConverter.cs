@@ -58,7 +58,10 @@ public static class TipTapHtmlConverter
     /// </summary>
     public static string ProcessHtmlInlineLinks(string html)
     {
-        return InlineLinkRe.Replace(html, m =>
+        // Replace Quill's &nbsp; with regular spaces so text wraps correctly in static output.
+        // Quill uses &nbsp; instead of space; in static HTML this prevents line-breaking.
+        var processed = html.Replace("&nbsp;", " ");
+        return InlineLinkRe.Replace(processed, m =>
         {
             var tag   = m.Groups[1].Value;
             var value = StripHtml(m.Groups[2].Value);

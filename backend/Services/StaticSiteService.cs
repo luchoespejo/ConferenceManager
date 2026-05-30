@@ -289,6 +289,7 @@ public class StaticSiteService(
             html, body { max-width: 100%; overflow-x: hidden; }
             img { max-width: 100%; height: auto; }
             body { font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; background: var(--surface); color: var(--text); line-height: 1.6; }
+            .puck-richtext { word-break: break-word; overflow-wrap: anywhere; }
             a { color: var(--primary); text-decoration: none; }
             a:hover { text-decoration: underline; }
             .nav { background: var(--secondary); padding: .875rem 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
@@ -402,7 +403,7 @@ public class StaticSiteService(
                 html, body { max-width: 100%; overflow-x: hidden; }
                 img { max-width: 100%; height: auto; }
                 /* Puck richtext */
-                .puck-richtext { word-break: break-word; overflow-wrap: break-word; }
+                .puck-richtext { word-break: break-word; overflow-wrap: anywhere; }
                 .puck-richtext h1,.puck-richtext h2,.puck-richtext h3,
                 .puck-richtext h4,.puck-richtext h5,.puck-richtext h6 { font-size: inherit; font-weight: 700; margin: .5em 0 .25em; }
                 .puck-richtext p { margin: .5em 0 .85em; }
