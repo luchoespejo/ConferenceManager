@@ -104,6 +104,7 @@ body {
 .fs-4xl  { font-size: clamp(2rem,     1.4167rem + 2.9167vw, 3.75rem);  }
 
 /* Puck rich text rendered output */
+.puck-richtext { word-break: break-word; overflow-wrap: anywhere; }
 .puck-richtext p  { margin: 0 0 .85em; }
 .puck-richtext p:last-child { margin-bottom: 0; }
 .puck-richtext ul { list-style: disc; padding-left: 1.5em; margin: 0 0 .85em 1em; }

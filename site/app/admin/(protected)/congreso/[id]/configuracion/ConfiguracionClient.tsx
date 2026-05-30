@@ -208,6 +208,13 @@ export default function ConfiguracionClient({ congreso: init }: Props) {
 
       {/* ── FORM ─────────────────────────────────────────────────────────────── */}
       <form onSubmit={guardar} noValidate>
+        {/* Save button — top right */}
+        <div className="flex justify-end mb-6">
+          <button type="submit" disabled={pending}
+            className="px-6 py-2.5 bg-slate-900 text-white rounded-lg text-sm font-semibold hover:bg-slate-800 disabled:opacity-60">
+            {pending ? 'Guardando...' : 'Guardar configuración'}
+          </button>
+        </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
 
         {/* ── Col 1: Información básica ──────────────────────────────────────── */}
@@ -520,12 +527,6 @@ export default function ConfiguracionClient({ congreso: init }: Props) {
         </div>{/* /Col 2 */}
         </div>{/* /grid */}
 
-        <div className="flex justify-end mt-6">
-          <button type="submit" disabled={pending}
-            className="px-6 py-2.5 bg-slate-900 text-white rounded-lg text-sm font-semibold hover:bg-slate-800 disabled:opacity-60">
-            {pending ? 'Guardando...' : 'Guardar configuración'}
-          </button>
-        </div>
       </form>
     </div>
   );

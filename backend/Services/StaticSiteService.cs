@@ -290,6 +290,12 @@ public class StaticSiteService(
             img { max-width: 100%; height: auto; }
             body { font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; background: var(--surface); color: var(--text); line-height: 1.6; }
             .puck-richtext { word-break: break-word; overflow-wrap: anywhere; }
+            .ql-align-center  { text-align: center; }
+            .ql-align-right   { text-align: right; }
+            .ql-align-justify { text-align: justify; }
+            .ql-size-small { font-size: .75em; }
+            .ql-size-large { font-size: 1.5em; }
+            .ql-size-huge  { font-size: 2.5em; }
             a { color: var(--primary); text-decoration: none; }
             a:hover { text-decoration: underline; }
             .nav { background: var(--secondary); padding: .875rem 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
