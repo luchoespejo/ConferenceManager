@@ -56,18 +56,20 @@ public class GithubPublishService(
         }
         logger.LogInformation("[GitHub] Zip generated — slug={Slug} size={Bytes}B", zip.Slug, zip.Data.Length);
 
-        // 2. Extraer archivos del zip → dict path→content
-        var files = new Dictionary<string, string>();
+        // 2. Extraer archivos del zip → dict path→bytes (raw, preserves binary files like PDFs)
+        var files = new Dictionary<string, byte[]>();
         using (var ms = new MemoryStream(zip.Data))
         using (var archive = new ZipArchive(ms, ZipArchiveMode.Read))
         {
             foreach (var entry in archive.Entries)
             {
                 if (entry.Length == 0) continue;
-                using var reader = new StreamReader(entry.Open(), Encoding.UTF8);
-                var content = await reader.ReadToEndAsync();
-                files[$"{zip.Slug}/{entry.FullName}"] = content;
-                logger.LogDebug("[GitHub] File queued: {Path} ({Len} chars)", $"{zip.Slug}/{entry.FullName}", content.Length);
+                using var entryStream = entry.Open();
+                using var buf = new MemoryStream();
+                await entryStream.CopyToAsync(buf);
+                var bytes = buf.ToArray();
+                files[$"{zip.Slug}/{entry.FullName}"] = bytes;
+                logger.LogDebug("[GitHub] File queued: {Path} ({Len} bytes)", $"{zip.Slug}/{entry.FullName}", bytes.Length);
             }
         }
 
@@ -161,11 +163,11 @@ public class GithubPublishService(
         return json.RootElement.GetProperty("tree").GetProperty("sha").GetString()!;
     }
 
-    private static async Task<string> CreateBlob(HttpClient client, string baseUrl, string content)
+    private static async Task<string> CreateBlob(HttpClient client, string baseUrl, byte[] content)
     {
         var body = JsonSerializer.Serialize(new
         {
-            content = Convert.ToBase64String(Encoding.UTF8.GetBytes(content)),
+            content = Convert.ToBase64String(content),
             encoding = "base64"
         });
         var res = await client.PostAsync($"{baseUrl}/git/blobs",
