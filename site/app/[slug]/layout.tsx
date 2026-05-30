@@ -81,7 +81,7 @@ export default async function SlugLayout({
         borderTop: '1px solid #e2e8f0',
         marginTop: '3rem',
       }}>
-        ©2026 @Espejo-Bassett. Derechos reservados
+        © 2026 @Espejo y Bassett · Derechos reservados
       </footer>
     </>
   );

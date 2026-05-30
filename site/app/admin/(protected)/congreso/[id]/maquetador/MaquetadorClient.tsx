@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Puck, usePuck } from '@puckeditor/core';
 import '@puckeditor/core/dist/index.css';
@@ -205,13 +205,7 @@ const [showNameModal, setShowNameModal] = useState(false);
         </div>
       )}
 
-      {templateNombre && (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-white border border-slate-200 text-slate-700 text-xs px-3 py-1.5 rounded-full shadow-sm pointer-events-none">
-          {templateNombre}
-        </div>
-      )}
-
-      <div style={{ flex: '1 1 0%', minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+<div style={{ flex: '1 1 0%', minHeight: 0, display: 'flex', flexDirection: 'column' }}>
         <Puck
           config={puckConfig}
           data={puckData}

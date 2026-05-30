@@ -1,5 +1,56 @@
 import { DropZone, type Config, type CustomField } from '@puckeditor/core';
+import dynamic from 'next/dynamic';
 import CountdownDisplay from './puck-components/CountdownDisplay';
+
+const RichTextEditor = dynamic(() => import('@/components/admin/RichTextEditor'), { ssr: false });
+
+// ── TipTap JSON → HTML (handles legacy data stored by Puck native richtext) ──
+// Mirrors TipTapHtmlConverter.cs so old content stays visible in the canvas.
+function tiptapToHtml(node: unknown): string {
+  if (typeof node === 'string') return node;
+  if (!node || typeof node !== 'object') return '';
+  const n = node as Record<string, unknown>;
+  const type = n.type as string | undefined;
+  const children = Array.isArray(n.content) ? (n.content as unknown[]).map(tiptapToHtml).join('') : '';
+
+  if (type === 'text') {
+    const raw = typeof n.text === 'string' ? n.text : '';
+    let t = raw.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const marks = Array.isArray(n.marks) ? n.marks as Array<{ type: string; attrs?: Record<string, string> }> : [];
+    for (const m of marks) {
+      switch (m.type) {
+        case 'bold':      t = `<strong>${t}</strong>`; break;
+        case 'italic':    t = `<em>${t}</em>`; break;
+        case 'underline': t = `<u>${t}</u>`; break;
+        case 'strike':    t = `<s>${t}</s>`; break;
+        case 'link':      t = `<a href="${m.attrs?.href ?? '#'}" target="_blank" rel="noopener">${t}</a>`; break;
+      }
+    }
+    return t;
+  }
+
+  switch (type) {
+    case 'doc':         return children;
+    case 'paragraph':   return `<p>${children}</p>`;
+    case 'hardBreak':   return '<br>';
+    case 'bulletList':  return `<ul>${children}</ul>`;
+    case 'orderedList': return `<ol>${children}</ol>`;
+    case 'listItem':    return `<li>${children}</li>`;
+    case 'blockquote':  return `<blockquote>${children}</blockquote>`;
+    case 'heading': {
+      const level = (n.attrs as Record<string, number>)?.level ?? 2;
+      return `<h${level}>${children}</h${level}>`;
+    }
+    default: return children;
+  }
+}
+
+// Acepta tanto HTML string (Quill) como TipTap JSON object (legado Puck nativo)
+function resolveRichText(value: unknown): string {
+  if (typeof value === 'string') return value;
+  if (value && typeof value === 'object') return tiptapToHtml(value);
+  return '';
+}
 
 // ── Campo color: swatch + hex input ─────────────────────────────────────────
 function ColorPicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
@@ -90,6 +141,15 @@ const imageField = (label: string): CustomField<string> => ({
   type: 'custom',
   label,
   render: ({ value, onChange }: { value: string; onChange: (v: string) => void }) => <ImageField value={value} onChange={onChange} />,
+});
+
+// ── Campo richtext: Quill editor ─────────────────────────────────────────────
+const richtextField = (label: string): CustomField<string> => ({
+  type: 'custom',
+  label,
+  render: ({ value, onChange }: { value: unknown; onChange: (v: string) => void }) => (
+    <RichTextEditor value={resolveRichText(value)} onChange={onChange} />
+  ),
 });
 
 
@@ -343,7 +403,7 @@ export const puckConfig: Config = {
     Parrafo: {
       label: '¶ Párrafo',
       fields: {
-        contenido: { type: 'richtext', label: 'Texto' },
+        contenido: richtextField('Texto'),
         color:    colorField('Color texto'),
         bgColor:  colorField('Color de fondo'),
         fontSize: {
@@ -370,9 +430,8 @@ export const puckConfig: Config = {
           <div
             style={{ color, lineHeight: 1.7, maxWidth: maxWidth || 'none' }}
             className={`puck-richtext ${getFontSizeClass(fontSize, 'fs-base')}`}
-          >
-            {contenido}
-          </div>
+            dangerouslySetInnerHTML={{ __html: resolveRichText(contenido) }}
+          />
         </div>
       ),
     },

@@ -57,13 +57,35 @@ public class StaticSiteService(
             """;
     }
 
-    public async Task<StaticSiteZip?> GenerateZipAsync(Guid conferenciaId, Guid usuarioId)
+    public async Task<StaticSiteZip?> GenerateZipAsync(Guid conferenciaId, Guid usuarioId, Guid? layoutId = null)
     {
         var conferencia = await context.Conferencias
             .AsNoTracking()
             .FirstOrDefaultAsync(c => c.Id == conferenciaId && c.UsuarioId == usuarioId);
 
         if (conferencia is null) return null;
+
+        // Si se especifica layoutId, usar ese layout en lugar de conferencia.LayoutJson
+        if (layoutId.HasValue)
+        {
+            logger.LogInformation("[ZIP] layoutId recibido: {LayoutId}", layoutId.Value);
+            var specificLayout = await context.ConferenciaLayouts
+                .AsNoTracking()
+                .FirstOrDefaultAsync(l => l.Id == layoutId.Value && l.ConferenciaId == conferenciaId);
+            if (specificLayout is not null)
+            {
+                logger.LogInformation("[ZIP] Layout encontrado: {Nombre}, JSON size: {Size}", specificLayout.Nombre, specificLayout.LayoutJson?.Length ?? 0);
+                conferencia.LayoutJson = specificLayout.LayoutJson;
+            }
+            else
+            {
+                logger.LogWarning("[ZIP] Layout no encontrado para layoutId={LayoutId}", layoutId.Value);
+            }
+        }
+        else
+        {
+            logger.LogInformation("[ZIP] Sin layoutId — usando conferencia.LayoutJson (último deploy)");
+        }
 
         var expositores = await context.Expositores
             .AsNoTracking()
@@ -264,6 +286,8 @@ public class StaticSiteService(
               --shadow: 0 1px 3px rgba(0,0,0,.08);
             }
             *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+            html, body { max-width: 100%; overflow-x: hidden; }
+            img { max-width: 100%; height: auto; }
             body { font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; background: var(--surface); color: var(--text); line-height: 1.6; }
             a { color: var(--primary); text-decoration: none; }
             a:hover { text-decoration: underline; }
@@ -375,10 +399,19 @@ public class StaticSiteService(
                 .fs-2xl  { font-size: clamp(1.5rem,   1.25rem   + 1.25vw,   2.25rem);  }
                 .fs-3xl  { font-size: clamp(1.75rem,  1.3333rem + 2.0833vw, 3rem);     }
                 .fs-4xl  { font-size: clamp(2rem,     1.4167rem + 2.9167vw, 3.75rem);  }
+                html, body { max-width: 100%; overflow-x: hidden; }
+                img { max-width: 100%; height: auto; }
                 /* Puck richtext */
+                .puck-richtext { word-break: break-word; overflow-wrap: break-word; }
                 .puck-richtext h1,.puck-richtext h2,.puck-richtext h3,
                 .puck-richtext h4,.puck-richtext h5,.puck-richtext h6 { font-size: inherit; font-weight: 700; margin: .5em 0 .25em; }
                 .puck-richtext p { margin: .5em 0 .85em; }
+                .ql-align-center  { text-align: center; }
+                .ql-align-right   { text-align: right; }
+                .ql-align-justify { text-align: justify; }
+                .ql-size-small { font-size: .75em; }
+                .ql-size-large { font-size: 1.5em; }
+                .ql-size-huge  { font-size: 2.5em; }
                 .puck-richtext ul { list-style: disc; padding-left: 1.5em; margin: .5em 0 .85em 1em; }
                 .puck-richtext ol { list-style: decimal; padding-left: 1.5em; margin: .5em 0 .85em 1em; }
                 .puck-richtext li { margin-bottom: .3em; }
@@ -392,7 +425,7 @@ public class StaticSiteService(
             <body>
               {{navHtml}}
               <main>{{mainContent}}</main>
-              <footer class="footer">©2026 @Espejo-Bassett. Derechos reservados</footer>
+              <footer class="footer">© 2026 @Espejo y Bassett · Derechos reservados</footer>
             </body>
             </html>
             """;
@@ -453,7 +486,7 @@ public class StaticSiteService(
               <div class="container">
                 <div class="cta-row">{{ctaHtml}}</div>
               </div>
-              <footer class="footer">©2026 @Espejo-Bassett. Derechos reservados</footer>
+              <footer class="footer">© 2026 @Espejo y Bassett · Derechos reservados</footer>
             </body>
             </html>
             """;
@@ -510,7 +543,7 @@ public class StaticSiteService(
                 <h2 class="section-title">Programa del Evento</h2>
                 {{sb}}
               </div>
-              <footer class="footer">©2026 @Espejo-Bassett. Derechos reservados</footer>
+              <footer class="footer">© 2026 @Espejo y Bassett · Derechos reservados</footer>
             </body>
             </html>
             """;
@@ -579,7 +612,7 @@ public class StaticSiteService(
                 <h2 class="section-title">Expositores</h2>
                 {{content}}
               </div>
-              <footer class="footer">©2026 @Espejo-Bassett. Derechos reservados</footer>
+              <footer class="footer">© 2026 @Espejo y Bassett · Derechos reservados</footer>
             </body>
             </html>
             """;
@@ -643,7 +676,7 @@ public class StaticSiteService(
               <div class="container" style="max-width:760px">
                 {{sb}}
               </div>
-              <footer class="footer">©2026 @Espejo-Bassett. Derechos reservados</footer>
+              <footer class="footer">© 2026 @Espejo y Bassett · Derechos reservados</footer>
             </body>
             </html>
             """;
@@ -743,7 +776,7 @@ public class StaticSiteService(
                 <h2 class="section-title">Inscripciones</h2>
                 {{sb}}
               </div>
-              <footer class="footer">©2026 @Espejo-Bassett. Derechos reservados</footer>
+              <footer class="footer">© 2026 @Espejo y Bassett · Derechos reservados</footer>
             </body>
             </html>
             """;
@@ -772,7 +805,7 @@ public class StaticSiteService(
                 <h2 class="section-title">Información</h2>
                 <div class="puck-richtext" style="line-height:1.7;color:#1e293b">{{contentHtml}}</div>
               </div>
-              <footer class="footer">©2026 @Espejo-Bassett. Derechos reservados</footer>
+              <footer class="footer">© 2026 @Espejo y Bassett · Derechos reservados</footer>
             </body>
             </html>
             """;
@@ -831,7 +864,7 @@ public class StaticSiteService(
                   </div>
                 </div>
               </div>
-              <footer class="footer">©2026 @Espejo-Bassett. Derechos reservados</footer>
+              <footer class="footer">© 2026 @Espejo y Bassett · Derechos reservados</footer>
             </body>
             </html>
             """;

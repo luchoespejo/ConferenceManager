@@ -189,14 +189,15 @@ public class ConferenciaLayoutsController(
         return CreatedAtAction(nameof(GetLayout), new { conferenciaId, layoutId = copy.Id }, MapDto(copy));
     }
 
-    // GET /api/dashboard/conferencias/{conferenciaId}/layouts/descargar-zip
-    // Devuelve el ZIP estático del sitio listo para desplegar en servidor propio
+    // GET /api/dashboard/conferencias/{conferenciaId}/layouts/descargar-zip[?layoutId=...]
+    // Sin layoutId → usa conferencia.LayoutJson (último deploy).
+    // Con layoutId → usa ese layout específico (útil para previsualizar copias sin activar).
     [HttpGet("descargar-zip")]
-    public async Task<IActionResult> DescargarZip(Guid conferenciaId)
+    public async Task<IActionResult> DescargarZip(Guid conferenciaId, [FromQuery] Guid? layoutId)
     {
         if (!await ConferenciaExiste(conferenciaId)) return NotFound();
 
-        var zip = await staticSiteService.GenerateZipAsync(conferenciaId, UsuarioId);
+        var zip = await staticSiteService.GenerateZipAsync(conferenciaId, UsuarioId, layoutId);
         if (zip is null) return NotFound();
 
         return File(zip.Data, "application/zip", $"{zip.Slug}-sitio.zip");

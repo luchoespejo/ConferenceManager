@@ -178,7 +178,7 @@ export default function MaquetasClient({ congresoId, initial, slug }: Props) {
                       <button onClick={() => startEdit(t)} className="block w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50">✏️ Renombrar</button>
                       {!t.isActive && <button onClick={() => handleActivar(t)} className="block w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50">✅ Activar</button>}
                       <a
-                        href={`/api/admin/congreso/${congresoId}/zip`}
+                        href={`/api/admin/congreso/${congresoId}/zip?layoutId=${t.id}`}
                         download
                         onClick={() => setOpenMenuId(null)}
                         className="block w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50"
@@ -206,16 +206,15 @@ export default function MaquetasClient({ congresoId, initial, slug }: Props) {
               ) : (
                 <div
                   onClick={() => startEdit(t)}
-                  className="text-base font-semibold text-slate-900 cursor-pointer hover:text-slate-600 flex items-center gap-1.5 group"
+                  className="text-base font-semibold text-slate-900 cursor-pointer hover:text-slate-600"
                   title="Clic para renombrar"
                 >
                   {t.nombre}
-                  <span className="text-xs opacity-0 group-hover:opacity-60 transition-opacity">✏️</span>
                 </div>
               )}
 
               {/* Meta */}
-              <div className="text-xs text-slate-400">
+              <div className="text-xs text-slate-400" suppressHydrationWarning>
                 Actualizada {new Date(t.updatedAt).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
               </div>
 
