@@ -49,8 +49,10 @@ public class StaticSiteService(
         return $"""
             <nav class="nav">
               <a href="{prefix}index.html" class="nav-brand">Inicio</a>
-              <button class="nav-burger" onclick="this.closest('nav').querySelector('.nav-links').classList.toggle('open')" aria-label="Menú">{burgerSvg}</button>
-              <div class="nav-links">{links}</div>
+              <div class="nav-burger-wrap">
+                <button class="nav-burger" onclick="var l=this.nextElementSibling;l.classList.toggle('open')" aria-label="Menú">{burgerSvg}</button>
+                <div class="nav-links">{links}</div>
+              </div>
             </nav>
             """;
     }
@@ -268,11 +270,13 @@ public class StaticSiteService(
             .nav { background: var(--secondary); padding: .875rem 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
             .nav-brand { color: #fff; font-weight: 700; font-size: 1.05rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70%; }
             .nav-brand:hover { text-decoration: none; opacity: .85; }
-            .nav-burger { display: flex; align-items: center; background: none; border: none; cursor: pointer; padding: .35rem; color: #fff; line-height: 0; flex-shrink: 0; margin-left: auto; }
-            .nav-links { display: none; width: 100%; flex-direction: column; gap: 0; padding-top: .5rem; border-top: 1px solid rgba(255,255,255,.2); }
+            .nav-burger { display: flex; align-items: center; background: none; border: none; cursor: pointer; padding: .35rem; color: #fff; line-height: 0; flex-shrink: 0; margin-left: auto; position: relative; }
+            .nav-burger-wrap { position: relative; margin-left: auto; flex-shrink: 0; }
+            .nav-links { display: none; position: absolute; top: calc(100% + 6px); right: 0; flex-direction: column; min-width: 160px; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,.25); z-index: 200; background: var(--secondary); }
             .nav-links.open { display: flex; }
-            .nav-links a { color: rgba(255,255,255,.85); font-size: .9rem; padding: .55rem .5rem; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; border-radius: 4px; }
-            .nav-links a:hover { background: rgba(255,255,255,.1); text-decoration: none; color: #fff; }
+            .nav-links a { color: rgba(255,255,255,.9); font-size: .9rem; padding: .65rem 1.1rem; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; white-space: nowrap; border-bottom: 1px solid rgba(255,255,255,.1); }
+            .nav-links a:last-child { border-bottom: none; }
+            .nav-links a:hover { background: rgba(255,255,255,.12); text-decoration: none; color: #fff; }
             @media (max-width: 640px) {
               .nav { padding: .75rem 1rem; }
             }
