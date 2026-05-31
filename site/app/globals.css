@@ -150,6 +150,13 @@ body {
 .richtext-quill-wrap .ql-snow .ql-stroke { stroke: #475569; }
 .richtext-quill-wrap .ql-snow .ql-fill { fill: #475569; }
 
+/* Quill — header picker: label "Formato" instead of "Normal" to avoid confusion with size */
+.ql-snow .ql-picker.ql-header { width: 82px; }
+.ql-snow .ql-picker.ql-header .ql-picker-label::before { content: 'Formato'; }
+.ql-snow .ql-picker.ql-header .ql-picker-label[data-value="1"]::before { content: 'Título 1'; }
+.ql-snow .ql-picker.ql-header .ql-picker-label[data-value="2"]::before { content: 'Título 2'; }
+.ql-snow .ql-picker.ql-header .ql-picker-label[data-value="3"]::before { content: 'Título 3'; }
+
 /* Quill — size picker: px labels (default snow CSS only covers small/large/huge) */
 .ql-snow .ql-picker.ql-size .ql-picker-label::before,
 .ql-snow .ql-picker.ql-size .ql-picker-item::before { content: 'Normal'; }
