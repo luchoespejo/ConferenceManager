@@ -799,7 +799,7 @@ public class StaticSiteService(
 
         // 4. Información de pago
         if (!string.IsNullOrEmpty(c.InformacionPago))
-            sb.AppendLine($"""<div style="margin-top:.5rem;padding:1.25rem;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px"><h3 style="font-size:1rem;font-weight:600;margin-bottom:.75rem">Información de pago</h3><div class="puck-richtext" style="font-size:.9rem;color:#475569">{TipTapHtmlConverter.ProcessHtmlInlineLinks(c.InformacionPago)}</div></div>""");
+            sb.AppendLine($"""<div style="margin-top:.5rem;padding:1.25rem;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px"><h3 style="font-size:1rem;font-weight:600;margin-bottom:.75rem">Información</h3><div class="puck-richtext" style="font-size:.9rem;color:#475569">{TipTapHtmlConverter.ProcessHtmlInlineLinks(c.InformacionPago)}</div></div>""");
 
         var navHtml = BuildNav(c, nav);
         return $$"""
