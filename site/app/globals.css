@@ -150,6 +150,18 @@ body {
 .richtext-quill-wrap .ql-snow .ql-stroke { stroke: #475569; }
 .richtext-quill-wrap .ql-snow .ql-fill { fill: #475569; }
 
+/* Quill — size picker: px labels (default snow CSS only covers small/large/huge) */
+.ql-snow .ql-picker.ql-size .ql-picker-label::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item::before { content: 'Normal'; }
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value]:not([data-value=""])::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value]:not([data-value=""])::before { content: attr(data-value); }
+
+/* Quill — line-height custom picker */
+.ql-snow .ql-picker.ql-lineheight { width: 54px; }
+.ql-snow .ql-picker.ql-lineheight .ql-picker-label::before { content: '↕'; }
+.ql-snow .ql-picker.ql-lineheight .ql-picker-label[data-value]:not([data-value=""])::before { content: attr(data-value); }
+.ql-snow .ql-picker.ql-lineheight .ql-picker-item::before { content: attr(data-value); }
+
 /* Hamburger button */
 .site-nav-burger {
   display: flex;
