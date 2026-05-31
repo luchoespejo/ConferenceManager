@@ -150,24 +150,26 @@ body {
 .richtext-quill-wrap .ql-snow .ql-stroke { stroke: #475569; }
 .richtext-quill-wrap .ql-snow .ql-fill { fill: #475569; }
 
-/* Quill — header picker: label "Formato" instead of "Normal" to avoid confusion with size */
-.ql-snow .ql-picker.ql-header { width: 82px; }
-.ql-snow .ql-picker.ql-header .ql-picker-label::before { content: 'Formato'; }
-.ql-snow .ql-picker.ql-header .ql-picker-label[data-value="1"]::before { content: 'Título 1'; }
-.ql-snow .ql-picker.ql-header .ql-picker-label[data-value="2"]::before { content: 'Título 2'; }
-.ql-snow .ql-picker.ql-header .ql-picker-label[data-value="3"]::before { content: 'Título 3'; }
+/* Quill — picker label overrides (prefixed with .richtext-quill-wrap for specificity over snow.css) */
+/* Header: "Formato" instead of "Normal" */
+.richtext-quill-wrap .ql-snow .ql-picker.ql-header { width: 84px; }
+.richtext-quill-wrap .ql-snow .ql-picker.ql-header .ql-picker-label::before { content: 'Formato'; }
+.richtext-quill-wrap .ql-snow .ql-picker.ql-header .ql-picker-label[data-value="1"]::before { content: 'Título 1'; }
+.richtext-quill-wrap .ql-snow .ql-picker.ql-header .ql-picker-label[data-value="2"]::before { content: 'Título 2'; }
+.richtext-quill-wrap .ql-snow .ql-picker.ql-header .ql-picker-label[data-value="3"]::before { content: 'Título 3'; }
 
-/* Quill — size picker: px labels (default snow CSS only covers small/large/huge) */
-.ql-snow .ql-picker.ql-size .ql-picker-label::before,
-.ql-snow .ql-picker.ql-size .ql-picker-item::before { content: 'Normal'; }
-.ql-snow .ql-picker.ql-size .ql-picker-label[data-value]:not([data-value=""])::before,
-.ql-snow .ql-picker.ql-size .ql-picker-item[data-value]:not([data-value=""])::before { content: attr(data-value); }
+/* Size: default "px", selected value shows the px number */
+.richtext-quill-wrap .ql-snow .ql-picker.ql-size { width: 54px; }
+.richtext-quill-wrap .ql-snow .ql-picker.ql-size .ql-picker-label::before { content: 'px'; }
+.richtext-quill-wrap .ql-snow .ql-picker.ql-size .ql-picker-item::before { content: 'Normal'; }
+.richtext-quill-wrap .ql-snow .ql-picker.ql-size .ql-picker-label[data-value]:not([data-value=""])::before { content: attr(data-value); }
+.richtext-quill-wrap .ql-snow .ql-picker.ql-size .ql-picker-item[data-value]:not([data-value=""])::before { content: attr(data-value); }
 
-/* Quill — line-height custom picker */
-.ql-snow .ql-picker.ql-lineheight { width: 54px; }
-.ql-snow .ql-picker.ql-lineheight .ql-picker-label::before { content: '↕'; }
-.ql-snow .ql-picker.ql-lineheight .ql-picker-label[data-value]:not([data-value=""])::before { content: attr(data-value); }
-.ql-snow .ql-picker.ql-lineheight .ql-picker-item::before { content: attr(data-value); }
+/* Line-height: "↕" default, selected value */
+.richtext-quill-wrap .ql-snow .ql-picker.ql-lineheight { width: 50px; }
+.richtext-quill-wrap .ql-snow .ql-picker.ql-lineheight .ql-picker-label::before { content: '↕'; }
+.richtext-quill-wrap .ql-snow .ql-picker.ql-lineheight .ql-picker-label[data-value]:not([data-value=""])::before { content: attr(data-value); }
+.richtext-quill-wrap .ql-snow .ql-picker.ql-lineheight .ql-picker-item::before { content: attr(data-value); }
 
 /* Hamburger button */
 .site-nav-burger {
