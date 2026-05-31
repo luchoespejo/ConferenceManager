@@ -3,17 +3,41 @@
 import dynamic from 'next/dynamic';
 import 'react-quill-new/dist/quill.snow.css';
 
-// ── Dynamic import — avoids SSR issues (Quill uses `document`) ────────────
-const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
+// ── Dynamic import — register custom formats before first mount ────────────
+// Style-based size (px values → inline styles, no CSS classes needed).
+// Custom lineheight format (block-level, inline style line-height).
+const ReactQuill = dynamic(
+  async () => {
+    const { default: RQ, Quill } = await import('react-quill-new');
+    const { StyleAttributor, Scope } = await import('parchment');
 
-// ── Toolbar config — Gmail-style ───────────────────────────────────────────
+    // Size — px-based, produces style="font-size:14px"
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const SizeStyle = Quill.import('attributors/style/size') as any;
+    SizeStyle.whitelist = ['8px', '10px', '12px', '14px', '18px', '24px', '32px', '48px'];
+    Quill.register(SizeStyle, true);
+
+    // Line height — custom block attributor, produces style="line-height:1.5"
+    const LineHeightStyle = new StyleAttributor('lineheight', 'line-height', {
+      scope: Scope.BLOCK,
+      whitelist: ['0.5', '0.75', '1', '1.15', '1.5', '1.75', '2', '2.5', '3'],
+    });
+    Quill.register(LineHeightStyle, true);
+
+    return RQ;
+  },
+  { ssr: false }
+);
+
+// ── Toolbar ────────────────────────────────────────────────────────────────
 const TOOLBAR = [
   [{ header: [1, 2, 3, false] }],
   ['bold', 'italic', 'underline', 'strike'],
   [{ color: [] }, { background: [] }],
   [{ align: [] }],
   [{ list: 'ordered' }, { list: 'bullet' }],
-  [{ size: ['small', false, 'large', 'huge'] }],
+  [{ size: ['8px', '10px', '12px', '14px', false, '18px', '24px', '32px', '48px'] }],
+  [{ lineheight: ['0.5', '0.75', '1', '1.15', '1.5', '1.75', '2', '2.5', '3'] }],
   ['link'],
   ['clean'],
 ];
@@ -23,10 +47,10 @@ const FORMATS = [
   'header', 'bold', 'italic', 'underline', 'strike',
   'color', 'background', 'align',
   'list',
-  'size', 'link',
+  'size', 'lineheight', 'link',
 ];
 
-// ── Props — same interface as previous TipTap component ───────────────────
+// ── Props ──────────────────────────────────────────────────────────────────
 interface RichTextEditorProps {
   value: string;
   onChange: (html: string) => void;
