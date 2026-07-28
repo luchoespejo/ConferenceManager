@@ -8,6 +8,19 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// ── Config sin file watchers ────────────────────────────────────────────────
+// Containers (Render) tienen un límite bajo de inotify. reloadOnChange monta un
+// FileSystemWatcher por cada archivo de config; al agotarse los inotify el host
+// crashea al arrancar (IOException en CreateBuilder). Reconstruimos las fuentes
+// sin watchers. El env var DOTNET_hostBuilder__reloadConfigOnChange=false hace lo
+// mismo desde Render; esto lo blinda por si la variable falta.
+builder.Configuration.Sources.Clear();
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: false)
+    .AddEnvironmentVariables()
+    .AddCommandLine(args);
+
 // ── Startup validation ──────────────────────────────────────────────────────
 var jwtSecretKey = builder.Configuration["Jwt:SecretKey"]
     ?? throw new InvalidOperationException("Jwt:SecretKey is not configured.");
