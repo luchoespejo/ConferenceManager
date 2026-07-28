@@ -299,6 +299,61 @@ RUN dotnet ef database update -c AppDbContext || true
 dotnet ef database update -c AppDbContext
 ```
 
+## Troubleshooting
+
+### Startup crash: `inotify instances limit (128) reached` (exit 139)
+
+**Symptom** — the container builds fine but crashes on boot with:
+
+```
+Unhandled exception. System.IO.IOException: The configured user limit (128)
+on the number of inotify instances has been reached ...
+   at System.IO.FileSystemWatcher.StartRaisingEvents()
+   ...
+   at Microsoft.AspNetCore.Builder.WebApplication.CreateBuilder(String[] args)
+==> Exited with status 139
+```
+
+**Cause** — `WebApplication.CreateBuilder` loads `appsettings*.json` with
+`reloadOnChange: true` by default, mounting a `FileSystemWatcher` (one inotify
+instance) per config file. Render's inotify limit (128) is **shared per host**,
+so the crash is non-deterministic: the same commit boots fine or crashes
+depending on how many inotify instances the node's other tenants already hold.
+
+**Fix (applied)** — two layers, either one is sufficient:
+
+1. **Env var** (Render → service → Environment):
+   ```
+   DOTNET_hostBuilder__reloadConfigOnChange=false
+   ```
+   Note the **double underscore** — .NET config nesting convention.
+
+2. **Code backstop** (`backend/Program.cs`) — config sources are rebuilt with
+   `reloadOnChange: false` right after `CreateBuilder`, so the fix survives even
+   if the env var is missing (e.g. service recreated).
+
+Config hot-reload is a dev convenience with no value in a container; disabling
+it costs nothing in prod.
+
+### `pg_pgrst_no_exposed_schemas` errors in Supabase logs
+
+Harmless. PostgREST (Supabase Data API) health-checks every ~32s. Since the Data
+API is intentionally **disabled** (prevents leaking `usuarios.PasswordHash`,
+`refresh_tokens`, `expositor_credenciales` without RLS), it points at a
+placeholder schema that doesn't exist. The .NET backend connects directly to
+Postgres and never goes through PostgREST — ignore these log lines.
+
+## Access URLs
+
+| Surface | URL |
+|---------|-----|
+| Backend API (Render) | `https://api.devflux.dpdns.org` — API only, `/` returns 404 by design |
+| API health check | `https://api.devflux.dpdns.org/api/health` → `{"status":"ok"}` |
+| Admin panel | Vercel instance `conference-manager-irl1`, route `/admin` (see Vercel dashboard for exact domain) |
+
+> Render Free spins the service down after inactivity; the first request cold-starts
+> in ~50s. Hit `/api/health` to wake it before logging into the admin panel.
+
 ## Support
 
 - **Render Docs:** https://render.com/docs
